@@ -1,2 +1,2 @@
-# util
+# utils
 Java utility classes.
