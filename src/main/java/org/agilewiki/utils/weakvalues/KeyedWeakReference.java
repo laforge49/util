@@ -13,7 +13,6 @@ public class KeyedWeakReference<K, T> extends WeakReference<T> {
     public final K key;
 
     /**
-     /**
      * Creates a new keyed weak reference with the given key that refers to the given object and is
      * registered with the given queue.
      *
