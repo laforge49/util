@@ -18,7 +18,7 @@ public class KeyedWeakReferenceTest extends TestCase {
             l.add(x);
             w = (KeyedWeakReference<String, String>) q.poll();
         }
-        System.out.println(l.size());
+        System.out.println("Number of weak references created before poll returns non-null: " + l.size());
         assertEquals("Hi!", w.key);
     }
 }
