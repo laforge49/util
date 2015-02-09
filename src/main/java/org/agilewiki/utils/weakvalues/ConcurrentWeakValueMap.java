@@ -1,17 +1,19 @@
 package org.agilewiki.utils.weakvalues;
 
 import java.lang.ref.ReferenceQueue;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * A concurrent hash map with weak reference values.
+ * A concurrent map with weak reference values.
  */
 public class ConcurrentWeakValueMap<K, T> {
     /**
-     * The wrapped concurrent hash map.
+     * The wrapped concurrent skip list map.
      */
-    public final ConcurrentHashMap<K, KeyedWeakReference<K, T>> map = new ConcurrentHashMap(8, 0.9f, 1);
+    public final ConcurrentSkipListMap<K, KeyedWeakReference<K, T>> map =
+            new ConcurrentSkipListMap();
+
     private final ReferenceQueue<? super T> q = new ReferenceQueue();
     private final AtomicBoolean pollGate = new AtomicBoolean();
 
