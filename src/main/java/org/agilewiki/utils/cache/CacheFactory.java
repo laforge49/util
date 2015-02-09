@@ -6,8 +6,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
+ * <p>
  * A factory of caches with shared references.
  * Can be helpful when using multiple threads.
+ * </p>
  */
 public class CacheFactory<K, V> {
     private final int maxCacheSize;
@@ -28,7 +30,7 @@ public class CacheFactory<K, V> {
      * Create a cache which is not thread safe,
      * but which shares references with other caches
      * created by the same factory.
-     * (But the createCache method itself is thread safe.)
+     * (The createCache method itself is thread safe.)
      *
      * @return A cache.
      */
@@ -48,18 +50,21 @@ public class CacheFactory<K, V> {
 
         @Override
         public V get(Object key) {
-            V rv = super.get(key);
-            if (rv == null) {
-                rv = map.get(key);
-                if (rv != null)
-                    super.put((K) key, rv);
-            }
+            V rv = map.get(key);
+            super.get(key);
+            super.put((K) key, rv);
             return rv;
         }
 
         @Override
         public V put(K key, V value) {
-            V old = super.put(key, value);
+            if (value == null) {
+                V old = map.remove(key);
+                super.remove(key);
+                return old;
+            }
+            V old = map.put(key, value);
+            super.get(key);
             super.put(key, value);
             putCount += 1;
             if (putCount > maxCacheSize) {
