@@ -1,5 +1,7 @@
 package org.agilewiki.utils.cache;
 
+import org.agilewiki.utils.weakvalues.ConcurrentWeakValueMap;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -8,7 +10,9 @@ import java.util.Map;
  * Can be helpful when using multiple threads.
  */
 public class CacheFactory<K, V> {
-    private int maxCacheSize;
+    private final int maxCacheSize;
+    private int putCount;
+    private final ConcurrentWeakValueMap<K, V> map = new ConcurrentWeakValueMap();
 
     /**
      * Create a CacheFactory
@@ -40,6 +44,29 @@ public class CacheFactory<K, V> {
         @Override
         protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
             return size() > maxCacheSize;
+        }
+
+        @Override
+        public V get(Object key) {
+            V rv = super.get(key);
+            if (rv == null) {
+                rv = map.get(key);
+                if (rv != null)
+                    super.put((K) key, rv);
+            }
+            return rv;
+        }
+
+        @Override
+        public V put(K key, V value) {
+            V old = super.put(key, value);
+            super.put(key, value);
+            putCount += 1;
+            if (putCount > maxCacheSize) {
+                putCount = 0;
+                map.poll();
+            }
+            return old;
         }
     }
 }

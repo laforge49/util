@@ -14,7 +14,7 @@ public class ConcurrentWeakValueMap<K, T> {
         return new KeyedWeakReference(key, value, q);
     }
 
-    public T get(K key) {
+    public T get(Object key) {
         KeyedWeakReference<K, T> r = map.get(key);
         if (r == null)
             return null;
@@ -28,7 +28,7 @@ public class ConcurrentWeakValueMap<K, T> {
     /**
      * Call poll occasionally to drop null references.
      */
-    public void poll() {
+    synchronized public void poll() {
         while(true) {
             KeyedWeakReference<K, T> r = (KeyedWeakReference) q.poll();
             if (r == null)
