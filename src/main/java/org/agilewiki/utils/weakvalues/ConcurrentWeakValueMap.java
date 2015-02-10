@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * A concurrent map with weak reference values.
  */
-public class ConcurrentWeakValueMap<K, T> {
+public class ConcurrentWeakValueMap<K extends Comparable, T> {
     /**
      * The wrapped concurrent skip list map.
      */

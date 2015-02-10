@@ -11,7 +11,7 @@ import java.util.Map;
  * Can be helpful when using multiple threads.
  * </p>
  */
-public class CacheFactory<K, V> {
+public class CacheFactory<K extends Comparable, V> {
     private final int maxCacheSize;
     private int putCount;
     private final ConcurrentWeakValueMap<K, V> map = new ConcurrentWeakValueMap();
