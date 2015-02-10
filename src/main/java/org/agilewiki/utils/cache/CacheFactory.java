@@ -34,12 +34,12 @@ public class CacheFactory<K extends Comparable, V> {
      *
      * @return A cache.
      */
-    public Map<K, V> createCache() {
-        return new Cache();
+    public Cache<K, V> createCache() {
+        return new SharingCache();
     }
 
-    private class Cache extends LinkedHashMap<K, V> {
-        private Cache() {
+    private class SharingCache extends LinkedHashMap<K, V> implements Cache<K, V> {
+        private SharingCache() {
             super(16, 0.75f, true);
         }
 
