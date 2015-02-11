@@ -1,4 +1,4 @@
-package org.agilewiki.utils.weakvalues;
+package org.agilewiki.utils.ref;
 
 import junit.framework.TestCase;
 

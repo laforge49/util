@@ -1,11 +1,17 @@
-package org.agilewiki.utils.weakvalues;
+package org.agilewiki.utils.ref;
 
 import java.lang.ref.ReferenceQueue;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * A concurrent map with weak reference values.
+ * <p>
+ * A concurrent map with weak reference values,
+ * built on ConcurrentSkipList and KeyedWeakReference.
+ * </p>
+ * <p>
+ * ConcurrentWeakValueMap is intended for use in a thread-safe cache.
+ * </p>
  */
 public class ConcurrentWeakValueMap<K extends Comparable, T> {
     /**

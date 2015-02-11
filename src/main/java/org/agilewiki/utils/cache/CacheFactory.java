@@ -1,6 +1,6 @@
 package org.agilewiki.utils.cache;
 
-import org.agilewiki.utils.weakvalues.ConcurrentWeakValueMap;
+import org.agilewiki.utils.ref.ConcurrentWeakValueMap;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

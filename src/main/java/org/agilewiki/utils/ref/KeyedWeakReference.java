@@ -1,4 +1,4 @@
-package org.agilewiki.utils.weakvalues;
+package org.agilewiki.utils.ref;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
