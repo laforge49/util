@@ -1,6 +1,6 @@
 /**
  * <p>
- * Java utility classes.
+ * Advanced Java utility classes.
  * </p>
  * <ul>
  * <li>
