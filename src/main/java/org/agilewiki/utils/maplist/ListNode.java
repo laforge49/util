@@ -217,7 +217,7 @@ public class ListNode {
      *
      * @param value    The value to be added.
      * @param time     The time the value is added.
-     * @return The updated root node, for convenience chaining.
+     * @return The revised root node.
      */
     public ListNode add(Object value, long time) {
         return add(size, value, time);
@@ -229,7 +229,7 @@ public class ListNode {
      * @param ndx      Where to add the value.
      * @param value    The value to be added.
      * @param time     The time the value is added.
-     * @return The updated root node, for convenience chaining.
+     * @return The revised root node.
      */
     public ListNode add(int ndx, Object value, long time) {
         if (isNil()) {
@@ -242,6 +242,7 @@ public class ListNode {
             leftNode = leftNode.add(ndx, value, time);
         else
             rightNode = rightNode.add(ndx - leftSize -1, value, time);
+        size = leftNode.size + rightNode.size + 1;
         return skew().split();
     }
 }
