@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A node in an AA Tree representing a versioned list.
+ * A node in an
+ * <a href="http://en.wikipedia.org/wiki/AA_tree">AA Tree</a>
+ * representing a versioned list.
  */
 public class ListNode {
     /**
@@ -175,5 +177,71 @@ public class ListNode {
                 return ListNode.this.flat(time);
             }
         };
+    }
+
+    private ListNode skew() {
+        if (isNil())
+            return this;
+        if (leftNode.isNil())
+            return this;
+        if (leftNode.level == level) {
+            ListNode l = leftNode;
+            leftNode = l.rightNode;
+            l.rightNode = this;
+            l.size = size;
+            size = leftNode.size + rightNode.size + 1;
+            return l;
+        } else
+            return this;
+    }
+
+    private ListNode split() {
+        if (isNil())
+            return this;
+        if (rightNode.isNil() || rightNode.rightNode.isNil())
+            return this;
+        if (level == rightNode.rightNode.level) {
+            ListNode r = rightNode;
+            rightNode = r.leftNode;
+            r.leftNode = this;
+            r.level += 1;
+            r.size = size;
+            size = leftNode.size + rightNode.size + 1;
+            return r;
+        }
+        return this;
+    }
+
+    /**
+     * Add a value to the end of the list.
+     *
+     * @param value    The value to be added.
+     * @param time     The time the value is added.
+     * @return The updated root node, for convenience chaining.
+     */
+    public ListNode add(Object value, long time) {
+        return add(size, value, time);
+    }
+
+    /**
+     * Add a value to the list.
+     *
+     * @param ndx      Where to add the value.
+     * @param value    The value to be added.
+     * @param time     The time the value is added.
+     * @return The updated root node, for convenience chaining.
+     */
+    public ListNode add(int ndx, Object value, long time) {
+        if (isNil()) {
+            if (ndx != 0)
+                throw new IllegalArgumentException("index out of range");
+            return new ListNode(1, LIST_NIL, LIST_NIL, value, time, Integer.MAX_VALUE);
+        }
+        int leftSize = leftNode.size;
+        if (ndx <= leftSize)
+            leftNode = leftNode.add(ndx, value, time);
+        else
+            rightNode = rightNode.add(ndx - leftSize -1, value, time);
+        return skew().split();
     }
 }
