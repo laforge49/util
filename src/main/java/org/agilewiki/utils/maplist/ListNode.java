@@ -7,8 +7,10 @@ import java.util.List;
  * A node in an AA Tree representing a versioned list.
  */
 public class ListNode {
-
-    private final static long MAX_TIME = Integer.MAX_VALUE - 1;
+    /**
+     * A time after all insertions and deletions.
+     */
+    public final static long MAX_TIME = Integer.MAX_VALUE - 1;
 
     /**
      * The root node of an empty tree.
@@ -82,7 +84,7 @@ public class ListNode {
     }
 
     public int higher(int ndx, long time) {
-        if (ndx < -1 || ndx >= size)
+        if (ndx < -1 || ndx >= size || isNil())
             return -1; //out of range
         int leftSize = leftNode.size;
         if (ndx < leftSize + 1) {
