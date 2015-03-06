@@ -23,6 +23,42 @@ public interface ListAccessor {
     Object get(int ndx);
 
     /**
+     * Get the index of an existing value with the same identity (==).
+     * (The list is searched in order.)
+     *
+     * @param value    The value sought.
+     * @return The index, or -1.
+     */
+    int getIndex(Object value);
+
+    /**
+     * Get the index of an existing value with the same identity (==).
+     * (The list is searched in reverse order.)
+     *
+     * @param value    The value sought.
+     * @return The index, or -1.
+     */
+    int getIndexRight(Object value);
+
+    /**
+     * Find the index of an equal existing value.
+     * (The list is searched in order.)
+     *
+     * @param value    The value sought.
+     * @return The index, or -1.
+     */
+    int findIndex(Object value);
+
+    /**
+     * Find the index of an equal existing value.
+     * (The list is searched in reverse order.)
+     *
+     * @param value    The value sought.
+     * @return The index, or -1.
+     */
+    int findIndexRight(Object value);
+
+    /**
      * Returns the index of an existing value higher than the given index.
      *
      * @param ndx    A given index.

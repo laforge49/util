@@ -81,6 +81,94 @@ public class ListNode {
         return n.value;
     }
 
+    /**
+     * Get the index of an existing value with the same identity (==).
+     * (The list is searched in order.)
+     *
+     * @param value    The value sought.
+     * @param time     The time of the query.
+     * @return The index, or -1.
+     */
+    public int getIndex(Object value, long time) {
+        if (isNil())
+            return -1;
+        int ndx = leftNode.getIndex(value, time);
+        if (ndx > -1)
+            return ndx;
+        if (this.value == value && exists(time))
+            return leftNode.size;
+        ndx = rightNode.getIndex(value, time);
+        if (ndx == -1)
+            return -1;
+        return leftNode.size + 1 + ndx;
+    }
+
+    /**
+     * Get the index of an existing value with the same identity (==).
+     * (The list is searched in reverse order.)
+     *
+     * @param value    The value sought.
+     * @param time     The time of the query.
+     * @return The index, or -1.
+     */
+    public int getIndexRight(Object value, long time) {
+        if (isNil())
+            return -1;
+        int ndx = rightNode.getIndexRight(value, time);
+        if (ndx > -1)
+            return leftNode.size + 1 + ndx;
+        if (this.value == value && exists(time))
+            return leftNode.size;
+        ndx = leftNode.getIndexRight(value, time);
+        if (ndx == -1)
+            return -1;
+        return ndx;
+    }
+
+    /**
+     * Find the index of an equal existing value.
+     * (The list is searched in order.)
+     *
+     * @param value    The value sought.
+     * @param time     The time of the query.
+     * @return The index, or -1.
+     */
+    public int findIndex(Object value, long time) {
+        if (isNil())
+            return -1;
+        int ndx = leftNode.findIndex(value, time);
+        if (ndx > -1)
+            return ndx;
+        if (exists(time) && this.value.equals(value))
+            return leftNode.size;
+        ndx = rightNode.findIndex(value, time);
+        if (ndx == -1)
+            return -1;
+        return leftNode.size + 1 + ndx;
+    }
+
+    /**
+     * Find the index of an equal existing value.
+     * (The list is searched in reverse order.)
+     *
+     * @param value    The value sought.
+     * @param time     The time of the query.
+     * @return The index, or -1.
+     */
+    public int findIndexRight(Object value, long time) {
+        if (isNil())
+            return -1;
+        int ndx = rightNode.findIndexRight(value, time);
+        if (ndx > -1)
+            return leftNode.size + 1 + ndx;
+        if (exists(time) && this.value.equals(value))
+            return leftNode.size;
+        ndx = leftNode.findIndexRight(value, time);
+        if (ndx == -1)
+            return -1;
+        return ndx;
+    }
+
     private ListNode getListNode(int ndx) {
         if (ndx < 0 || ndx >= size)
             return null; //out of range
@@ -267,6 +355,26 @@ public class ListNode {
             @Override
             public Object get(int ndx) {
                 return ListNode.this.get(ndx, time);
+            }
+
+            @Override
+            public int getIndex(Object value) {
+                return ListNode.this.getIndex(value, time);
+            }
+
+            @Override
+            public int getIndexRight(Object value) {
+                return ListNode.this.getIndexRight(value, time);
+            }
+
+            @Override
+            public int findIndex(Object value) {
+                return ListNode.this.findIndex(value, time);
+            }
+
+            @Override
+            public int findIndexRight(Object value) {
+                return ListNode.this.findIndexRight(value, time);
             }
 
             @Override
