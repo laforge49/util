@@ -98,7 +98,8 @@ public class ListNode {
             if (exists(time))
                 return leftSize;
         }
-        return rightNode.higher(ndx - leftSize - 1, time) + leftSize + 1;
+        int h = rightNode.higher(ndx - leftSize - 1, time);
+        return h == -1 ? -1 : h + leftSize + 1;
     }
 
     /**
