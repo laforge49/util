@@ -123,7 +123,7 @@ public class ListNode {
         if (ndx > leftSize + 1) {
             int l = rightNode.lower(ndx - leftSize - 1, time);
             if (l > -1)
-                return l;
+                return l + leftSize + 1;
         }
         if (ndx > leftSize) {
             if (exists(time))

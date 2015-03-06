@@ -57,5 +57,19 @@ public class ListInsertTest extends TestCase {
         assertEquals(6, a1.higher(5));
         assertEquals(-1, a1.higher(6));
         assertEquals(-1, a1.higher(7));
+        assertEquals(-1, a1.higher(8));
+
+        assertEquals(-1, a1.lower(-3));
+        assertEquals(-1, a1.lower(-2));
+        assertEquals(-1, a1.lower(-1));
+        assertEquals(-1, a1.lower(0));
+        assertEquals(0, a1.lower(1));
+        assertEquals(1, a1.lower(2));
+        assertEquals(2, a1.lower(3));
+        assertEquals(3, a1.lower(4));
+        assertEquals(4, a1.lower(5));
+        assertEquals(5, a1.lower(6));
+        assertEquals(6, a1.lower(7));
+        assertEquals(-1, a1.lower(8));
     }
 }
