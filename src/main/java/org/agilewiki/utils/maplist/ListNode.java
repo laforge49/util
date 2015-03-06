@@ -347,10 +347,12 @@ public class ListNode {
         return skew().split();
     }
 
-    public ListNode remove(int ndx, long time) {
+    public Object remove(int ndx, long time) {
         ListNode n = getListNode(ndx);
-        if (n != null && !n.isNil() && n.exists(MAX_TIME))
-            n.deleted = time;
-        return this;
+        if (n == null || n.isNil() || !n.exists(time))
+            return null;
+        Object o = n.value;
+        n.deleted = time;
+        return o;
     }
 }
