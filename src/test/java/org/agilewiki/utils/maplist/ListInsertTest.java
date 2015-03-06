@@ -95,5 +95,8 @@ public class ListInsertTest extends TestCase {
         assertEquals(6, a1.floorIndex(6));
         assertEquals(6, a1.floorIndex(7));
         assertEquals(6, a1.floorIndex(8));
+
+        assertEquals(0, a1.firstIndex());
+        assertEquals(6, a1.lastIndex());
     }
 }

@@ -142,6 +142,16 @@ public class ListNode {
     }
 
     /**
+     * Returns the index of the first existing value in the list.
+     *
+     * @param time The time of the query.
+     * @return The index of the first existing value in the list, or -1.
+     */
+    public int firstIndex(long time) {
+        return ceilingIndex(0, time);
+    }
+
+    /**
      * Returns the index of an existing value lower than the given index.
      *
      * @param ndx  A given index.
@@ -188,6 +198,16 @@ public class ListNode {
     }
 
     /**
+     * Returns the index of the last existing value in the list.
+     *
+     * @param time The time of the query.
+     * @return The index of the last existing value in the list, or -1.
+     */
+    public int lastIndex(long time) {
+        return floorIndex(size, time);
+    }
+
+    /**
      * Returns true if there are no values present for the given time.
      *
      * @param time The time of the query.
@@ -231,6 +251,7 @@ public class ListNode {
 
     /**
      * Returns a list accessor for the given time.
+     * But after calling add, a previously created accessor becomes invalid.
      *
      * @param time The time of the query.
      * @return A list accessor for the given time.
@@ -259,6 +280,11 @@ public class ListNode {
             }
 
             @Override
+            public int firstIndex() {
+                return ListNode.this.firstIndex(time);
+            }
+
+            @Override
             public int lowerIndex(int ndx) {
                 return ListNode.this.lowerIndex(ndx, time);
             }
@@ -266,6 +292,11 @@ public class ListNode {
             @Override
             public int floorIndex(int ndx) {
                 return ListNode.this.floorIndex(ndx, time);
+            }
+
+            @Override
+            public int lastIndex() {
+                return ListNode.this.lastIndex(time);
             }
 
             @Override
@@ -315,6 +346,7 @@ public class ListNode {
 
     /**
      * Add a value to the end of the list.
+     * After calling add, a previously created accessor becomes invalid.
      *
      * @param value The value to be added.
      * @param time  The time the value is added.
@@ -326,6 +358,7 @@ public class ListNode {
 
     /**
      * Add a value to the list.
+     * After calling add, a previously created accessor becomes invalid.
      *
      * @param ndx   Where to add the value.
      * @param value The value to be added.

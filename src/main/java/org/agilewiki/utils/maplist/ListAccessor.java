@@ -39,6 +39,13 @@ public interface ListAccessor {
     int ceilingIndex(int ndx);
 
     /**
+     * Returns the index of the first existing value in the list.
+     *
+     * @return The index of the first existing value in the list, or -1.
+     */
+    int firstIndex();
+
+    /**
      * Returns the index of an existing value lower than the given index.
      *
      * @param ndx  A given index.
@@ -53,6 +60,13 @@ public interface ListAccessor {
      * @return An index of an existing value that is lower or equal, or -1.
      */
     int floorIndex(int ndx);
+
+    /**
+     * Returns the index of the last existing value in the list.
+     *
+     * @return The index of the last existing value in the list, or -1.
+     */
+    int lastIndex();
 
     /**
      * Returns true if there are no values present for the given time.

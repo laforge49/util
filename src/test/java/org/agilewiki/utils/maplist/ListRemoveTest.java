@@ -34,5 +34,8 @@ public class ListRemoveTest extends TestCase {
         assertEquals("bcdefg", String.join("", l2.flat(12)));
         assertEquals("g", String.join("", l2.flat(17)));
         assertEquals("", String.join("", l2.flat(21)));
+
+        assertEquals(6, l2.firstIndex(17));
+        assertEquals(-1, l2.lastIndex(22));
     }
 }
