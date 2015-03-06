@@ -23,12 +23,20 @@ public interface ListAccessor {
     Object get(int ndx);
 
     /**
-     * Returns the index of an existing value larger than the given index.
+     * Returns the index of an existing value higher than the given index.
      *
      * @param ndx    A given index.
      * @return An index of an existing value that is higher, or -1.
      */
     int higher(int ndx);
+
+    /**
+     * Returns the index of an existing value lower than the given index.
+     *
+     * @param ndx  A given index.
+     * @return An index of an existing value that is lower, or -1.
+     */
+    int lower(int ndx);
 
     /**
      * Returns true if there are no values present for the given time.

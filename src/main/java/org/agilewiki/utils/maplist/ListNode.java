@@ -85,6 +85,13 @@ public class ListNode {
         return exists(time) ? value : null;
     }
 
+    /**
+     * Returns the index of an existing value higher than the given index.
+     *
+     * @param ndx  A given index.
+     * @param time The time of the query.
+     * @return An index of an existing value that is higher, or -1.
+     */
     public int higher(int ndx, long time) {
         if (ndx < -1 || ndx >= size || isNil())
             return -1; //out of range
@@ -100,6 +107,29 @@ public class ListNode {
         }
         int h = rightNode.higher(ndx - leftSize - 1, time);
         return h == -1 ? -1 : h + leftSize + 1;
+    }
+
+    /**
+     * Returns the index of an existing value lower than the given index.
+     *
+     * @param ndx  A given index.
+     * @param time The time of the query.
+     * @return An index of an existing value that is lower, or -1.
+     */
+    public int lower(int ndx, long time) {
+        if (ndx < 0 || ndx > size || isNil())
+            return -1; //out of range
+        int leftSize = leftNode.size;
+        if (ndx > leftSize + 1) {
+            int l = rightNode.lower(ndx - leftSize - 1, time);
+            if (l > -1)
+                return l;
+        }
+        if (ndx > leftSize) {
+            if (exists(time))
+                return leftSize;
+        }
+        return leftNode.lower(ndx, time);
     }
 
     /**
@@ -147,7 +177,7 @@ public class ListNode {
     /**
      * Returns a list accessor for the given time.
      *
-     * @param time    The time of the query.
+     * @param time The time of the query.
      * @return A list accessor for the given time.
      */
     public ListAccessor accessor(long time) {
@@ -166,6 +196,11 @@ public class ListNode {
             @Override
             public int higher(int ndx) {
                 return ListNode.this.higher(ndx, time);
+            }
+
+            @Override
+            public int lower(int ndx) {
+                return ListNode.this.lower(ndx, time);
             }
 
             @Override
@@ -216,8 +251,8 @@ public class ListNode {
     /**
      * Add a value to the end of the list.
      *
-     * @param value    The value to be added.
-     * @param time     The time the value is added.
+     * @param value The value to be added.
+     * @param time  The time the value is added.
      * @return The revised root node.
      */
     public ListNode add(Object value, long time) {
@@ -227,9 +262,9 @@ public class ListNode {
     /**
      * Add a value to the list.
      *
-     * @param ndx      Where to add the value.
-     * @param value    The value to be added.
-     * @param time     The time the value is added.
+     * @param ndx   Where to add the value.
+     * @param value The value to be added.
+     * @param time  The time the value is added.
      * @return The revised root node.
      */
     public ListNode add(int ndx, Object value, long time) {
@@ -242,7 +277,7 @@ public class ListNode {
         if (ndx <= leftSize)
             leftNode = leftNode.add(ndx, value, time);
         else
-            rightNode = rightNode.add(ndx - leftSize -1, value, time);
+            rightNode = rightNode.add(ndx - leftSize - 1, value, time);
         size = leftNode.size + rightNode.size + 1;
         return skew().split();
     }
