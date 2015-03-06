@@ -345,7 +345,7 @@ public class ListNode {
     }
 
     /**
-     * Add a value to the end of the list.
+     * Add a non-null value to the end of the list.
      * After calling add, a previously created accessor becomes invalid.
      *
      * @param value The value to be added.
@@ -357,7 +357,7 @@ public class ListNode {
     }
 
     /**
-     * Add a value to the list.
+     * Add a non-null value to the list.
      * After calling add, a previously created accessor becomes invalid.
      *
      * @param ndx   Where to add the value.
@@ -366,6 +366,8 @@ public class ListNode {
      * @return The revised root node.
      */
     public ListNode add(int ndx, Object value, long time) {
+        if (value == null)
+            throw new IllegalArgumentException("value may not be null");
         if (isNil()) {
             if (ndx != 0)
                 throw new IllegalArgumentException("index out of range");
