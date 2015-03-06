@@ -89,14 +89,14 @@ public class ListNode {
         if (ndx < -1 || ndx >= size || isNil())
             return -1; //out of range
         int leftSize = leftNode.size;
-        if (ndx < leftSize + 1) {
+        if (ndx < leftSize - 1) {
             int h = leftNode.higher(ndx, time);
             if (h > -1)
                 return h;
         }
-        if (ndx < leftSize + 2) {
+        if (ndx < leftSize) {
             if (exists(time))
-                return leftSize + 1;
+                return leftSize;
         }
         return rightNode.higher(ndx - leftSize - 1, time) + leftSize + 1;
     }

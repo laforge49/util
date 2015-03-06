@@ -43,5 +43,8 @@ public class ListInsertTest extends TestCase {
         assertEquals("G", a2.get(6));
         assertEquals("ABCDEFG", String.join("", a2.flat()));
         assertEquals("DEFG", String.join("", l2.flat(5)));
+
+        assertFalse(a1.isEmpty());
+        assertEquals(3, a1.higher(2));
     }
 }
