@@ -75,14 +75,21 @@ public class ListNode {
      * @return A value, or null.
      */
     public Object get(int ndx, long time) {
+        ListNode n = getListNode(ndx);
+        if (n == null || !n.exists(time))
+            return null;
+        return n.value;
+    }
+
+    private ListNode getListNode(int ndx) {
         if (ndx < 0 || ndx >= size)
             return null; //out of range
         int leftSize = leftNode.size;
         if (ndx < leftSize)
-            return leftNode.get(ndx, time);
+            return leftNode.getListNode(ndx);
         if (ndx > leftSize)
-            return rightNode.get(ndx - leftSize - 1, time);
-        return exists(time) ? value : null;
+            return rightNode.getListNode(ndx - leftSize - 1);
+        return this;
     }
 
     /**
@@ -338,5 +345,12 @@ public class ListNode {
             rightNode = rightNode.add(ndx - leftSize - 1, value, time);
         size = leftNode.size + rightNode.size + 1;
         return skew().split();
+    }
+
+    public ListNode remove(int ndx, long time) {
+        ListNode n = getListNode(ndx);
+        if (n != null && !n.isNil() && n.exists(MAX_TIME))
+            n.deleted = time;
+        return this;
     }
 }
