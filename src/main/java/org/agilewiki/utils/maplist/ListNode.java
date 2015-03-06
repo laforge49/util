@@ -93,7 +93,7 @@ public class ListNode {
      * @return An index of an existing value that is higher, or -1.
      */
     public int higherIndex(int ndx, long time) {
-        if (ndx >= size || isNil())
+        if (ndx >= size - 1 || isNil())
             return -1; //out of range
         int leftSize = leftNode.size;
         if (ndx < leftSize - 1) {
@@ -142,7 +142,7 @@ public class ListNode {
      * @return An index of an existing value that is lower, or -1.
      */
     public int lowerIndex(int ndx, long time) {
-        if (ndx < 0 || isNil())
+        if (ndx <= 0 || isNil())
             return -1; //out of range
         int leftSize = leftNode.size;
         if (ndx > leftSize + 1) {
@@ -155,6 +155,29 @@ public class ListNode {
                 return leftSize;
         }
         return leftNode.lowerIndex(ndx, time);
+    }
+
+    /**
+     * Returns the index of an existing value lower than or equal to the given index.
+     *
+     * @param ndx  A given index.
+     * @param time The time of the query.
+     * @return An index of an existing value that is lower or equal, or -1.
+     */
+    public int floorIndex(int ndx, long time) {
+        if (ndx < 0 || isNil())
+            return -1; //out of range
+        int leftSize = leftNode.size;
+        if (ndx > leftSize) {
+            int l = rightNode.floorIndex(ndx - leftSize - 1, time);
+            if (l > -1)
+                return l + leftSize + 1;
+        }
+        if (ndx >= leftSize) {
+            if (exists(time))
+                return leftSize;
+        }
+        return leftNode.floorIndex(ndx, time);
     }
 
     /**
@@ -231,6 +254,11 @@ public class ListNode {
             @Override
             public int lowerIndex(int ndx) {
                 return ListNode.this.lowerIndex(ndx, time);
+            }
+
+            @Override
+            public int floorIndex(int ndx) {
+                return ListNode.this.floorIndex(ndx, time);
             }
 
             @Override

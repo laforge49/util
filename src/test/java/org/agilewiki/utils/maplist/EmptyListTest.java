@@ -24,6 +24,10 @@ public class EmptyListTest extends TestCase {
         assertEquals(-1, la.lowerIndex(0));
         assertEquals(-1, la.lowerIndex(1));
 
+        assertEquals(-1, la.floorIndex(-1));
+        assertEquals(-1, la.floorIndex(0));
+        assertEquals(-1, la.floorIndex(1));
+
         assertTrue(la.isEmpty());
 
         assertEquals(0, la.flat().size());

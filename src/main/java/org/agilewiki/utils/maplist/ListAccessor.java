@@ -47,6 +47,14 @@ public interface ListAccessor {
     int lowerIndex(int ndx);
 
     /**
+     * Returns the index of an existing value lower than or equal to the given index.
+     *
+     * @param ndx  A given index.
+     * @return An index of an existing value that is lower or equal, or -1.
+     */
+    int floorIndex(int ndx);
+
+    /**
      * Returns true if there are no values present for the given time.
      *
      * @return Returns true if the list is empty for the given time.
