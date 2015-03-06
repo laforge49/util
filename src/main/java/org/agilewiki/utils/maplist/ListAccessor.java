@@ -31,6 +31,14 @@ public interface ListAccessor {
     int higher(int ndx);
 
     /**
+     * Returns the index of an existing value higher than or equal to the given index.
+     *
+     * @param ndx  A given index.
+     * @return An index of an existing value that is higher or equal, or -1.
+     */
+    int ceiling(int ndx);
+
+    /**
      * Returns the index of an existing value lower than the given index.
      *
      * @param ndx  A given index.

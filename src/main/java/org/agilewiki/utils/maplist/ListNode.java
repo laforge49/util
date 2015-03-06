@@ -93,7 +93,7 @@ public class ListNode {
      * @return An index of an existing value that is higher, or -1.
      */
     public int higher(int ndx, long time) {
-        if (ndx < -1 || ndx >= size || isNil())
+        if (ndx >= size || isNil())
             return -1; //out of range
         int leftSize = leftNode.size;
         if (ndx < leftSize - 1) {
@@ -110,6 +110,31 @@ public class ListNode {
     }
 
     /**
+     * Returns the index of an existing value higher than or equal to the given index.
+     *
+     * @param ndx  A given index.
+     * @param time The time of the query.
+     * @return An index of an existing value that is higher or equal, or -1.
+     */
+    public int ceiling(int ndx, long time) {
+        if (ndx >= size || isNil()) {
+            return -1; //out of range
+        }
+        int leftSize = leftNode.size;
+        if (ndx < leftSize) {
+            int h = leftNode.ceiling(ndx, time);
+            if (h > -1)
+                return h;
+        }
+        if (ndx <= leftSize) {
+            if (exists(time))
+                return leftSize;
+        }
+        int h = rightNode.ceiling(ndx - leftSize - 1, time);
+        return h <= -1 ? -1 : h + leftSize + 1;
+    }
+
+    /**
      * Returns the index of an existing value lower than the given index.
      *
      * @param ndx  A given index.
@@ -117,7 +142,7 @@ public class ListNode {
      * @return An index of an existing value that is lower, or -1.
      */
     public int lower(int ndx, long time) {
-        if (ndx < 0 || ndx > size || isNil())
+        if (ndx < 0 || isNil())
             return -1; //out of range
         int leftSize = leftNode.size;
         if (ndx > leftSize + 1) {
@@ -196,6 +221,11 @@ public class ListNode {
             @Override
             public int higher(int ndx) {
                 return ListNode.this.higher(ndx, time);
+            }
+
+            @Override
+            public int ceiling(int ndx) {
+                return ListNode.this.ceiling(ndx, time);
             }
 
             @Override

@@ -46,8 +46,8 @@ public class ListInsertTest extends TestCase {
 
         assertFalse(a1.isEmpty());
 
-        assertEquals(-1, a1.higher(-3));
-        assertEquals(-1, a1.higher(-2));
+        assertEquals(0, a1.higher(-3));
+        assertEquals(0, a1.higher(-2));
         assertEquals(0, a1.higher(-1));
         assertEquals(1, a1.higher(0));
         assertEquals(2, a1.higher(1));
@@ -58,6 +58,19 @@ public class ListInsertTest extends TestCase {
         assertEquals(-1, a1.higher(6));
         assertEquals(-1, a1.higher(7));
         assertEquals(-1, a1.higher(8));
+
+        assertEquals(0, a1.ceiling(-3));
+        assertEquals(0, a1.ceiling(-2));
+        assertEquals(0, a1.ceiling(-1));
+        assertEquals(0, a1.ceiling(0));
+        assertEquals(1, a1.ceiling(1));
+        assertEquals(2, a1.ceiling(2));
+        assertEquals(3, a1.ceiling(3));
+        assertEquals(4, a1.ceiling(4));
+        assertEquals(5, a1.ceiling(5));
+        assertEquals(6, a1.ceiling(6));
+        assertEquals(-1, a1.ceiling(7));
+        assertEquals(-1, a1.ceiling(8));
 
         assertEquals(-1, a1.lower(-3));
         assertEquals(-1, a1.lower(-2));
@@ -70,6 +83,6 @@ public class ListInsertTest extends TestCase {
         assertEquals(4, a1.lower(5));
         assertEquals(5, a1.lower(6));
         assertEquals(6, a1.lower(7));
-        assertEquals(-1, a1.lower(8));
+        assertEquals(6, a1.lower(8));
     }
 }
