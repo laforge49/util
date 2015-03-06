@@ -2,8 +2,6 @@ package org.agilewiki.utils.maplist;
 
 import junit.framework.TestCase;
 
-import java.util.List;
-
 public class ListInsertTest extends TestCase {
     public void test() throws Exception {
         ListNode l1 = ListNode.LIST_NIL.add("a", 2);
@@ -46,43 +44,43 @@ public class ListInsertTest extends TestCase {
 
         assertFalse(a1.isEmpty());
 
-        assertEquals(0, a1.higher(-3));
-        assertEquals(0, a1.higher(-2));
-        assertEquals(0, a1.higher(-1));
-        assertEquals(1, a1.higher(0));
-        assertEquals(2, a1.higher(1));
-        assertEquals(3, a1.higher(2));
-        assertEquals(4, a1.higher(3));
-        assertEquals(5, a1.higher(4));
-        assertEquals(6, a1.higher(5));
-        assertEquals(-1, a1.higher(6));
-        assertEquals(-1, a1.higher(7));
-        assertEquals(-1, a1.higher(8));
+        assertEquals(0, a1.higherIndex(-3));
+        assertEquals(0, a1.higherIndex(-2));
+        assertEquals(0, a1.higherIndex(-1));
+        assertEquals(1, a1.higherIndex(0));
+        assertEquals(2, a1.higherIndex(1));
+        assertEquals(3, a1.higherIndex(2));
+        assertEquals(4, a1.higherIndex(3));
+        assertEquals(5, a1.higherIndex(4));
+        assertEquals(6, a1.higherIndex(5));
+        assertEquals(-1, a1.higherIndex(6));
+        assertEquals(-1, a1.higherIndex(7));
+        assertEquals(-1, a1.higherIndex(8));
 
-        assertEquals(0, a1.ceiling(-3));
-        assertEquals(0, a1.ceiling(-2));
-        assertEquals(0, a1.ceiling(-1));
-        assertEquals(0, a1.ceiling(0));
-        assertEquals(1, a1.ceiling(1));
-        assertEquals(2, a1.ceiling(2));
-        assertEquals(3, a1.ceiling(3));
-        assertEquals(4, a1.ceiling(4));
-        assertEquals(5, a1.ceiling(5));
-        assertEquals(6, a1.ceiling(6));
-        assertEquals(-1, a1.ceiling(7));
-        assertEquals(-1, a1.ceiling(8));
+        assertEquals(0, a1.ceilingIndex(-3));
+        assertEquals(0, a1.ceilingIndex(-2));
+        assertEquals(0, a1.ceilingIndex(-1));
+        assertEquals(0, a1.ceilingIndex(0));
+        assertEquals(1, a1.ceilingIndex(1));
+        assertEquals(2, a1.ceilingIndex(2));
+        assertEquals(3, a1.ceilingIndex(3));
+        assertEquals(4, a1.ceilingIndex(4));
+        assertEquals(5, a1.ceilingIndex(5));
+        assertEquals(6, a1.ceilingIndex(6));
+        assertEquals(-1, a1.ceilingIndex(7));
+        assertEquals(-1, a1.ceilingIndex(8));
 
-        assertEquals(-1, a1.lower(-3));
-        assertEquals(-1, a1.lower(-2));
-        assertEquals(-1, a1.lower(-1));
-        assertEquals(-1, a1.lower(0));
-        assertEquals(0, a1.lower(1));
-        assertEquals(1, a1.lower(2));
-        assertEquals(2, a1.lower(3));
-        assertEquals(3, a1.lower(4));
-        assertEquals(4, a1.lower(5));
-        assertEquals(5, a1.lower(6));
-        assertEquals(6, a1.lower(7));
-        assertEquals(6, a1.lower(8));
+        assertEquals(-1, a1.lowerIndex(-3));
+        assertEquals(-1, a1.lowerIndex(-2));
+        assertEquals(-1, a1.lowerIndex(-1));
+        assertEquals(-1, a1.lowerIndex(0));
+        assertEquals(0, a1.lowerIndex(1));
+        assertEquals(1, a1.lowerIndex(2));
+        assertEquals(2, a1.lowerIndex(3));
+        assertEquals(3, a1.lowerIndex(4));
+        assertEquals(4, a1.lowerIndex(5));
+        assertEquals(5, a1.lowerIndex(6));
+        assertEquals(6, a1.lowerIndex(7));
+        assertEquals(6, a1.lowerIndex(8));
     }
 }

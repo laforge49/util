@@ -92,12 +92,12 @@ public class ListNode {
      * @param time The time of the query.
      * @return An index of an existing value that is higher, or -1.
      */
-    public int higher(int ndx, long time) {
+    public int higherIndex(int ndx, long time) {
         if (ndx >= size || isNil())
             return -1; //out of range
         int leftSize = leftNode.size;
         if (ndx < leftSize - 1) {
-            int h = leftNode.higher(ndx, time);
+            int h = leftNode.higherIndex(ndx, time);
             if (h > -1)
                 return h;
         }
@@ -105,7 +105,7 @@ public class ListNode {
             if (exists(time))
                 return leftSize;
         }
-        int h = rightNode.higher(ndx - leftSize - 1, time);
+        int h = rightNode.higherIndex(ndx - leftSize - 1, time);
         return h == -1 ? -1 : h + leftSize + 1;
     }
 
@@ -116,13 +116,13 @@ public class ListNode {
      * @param time The time of the query.
      * @return An index of an existing value that is higher or equal, or -1.
      */
-    public int ceiling(int ndx, long time) {
+    public int ceilingIndex(int ndx, long time) {
         if (ndx >= size || isNil()) {
             return -1; //out of range
         }
         int leftSize = leftNode.size;
         if (ndx < leftSize) {
-            int h = leftNode.ceiling(ndx, time);
+            int h = leftNode.ceilingIndex(ndx, time);
             if (h > -1)
                 return h;
         }
@@ -130,7 +130,7 @@ public class ListNode {
             if (exists(time))
                 return leftSize;
         }
-        int h = rightNode.ceiling(ndx - leftSize - 1, time);
+        int h = rightNode.ceilingIndex(ndx - leftSize - 1, time);
         return h <= -1 ? -1 : h + leftSize + 1;
     }
 
@@ -141,12 +141,12 @@ public class ListNode {
      * @param time The time of the query.
      * @return An index of an existing value that is lower, or -1.
      */
-    public int lower(int ndx, long time) {
+    public int lowerIndex(int ndx, long time) {
         if (ndx < 0 || isNil())
             return -1; //out of range
         int leftSize = leftNode.size;
         if (ndx > leftSize + 1) {
-            int l = rightNode.lower(ndx - leftSize - 1, time);
+            int l = rightNode.lowerIndex(ndx - leftSize - 1, time);
             if (l > -1)
                 return l + leftSize + 1;
         }
@@ -154,7 +154,7 @@ public class ListNode {
             if (exists(time))
                 return leftSize;
         }
-        return leftNode.lower(ndx, time);
+        return leftNode.lowerIndex(ndx, time);
     }
 
     /**
@@ -219,18 +219,18 @@ public class ListNode {
             }
 
             @Override
-            public int higher(int ndx) {
-                return ListNode.this.higher(ndx, time);
+            public int higherIndex(int ndx) {
+                return ListNode.this.higherIndex(ndx, time);
             }
 
             @Override
-            public int ceiling(int ndx) {
-                return ListNode.this.ceiling(ndx, time);
+            public int ceilingIndex(int ndx) {
+                return ListNode.this.ceilingIndex(ndx, time);
             }
 
             @Override
-            public int lower(int ndx) {
-                return ListNode.this.lower(ndx, time);
+            public int lowerIndex(int ndx) {
+                return ListNode.this.lowerIndex(ndx, time);
             }
 
             @Override

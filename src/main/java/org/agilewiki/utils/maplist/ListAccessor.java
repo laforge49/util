@@ -28,7 +28,7 @@ public interface ListAccessor {
      * @param ndx    A given index.
      * @return An index of an existing value that is higher, or -1.
      */
-    int higher(int ndx);
+    int higherIndex(int ndx);
 
     /**
      * Returns the index of an existing value higher than or equal to the given index.
@@ -36,7 +36,7 @@ public interface ListAccessor {
      * @param ndx  A given index.
      * @return An index of an existing value that is higher or equal, or -1.
      */
-    int ceiling(int ndx);
+    int ceilingIndex(int ndx);
 
     /**
      * Returns the index of an existing value lower than the given index.
@@ -44,7 +44,7 @@ public interface ListAccessor {
      * @param ndx  A given index.
      * @return An index of an existing value that is lower, or -1.
      */
-    int lower(int ndx);
+    int lowerIndex(int ndx);
 
     /**
      * Returns true if there are no values present for the given time.
