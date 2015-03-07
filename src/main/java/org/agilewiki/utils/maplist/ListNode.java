@@ -474,18 +474,22 @@ public class ListNode {
      * @return The revised root node.
      */
     public ListNode add(int ndx, Object value, long time) {
+        return add(ndx, value, time, Integer.MAX_VALUE);
+    }
+
+    private ListNode add(int ndx, Object value, long created, long deleted) {
         if (value == null)
             throw new IllegalArgumentException("value may not be null");
         if (isNil()) {
             if (ndx != 0)
                 throw new IllegalArgumentException("index out of range");
-            return new ListNode(1, LIST_NIL, LIST_NIL, value, time, Integer.MAX_VALUE);
+            return new ListNode(1, LIST_NIL, LIST_NIL, value, created, deleted);
         }
         int leftSize = leftNode.size;
         if (ndx <= leftSize)
-            leftNode = leftNode.add(ndx, value, time);
+            leftNode = leftNode.add(ndx, value, created, deleted);
         else
-            rightNode = rightNode.add(ndx - leftSize - 1, value, time);
+            rightNode = rightNode.add(ndx - leftSize - 1, value, created, deleted);
         size = leftNode.size + rightNode.size + 1;
         return skew().split();
     }
@@ -504,5 +508,24 @@ public class ListNode {
         Object o = n.value;
         n.deleted = time;
         return o;
+    }
+
+    /**
+     * Copy everything except what was deleted before a given time.
+     *
+     * @param time    The given time.
+     * @return A shortened copy of the list without some historical values.
+     */
+    public ListNode copy(long time) {
+        return copy(LIST_NIL, time);
+    }
+
+    private ListNode copy(ListNode n, long time) {
+        if (isNil())
+            return n;
+        n = leftNode.copy(n, time);
+        if (deleted >= time)
+            n = n.add(n.size, value, created, deleted);
+        return rightNode.copy(n, time);
     }
 }
