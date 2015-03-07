@@ -8,6 +8,8 @@ import java.util.List;
  */
 public interface ListAccessor extends Iterable {
 
+    Comparable key();
+
     /**
      * Returns the time being accessed.
      *

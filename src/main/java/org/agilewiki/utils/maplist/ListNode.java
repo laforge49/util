@@ -37,11 +37,11 @@ public class ListNode {
     }
 
     protected ListNode(int level,
-                     ListNode leftNode,
-                     ListNode rightNode,
-                     Object value,
-                     long created,
-                     long deleted) {
+                       ListNode leftNode,
+                       ListNode rightNode,
+                       Object value,
+                       long created,
+                       long deleted) {
         this.level = level;
         this.leftNode = leftNode;
         this.rightNode = rightNode;
@@ -87,8 +87,8 @@ public class ListNode {
      * Get the index of an existing value with the same identity (==).
      * (The list is searched in order.)
      *
-     * @param value    The value sought.
-     * @param time     The time of the query.
+     * @param value The value sought.
+     * @param time  The time of the query.
      * @return The index, or -1.
      */
     public int getIndex(Object value, long time) {
@@ -109,8 +109,8 @@ public class ListNode {
      * Get the index of an existing value with the same identity (==).
      * (The list is searched in reverse order.)
      *
-     * @param value    The value sought.
-     * @param time     The time of the query.
+     * @param value The value sought.
+     * @param time  The time of the query.
      * @return The index, or -1.
      */
     public int getIndexRight(Object value, long time) {
@@ -131,8 +131,8 @@ public class ListNode {
      * Find the index of an equal existing value.
      * (The list is searched in order.)
      *
-     * @param value    The value sought.
-     * @param time     The time of the query.
+     * @param value The value sought.
+     * @param time  The time of the query.
      * @return The index, or -1.
      */
     public int findIndex(Object value, long time) {
@@ -153,8 +153,8 @@ public class ListNode {
      * Find the index of an equal existing value.
      * (The list is searched in reverse order.)
      *
-     * @param value    The value sought.
-     * @param time     The time of the query.
+     * @param value The value sought.
+     * @param time  The time of the query.
      * @return The index, or -1.
      */
     public int findIndexRight(Object value, long time) {
@@ -338,7 +338,7 @@ public class ListNode {
      */
     public Iterator iterator(long time) {
         return new Iterator() {
-            int last  = -1;
+            int last = -1;
 
             @Override
             public boolean hasNext() {
@@ -362,18 +362,33 @@ public class ListNode {
      * @return A list accessor for the latest time.
      */
     public ListAccessor accessor() {
-        return accessor(MAX_TIME);
+        return accessor(null, MAX_TIME);
+    }
+
+    /**
+     * Returns a list accessor for the latest time.
+     *
+     * @param key The key for the list.
+     * @return A list accessor for the latest time.
+     */
+    public ListAccessor accessor(Comparable key) {
+        return accessor(key, MAX_TIME);
     }
 
     /**
      * Returns a list accessor for the given time.
      * But after calling add, a previously created accessor becomes invalid.
      *
+     * @param key  The key for the list.
      * @param time The time of the query.
      * @return A list accessor for the given time.
      */
-    public ListAccessor accessor(long time) {
+    public ListAccessor accessor(Comparable key, long time) {
         return new ListAccessor() {
+            @Override
+            public Comparable key() {
+                return key;
+            }
 
             @Override
             public long time() {
@@ -530,8 +545,8 @@ public class ListNode {
     /**
      * Mark a value as deleted.
      *
-     * @param ndx     The index of the value.
-     * @param time    The time of the deletion.
+     * @param ndx  The index of the value.
+     * @param time The time of the deletion.
      * @return The deleted value.
      */
     public Object remove(int ndx, long time) {
@@ -556,7 +571,7 @@ public class ListNode {
      * Copy everything except what was deleted before a given time.
      * (This is a shallow copy, as the values in the list are not copied.)
      *
-     * @param time    The given time.
+     * @param time The given time.
      * @return A shortened copy of the list without some historical values.
      */
     public ListNode copy(long time) {
