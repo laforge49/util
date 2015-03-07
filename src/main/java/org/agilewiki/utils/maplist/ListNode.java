@@ -509,14 +509,14 @@ public class ListNode {
      * @return The revised root node.
      */
     public ListNode add(Object value, long time) {
-        return add(size, value, time);
+        return add(-1, value, time);
     }
 
     /**
      * Add a non-null value to the list.
      * After calling add, a previously created accessor becomes invalid.
      *
-     * @param ndx   Where to add the value.
+     * @param ndx   Where to add the value, or -1 to append to the end.
      * @param value The value to be added.
      * @param time  The time the value is added.
      * @return The revised root node.
@@ -529,10 +529,12 @@ public class ListNode {
         if (value == null)
             throw new IllegalArgumentException("value may not be null");
         if (isNil()) {
-            if (ndx != 0)
+            if (ndx != 0 && ndx != -1)
                 throw new IllegalArgumentException("index out of range");
             return new ListNode(1, LIST_NIL, LIST_NIL, value, created, deleted);
         }
+        if (ndx == -1)
+            ndx = size;
         int leftSize = leftNode.size;
         if (ndx <= leftSize)
             leftNode = leftNode.add(ndx, value, created, deleted);
