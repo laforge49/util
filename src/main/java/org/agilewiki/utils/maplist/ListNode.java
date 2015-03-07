@@ -21,22 +21,22 @@ public class ListNode {
      */
     public final static ListNode LIST_NIL = new ListNode();
 
-    private int level;
-    private ListNode leftNode;
-    private ListNode rightNode;
-    private final Object value;
-    private final long created;
-    private long deleted;
-    private int size;
+    protected int level;
+    protected ListNode leftNode;
+    protected ListNode rightNode;
+    protected final Object value;
+    protected final long created;
+    protected long deleted;
+    protected int size;
 
-    private ListNode() {
+    protected ListNode() {
         leftNode = this;
         rightNode = this;
         value = null;
         created = 0L;
     }
 
-    private ListNode(int level,
+    protected ListNode(int level,
                      ListNode leftNode,
                      ListNode rightNode,
                      Object value,
@@ -61,11 +61,11 @@ public class ListNode {
         return size;
     }
 
-    private boolean exists(long time) {
+    protected boolean exists(long time) {
         return time >= created && time < deleted;
     }
 
-    private boolean isNil() {
+    protected boolean isNil() {
         return this == LIST_NIL;
     }
 
@@ -171,7 +171,7 @@ public class ListNode {
         return ndx;
     }
 
-    private ListNode getListNode(int ndx) {
+    protected ListNode getListNode(int ndx) {
         if (ndx < 0 || ndx >= size)
             return null; //out of range
         int leftSize = leftNode.size;
@@ -309,7 +309,7 @@ public class ListNode {
         return !(exists(time) || leftNode.isEmpty(time) || rightNode.isEmpty(time));
     }
 
-    private void flat(List list, long time) {
+    protected void flat(List list, long time) {
         if (isNil())
             return;
         leftNode.flat(list, time);
@@ -338,7 +338,7 @@ public class ListNode {
      */
     public Iterator iterator(long time) {
         return new Iterator() {
-            private int last  = -1;
+            int last  = -1;
 
             @Override
             public boolean hasNext() {
@@ -452,7 +452,7 @@ public class ListNode {
         };
     }
 
-    private ListNode skew() {
+    protected ListNode skew() {
         if (isNil())
             return this;
         if (leftNode.isNil())
@@ -468,7 +468,7 @@ public class ListNode {
             return this;
     }
 
-    private ListNode split() {
+    protected ListNode split() {
         if (isNil())
             return this;
         if (rightNode.isNil() || rightNode.rightNode.isNil())
@@ -510,7 +510,7 @@ public class ListNode {
         return add(ndx, value, time, Integer.MAX_VALUE);
     }
 
-    private ListNode add(int ndx, Object value, long created, long deleted) {
+    protected ListNode add(int ndx, Object value, long created, long deleted) {
         if (value == null)
             throw new IllegalArgumentException("value may not be null");
         if (isNil()) {
@@ -563,7 +563,7 @@ public class ListNode {
         return copy(LIST_NIL, time);
     }
 
-    private ListNode copy(ListNode n, long time) {
+    protected ListNode copy(ListNode n, long time) {
         if (isNil())
             return n;
         n = leftNode.copy(n, time);
