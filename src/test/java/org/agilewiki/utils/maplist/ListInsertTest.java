@@ -18,7 +18,8 @@ public class ListInsertTest extends TestCase {
         assertEquals("c", a1.get(2));
         assertEquals("d", a1.get(3));
         assertEquals("e", a1.get(4));
-        assertEquals("f", a1.get(5));
+        String f = "f";
+        assertEquals(f, a1.get(5));
         assertEquals("g", a1.get(6));
         assertEquals("abcdefg", String.join("", a1.flat()));
         assertEquals("abcd", String.join("", l1.flat(5)));
@@ -98,5 +99,10 @@ public class ListInsertTest extends TestCase {
 
         assertEquals(0, a1.firstIndex());
         assertEquals(6, a1.lastIndex());
+
+        assertEquals(5, a1.getIndex(f));
+        assertEquals(5, a1.getIndexRight(f));
+        assertEquals(5, a1.findIndex("f"));
+        assertEquals(5, a1.findIndexRight("f"));
     }
 }

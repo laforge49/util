@@ -490,6 +490,13 @@ public class ListNode {
         return skew().split();
     }
 
+    /**
+     * Mark a value as deleted.
+     *
+     * @param ndx     The index of the value.
+     * @param time    The time of the deletion.
+     * @return The deleted value.
+     */
     public Object remove(int ndx, long time) {
         ListNode n = getListNode(ndx);
         if (n == null || n.isNil() || !n.exists(time))

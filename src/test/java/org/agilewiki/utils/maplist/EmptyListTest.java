@@ -36,6 +36,11 @@ public class EmptyListTest extends TestCase {
 
         assertEquals(0, la.flat().size());
 
+        assertEquals(-1, la.getIndex(""));
+        assertEquals(-1, la.getIndexRight(""));
+        assertEquals(-1, la.findIndex(""));
+        assertEquals(-1, la.findIndexRight(""));
+
         assertEquals(0, ListNode.LIST_NIL.maxSize());
     }
 }
