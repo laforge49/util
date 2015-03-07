@@ -1,7 +1,9 @@
 package org.agilewiki.utils.maplist;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * A node in an
@@ -329,6 +331,32 @@ public class ListNode {
     }
 
     /**
+     * Returns an iterator over the existing values.
+     *
+     * @param time The time of the query.
+     * @return The iterator.
+     */
+    public Iterator iterator(long time) {
+        return new Iterator() {
+            private int last  = -1;
+
+            @Override
+            public boolean hasNext() {
+                return higherIndex(last, time) > -1;
+            }
+
+            @Override
+            public Object next() {
+                int next = higherIndex(last, time);
+                if (next == -1)
+                    throw new NoSuchElementException();
+                last = next;
+                return get(last, time);
+            }
+        };
+    }
+
+    /**
      * Returns a list accessor for the latest time.
      *
      * @return A list accessor for the latest time.
@@ -415,6 +443,11 @@ public class ListNode {
             @Override
             public List flat() {
                 return ListNode.this.flat(time);
+            }
+
+            @Override
+            public Iterator iterator() {
+                return ListNode.this.iterator(time);
             }
         };
     }

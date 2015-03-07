@@ -2,6 +2,8 @@ package org.agilewiki.utils.maplist;
 
 import junit.framework.TestCase;
 
+import java.util.Iterator;
+
 public class ListRemoveTest extends TestCase {
     public void test() throws Exception {
         ListNode l1 = ListNode.LIST_NIL;
@@ -42,5 +44,13 @@ public class ListRemoveTest extends TestCase {
         assertEquals("e", String.join("", copy.flat(6)));
         assertEquals("efg", String.join("", copy.flat(15)));
         assertEquals("g", String.join("", copy.flat(17)));
+        Iterator it = copy.iterator(15);
+        assertTrue(it.hasNext());
+        assertEquals("e", it.next());
+        assertTrue(it.hasNext());
+        assertEquals("f", it.next());
+        assertTrue(it.hasNext());
+        assertEquals("g", it.next());
+        assertFalse(it.hasNext());
     }
 }

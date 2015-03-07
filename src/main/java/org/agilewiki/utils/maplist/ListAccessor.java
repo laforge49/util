@@ -1,11 +1,12 @@
 package org.agilewiki.utils.maplist;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * Accesses a versioned list for a given time.
  */
-public interface ListAccessor {
+public interface ListAccessor extends Iterable {
 
     /**
      * Returns the time being accessed.
@@ -117,4 +118,11 @@ public interface ListAccessor {
      * @return A list of all values present for the given time.
      */
     List flat();
+
+    /**
+     * Returns an iterator over the existing values.
+     *
+     * @return The iterator.
+     */
+    Iterator iterator();
 }
