@@ -37,4 +37,33 @@ public class MapNode {
     protected boolean isNil() {
         return this == MAP_NIL;
     }
+
+    protected MapNode skew() {
+        if (isNil())
+            return this;
+        if (leftNode.isNil())
+            return this;
+        if (leftNode.level == level) {
+            MapNode l = leftNode;
+            leftNode = l.rightNode;
+            l.rightNode = this;
+            return l;
+        } else
+            return this;
+    }
+
+    protected MapNode split() {
+        if (isNil())
+            return this;
+        if (rightNode.isNil() || rightNode.rightNode.isNil())
+            return this;
+        if (level == rightNode.rightNode.level) {
+            MapNode r = rightNode;
+            rightNode = r.leftNode;
+            r.leftNode = this;
+            r.level += 1;
+            return r;
+        }
+        return this;
+    }
 }
