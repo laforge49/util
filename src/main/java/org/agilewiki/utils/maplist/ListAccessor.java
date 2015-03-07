@@ -20,7 +20,7 @@ public interface ListAccessor extends Iterable {
     /**
      * Returns a value if it is in range and the value exists for the given time.
      *
-     * @param ndx  The index of the selected value.
+     * @param ndx The index of the selected value.
      * @return A value, or null.
      */
     Object get(int ndx);
@@ -29,7 +29,7 @@ public interface ListAccessor extends Iterable {
      * Get the index of an existing value with the same identity (==).
      * (The list is searched in order.)
      *
-     * @param value    The value sought.
+     * @param value The value sought.
      * @return The index, or -1.
      */
     int getIndex(Object value);
@@ -38,7 +38,7 @@ public interface ListAccessor extends Iterable {
      * Get the index of an existing value with the same identity (==).
      * (The list is searched in reverse order.)
      *
-     * @param value    The value sought.
+     * @param value The value sought.
      * @return The index, or -1.
      */
     int getIndexRight(Object value);
@@ -47,7 +47,7 @@ public interface ListAccessor extends Iterable {
      * Find the index of an equal existing value.
      * (The list is searched in order.)
      *
-     * @param value    The value sought.
+     * @param value The value sought.
      * @return The index, or -1.
      */
     int findIndex(Object value);
@@ -56,7 +56,7 @@ public interface ListAccessor extends Iterable {
      * Find the index of an equal existing value.
      * (The list is searched in reverse order.)
      *
-     * @param value    The value sought.
+     * @param value The value sought.
      * @return The index, or -1.
      */
     int findIndexRight(Object value);
@@ -64,7 +64,7 @@ public interface ListAccessor extends Iterable {
     /**
      * Returns the index of an existing value higher than the given index.
      *
-     * @param ndx    A given index.
+     * @param ndx A given index.
      * @return An index of an existing value that is higher, or -1.
      */
     int higherIndex(int ndx);
@@ -72,7 +72,7 @@ public interface ListAccessor extends Iterable {
     /**
      * Returns the index of an existing value higher than or equal to the given index.
      *
-     * @param ndx  A given index.
+     * @param ndx A given index.
      * @return An index of an existing value that is higher or equal, or -1.
      */
     int ceilingIndex(int ndx);
@@ -87,7 +87,7 @@ public interface ListAccessor extends Iterable {
     /**
      * Returns the index of an existing value lower than the given index.
      *
-     * @param ndx  A given index.
+     * @param ndx A given index.
      * @return An index of an existing value that is lower, or -1.
      */
     int lowerIndex(int ndx);
@@ -95,7 +95,7 @@ public interface ListAccessor extends Iterable {
     /**
      * Returns the index of an existing value lower than or equal to the given index.
      *
-     * @param ndx  A given index.
+     * @param ndx A given index.
      * @return An index of an existing value that is lower or equal, or -1.
      */
     int floorIndex(int ndx);

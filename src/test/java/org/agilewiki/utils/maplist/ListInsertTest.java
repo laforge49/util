@@ -11,7 +11,7 @@ public class ListInsertTest extends TestCase {
         l1 = l1.add("e", 6);
         l1 = l1.add("f", 7);
         l1 = l1.add("g", 8);
-        assertEquals(7,l1.maxSize());
+        assertEquals(7, l1.maxSize());
         ListAccessor a1 = l1.accessor();
         assertEquals("a", a1.get(0));
         assertEquals("b", a1.get(1));
@@ -31,7 +31,7 @@ public class ListInsertTest extends TestCase {
         l2 = l2.add(0, "C", 6);
         l2 = l2.add(0, "B", 7);
         l2 = l2.add(0, "A", 8);
-        assertEquals(7,l2.maxSize());
+        assertEquals(7, l2.maxSize());
         ListAccessor a2 = l2.accessor();
         assertEquals("A", a2.get(0));
         assertEquals("B", a2.get(1));

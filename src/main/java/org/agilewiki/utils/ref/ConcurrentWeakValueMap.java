@@ -26,8 +26,8 @@ public class ConcurrentWeakValueMap<K extends Comparable, T> {
     /**
      * Create a keyed weak reference.
      *
-     * @param key      The associated key.
-     * @param value    The wrapped value.
+     * @param key   The associated key.
+     * @param value The wrapped value.
      * @return Returns a weak reference for the given value with the associated key.
      */
     public KeyedWeakReference<K, T> createKeyedWeakReference(K key, T value) {
@@ -37,7 +37,7 @@ public class ConcurrentWeakValueMap<K extends Comparable, T> {
     /**
      * Get the value from the weak reference with the associated key.
      *
-     * @param key    The associated key.
+     * @param key The associated key.
      * @return The wrapped value, or null.
      */
     public T get(Object key) {
@@ -64,7 +64,7 @@ public class ConcurrentWeakValueMap<K extends Comparable, T> {
     /**
      * Remove the weak reference associated with the given key.
      *
-     * @param key   The key associated with the weak reference.
+     * @param key The key associated with the weak reference.
      * @return The wrapped value, or null.
      */
     public T remove(K key) {
@@ -81,7 +81,7 @@ public class ConcurrentWeakValueMap<K extends Comparable, T> {
     public void poll() {
         if (!pollGate.weakCompareAndSet(false, true))
             return;
-        while(true) {
+        while (true) {
             KeyedWeakReference<K, T> r = (KeyedWeakReference) q.poll();
             if (r == null) {
                 pollGate.set(false);

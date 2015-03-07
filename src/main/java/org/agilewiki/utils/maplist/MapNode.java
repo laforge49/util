@@ -25,8 +25,8 @@ public class MapNode {
     protected MapNode(int level,
                       MapNode leftNode,
                       MapNode rightNode,
-                       ListNode value,
-                       Comparable key) {
+                      ListNode value,
+                      Comparable key) {
         this.level = level;
         this.leftNode = leftNode;
         this.rightNode = rightNode;
@@ -68,10 +68,23 @@ public class MapNode {
     }
 
     /**
+     * Add a non-null value to the end of the list.
+     * After calling add, a previously created accessor becomes invalid.
+     *
+     * @param key   The key of the list.
+     * @param value The value to be added.
+     * @param time  The time the value is added.
+     * @return The revised root node.
+     */
+    public MapNode add(Comparable key, Object value, long time) {
+        return add(key, -1, value, time);
+    }
+
+    /**
      * Add a non-null value to the list.
      * After calling add, a previously created accessor becomes invalid.
      *
-     * @param key      The key of the list.
+     * @param key   The key of the list.
      * @param ndx   Where to add the value.
      * @param value The value to be added.
      * @param time  The time the value is added.
