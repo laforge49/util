@@ -511,7 +511,17 @@ public class ListNode {
     }
 
     /**
+     * Perform a complete copy.
+     *
+     * @return A complete, but shallow copy of the list.
+     */
+    public ListNode copy() {
+        return copy(0L);
+    }
+
+    /**
      * Copy everything except what was deleted before a given time.
+     * (This is a shallow copy, as the values in the list are not copied.)
      *
      * @param time    The given time.
      * @return A shortened copy of the list without some historical values.
