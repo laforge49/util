@@ -169,4 +169,24 @@ public class MapNode {
     public Object remove(Comparable key, int ndx, long time) {
         return getList(key).remove(ndx, time);
     }
+
+    /**
+     * Perform a complete copy.
+     *
+     * @return A complete, but shallow copy of the list.
+     */
+    public ListNode copyList(Comparable key) {
+        return getList(key).copyList();
+    }
+
+    /**
+     * Copy everything except what was deleted before a given time.
+     * (This is a shallow copy, as the values in the list are not copied.)
+     *
+     * @param time The given time.
+     * @return A shortened copy of the list without some historical values.
+     */
+    public ListNode copyList(Comparable key, long time) {
+        return getList(key).copyList(time);
+    }
 }
