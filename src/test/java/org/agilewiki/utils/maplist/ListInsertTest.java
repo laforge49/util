@@ -21,8 +21,8 @@ public class ListInsertTest extends TestCase {
         String f = "f";
         assertEquals(f, a1.get(5));
         assertEquals("g", a1.get(6));
-        assertEquals("abcdefg", String.join("", a1.flat()));
-        assertEquals("abcd", String.join("", l1.flat(5)));
+        assertEquals("abcdefg", String.join("", a1.flatList()));
+        assertEquals("abcd", String.join("", l1.flatList(5)));
 
         ListNode l2 = ListNode.LIST_NIL.add(0, "G", 2);
         l2 = l2.add(0, "F", 3);
@@ -40,8 +40,8 @@ public class ListInsertTest extends TestCase {
         assertEquals("E", a2.get(4));
         assertEquals("F", a2.get(5));
         assertEquals("G", a2.get(6));
-        assertEquals("ABCDEFG", String.join("", a2.flat()));
-        assertEquals("DEFG", String.join("", l2.flat(5)));
+        assertEquals("ABCDEFG", String.join("", a2.flatList()));
+        assertEquals("DEFG", String.join("", l2.flatList(5)));
 
         assertFalse(a1.isEmpty());
 

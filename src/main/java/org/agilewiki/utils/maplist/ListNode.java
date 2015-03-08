@@ -309,13 +309,13 @@ public class ListNode {
         return !(exists(time) || leftNode.isEmpty(time) || rightNode.isEmpty(time));
     }
 
-    protected void flat(List list, long time) {
+    protected void flatList(List list, long time) {
         if (isNil())
             return;
-        leftNode.flat(list, time);
+        leftNode.flatList(list, time);
         if (exists(time))
             list.add(value);
-        rightNode.flat(list, time);
+        rightNode.flatList(list, time);
     }
 
     /**
@@ -324,9 +324,9 @@ public class ListNode {
      * @param time The time of the query.
      * @return A list of all values present for the given time.
      */
-    public List flat(long time) {
+    public List flatList(long time) {
         List list = new ArrayList<>();
-        flat(list, time);
+        flatList(list, time);
         return list;
     }
 
@@ -458,8 +458,8 @@ public class ListNode {
             }
 
             @Override
-            public List flat() {
-                return ListNode.this.flat(time);
+            public List flatList() {
+                return ListNode.this.flatList(time);
             }
 
             @Override

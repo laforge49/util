@@ -119,7 +119,7 @@ public interface ListAccessor extends Iterable {
      *
      * @return A list of all values present for the given time.
      */
-    List flat();
+    List flatList();
 
     /**
      * Returns an iterator over the existing values.

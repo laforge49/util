@@ -32,18 +32,18 @@ public class ListRemoveTest extends TestCase {
         assertEquals("g", l2.remove(6, 18));
         assertNull(l2.remove(7, 19));
         assertNull(l2.remove(8, 20));
-        assertEquals("abcdefg", String.join("", l2.flat(8)));
-        assertEquals("bcdefg", String.join("", l2.flat(12)));
-        assertEquals("g", String.join("", l2.flat(17)));
-        assertEquals("", String.join("", l2.flat(21)));
+        assertEquals("abcdefg", String.join("", l2.flatList(8)));
+        assertEquals("bcdefg", String.join("", l2.flatList(12)));
+        assertEquals("g", String.join("", l2.flatList(17)));
+        assertEquals("", String.join("", l2.flatList(21)));
 
         assertEquals(6, l2.firstIndex(17));
         assertEquals(-1, l2.lastIndex(22));
 
         ListNode copy = l2.copyList(16);
-        assertEquals("e", String.join("", copy.flat(6)));
-        assertEquals("efg", String.join("", copy.flat(15)));
-        assertEquals("g", String.join("", copy.flat(17)));
+        assertEquals("e", String.join("", copy.flatList(6)));
+        assertEquals("efg", String.join("", copy.flatList(15)));
+        assertEquals("g", String.join("", copy.flatList(17)));
         Iterator it = copy.iterator(15);
         assertTrue(it.hasNext());
         assertEquals("e", it.next());
