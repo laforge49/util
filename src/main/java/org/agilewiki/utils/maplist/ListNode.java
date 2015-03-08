@@ -567,8 +567,8 @@ public class ListNode {
      *
      * @return A complete, but shallow copy of the list.
      */
-    public ListNode copy() {
-        return copy(0L);
+    public ListNode copyList() {
+        return copyList(0L);
     }
 
     /**
@@ -578,16 +578,16 @@ public class ListNode {
      * @param time The given time.
      * @return A shortened copy of the list without some historical values.
      */
-    public ListNode copy(long time) {
-        return copy(LIST_NIL, time);
+    public ListNode copyList(long time) {
+        return copyList(LIST_NIL, time);
     }
 
-    protected ListNode copy(ListNode n, long time) {
+    protected ListNode copyList(ListNode n, long time) {
         if (isNil())
             return n;
-        n = leftNode.copy(n, time);
+        n = leftNode.copyList(n, time);
         if (deleted >= time)
             n = n.add(n.size, value, created, deleted);
-        return rightNode.copy(n, time);
+        return rightNode.copyList(n, time);
     }
 }

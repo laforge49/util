@@ -40,7 +40,7 @@ public class ListRemoveTest extends TestCase {
         assertEquals(6, l2.firstIndex(17));
         assertEquals(-1, l2.lastIndex(22));
 
-        ListNode copy = l2.copy(16);
+        ListNode copy = l2.copyList(16);
         assertEquals("e", String.join("", copy.flat(6)));
         assertEquals("efg", String.join("", copy.flat(15)));
         assertEquals("g", String.join("", copy.flat(17)));
