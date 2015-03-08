@@ -61,6 +61,29 @@ public class MapNode {
         return getList(key).maxSize();
     }
 
+    /**
+     * Returns a list accessor for the latest time.
+     * But after calling add, a previously created accessor becomes invalid.
+     *
+     * @param key The key for the list.
+     * @return A list accessor for the latest time.
+     */
+    public ListAccessor listAccessor(Comparable key) {
+        return getList(key).listAccessor(key);
+    }
+
+    /**
+     * Returns a list accessor for the given time.
+     * But after calling add, a previously created accessor becomes invalid.
+     *
+     * @param key  The key for the list.
+     * @param time The time of the query.
+     * @return A list accessor for the given time.
+     */
+    public ListAccessor listAccessor(Comparable key, long time) {
+        return getList(key).listAccessor(key, time);
+    }
+
     protected MapNode skew() {
         if (isNil())
             return this;

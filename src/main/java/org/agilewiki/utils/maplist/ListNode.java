@@ -358,6 +358,7 @@ public class ListNode {
 
     /**
      * Returns a list accessor for the latest time.
+     * But after calling add, a previously created accessor becomes invalid.
      *
      * @return A list accessor for the latest time.
      */
@@ -367,6 +368,7 @@ public class ListNode {
 
     /**
      * Returns a list accessor for the latest time.
+     * But after calling add, a previously created accessor becomes invalid.
      *
      * @param key The key for the list.
      * @return A list accessor for the latest time.
