@@ -20,6 +20,7 @@ public class MapNode {
     protected MapNode() {
         leftNode = this;
         rightNode = this;
+        value = ListNode.LIST_NIL;
     }
 
     protected MapNode(int level,
@@ -36,6 +37,28 @@ public class MapNode {
 
     protected boolean isNil() {
         return this == MAP_NIL;
+    }
+
+    protected ListNode getList(Comparable key) {
+        if (isNil())
+            return value;
+        int c = key.compareTo(this.key);
+        if (c < 0)
+            return leftNode.getList(key);
+        if (c == 0)
+            return value;
+        return rightNode.getList(key);
+    }
+
+    /**
+     * Returns the count of all the values in the list,
+     * including deleted values.
+     *
+     * @param key    The list identifier.
+     * @return The count of all the values in the list.
+     */
+    public int maxSize(Comparable key) {
+        return getList(key).maxSize();
     }
 
     protected MapNode skew() {
