@@ -4,6 +4,9 @@ import junit.framework.TestCase;
 
 public class EmptyListTest extends TestCase {
     public void test() throws Exception {
+
+        assertEquals(0, ListNode.LIST_NIL.maxSize());
+
         ListAccessor la = ListNode.LIST_NIL.accessor();
 
         assertEquals(ListNode.MAX_TIME, la.time());
@@ -40,8 +43,6 @@ public class EmptyListTest extends TestCase {
         assertEquals(-1, la.getIndexRight(""));
         assertEquals(-1, la.findIndex(""));
         assertEquals(-1, la.findIndexRight(""));
-
-        assertEquals(0, ListNode.LIST_NIL.maxSize());
 
         assertFalse(la.iterator().hasNext());
     }
