@@ -120,8 +120,6 @@ public class MapNode {
     protected MapNode add(Comparable key, int ndx, Object value, long created, long deleted) {
         if (key == null)
             throw new IllegalArgumentException("key may not be null");
-        if (value == null)
-            throw new IllegalArgumentException("value may not be null");
         if (isNil()) {
             ListNode listNode = ListNode.LIST_NIL.add(ndx, value, created, deleted);
             return new MapNode(1, MAP_NIL, MAP_NIL, listNode, key);
@@ -135,5 +133,9 @@ public class MapNode {
         } else
             rightNode = rightNode.add(key, ndx, value, created, deleted);
         return skew().split();
+    }
+
+    public Object remove(Comparable key, int ndx, long time) {
+        return getList(key).remove(ndx, time);
     }
 }
