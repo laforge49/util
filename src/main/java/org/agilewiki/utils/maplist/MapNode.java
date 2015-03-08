@@ -123,9 +123,7 @@ public class MapNode {
         if (value == null)
             throw new IllegalArgumentException("value may not be null");
         if (isNil()) {
-            if (ndx != 0)
-                throw new IllegalArgumentException("index out of range");
-            ListNode listNode = ListNode.LIST_NIL.add(0, value, created, deleted);
+            ListNode listNode = ListNode.LIST_NIL.add(ndx, value, created, deleted);
             return new MapNode(1, MAP_NIL, MAP_NIL, listNode, key);
         }
         int c = key.compareTo(this.key);
