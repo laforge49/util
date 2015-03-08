@@ -7,7 +7,7 @@ public class EmptyListTest extends TestCase {
 
         assertEquals(0, ListNode.LIST_NIL.maxSize());
 
-        ListAccessor la = ListNode.LIST_NIL.accessor();
+        ListAccessor la = ListNode.LIST_NIL.listAccessor();
 
         assertEquals(ListNode.MAX_TIME, la.time());
 

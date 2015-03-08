@@ -14,24 +14,24 @@ public class MapNode {
     protected int level;
     protected MapNode leftNode;
     protected MapNode rightNode;
-    protected ListNode value;
+    protected ListNode listNode;
     protected Comparable key;
 
     protected MapNode() {
         leftNode = this;
         rightNode = this;
-        value = ListNode.LIST_NIL;
+        listNode = ListNode.LIST_NIL;
     }
 
     protected MapNode(int level,
                       MapNode leftNode,
                       MapNode rightNode,
-                      ListNode value,
+                      ListNode listNode,
                       Comparable key) {
         this.level = level;
         this.leftNode = leftNode;
         this.rightNode = rightNode;
-        this.value = value;
+        this.listNode = listNode;
         this.key = key;
     }
 
@@ -41,12 +41,12 @@ public class MapNode {
 
     protected ListNode getList(Comparable key) {
         if (isNil())
-            return value;
+            return listNode;
         int c = key.compareTo(this.key);
         if (c < 0)
             return leftNode.getList(key);
         if (c == 0)
-            return value;
+            return listNode;
         return rightNode.getList(key);
     }
 
@@ -128,7 +128,7 @@ public class MapNode {
         if (c < 0)
             leftNode = leftNode.add(key, ndx, value, created, deleted);
         else if (c == 0) {
-            this.value = this.value.add(ndx, value, created, deleted);
+            this.listNode = this.listNode.add(ndx, value, created, deleted);
             return this;
         } else
             rightNode = rightNode.add(key, ndx, value, created, deleted);

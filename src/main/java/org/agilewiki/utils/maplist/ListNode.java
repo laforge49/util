@@ -361,8 +361,8 @@ public class ListNode {
      *
      * @return A list accessor for the latest time.
      */
-    public ListAccessor accessor() {
-        return accessor(null, MAX_TIME);
+    public ListAccessor listAccessor() {
+        return listAccessor(null, MAX_TIME);
     }
 
     /**
@@ -371,8 +371,8 @@ public class ListNode {
      * @param key The key for the list.
      * @return A list accessor for the latest time.
      */
-    public ListAccessor accessor(Comparable key) {
-        return accessor(key, MAX_TIME);
+    public ListAccessor listAccessor(Comparable key) {
+        return listAccessor(key, MAX_TIME);
     }
 
     /**
@@ -383,7 +383,7 @@ public class ListNode {
      * @param time The time of the query.
      * @return A list accessor for the given time.
      */
-    public ListAccessor accessor(Comparable key, long time) {
+    public ListAccessor listAccessor(Comparable key, long time) {
         return new ListAccessor() {
             @Override
             public Comparable key() {
