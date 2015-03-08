@@ -54,7 +54,7 @@ public class MapNode {
      * Returns the count of all the values in the list,
      * including deleted values.
      *
-     * @param key    The list identifier.
+     * @param key The list identifier.
      * @return The count of all the values in the list.
      */
     public int maxSize(Comparable key) {
@@ -135,6 +135,14 @@ public class MapNode {
         return skew().split();
     }
 
+    /**
+     * Mark a value as deleted.
+     *
+     * @param key  The key of the list.
+     * @param ndx  The index of the value.
+     * @param time The time of the deletion.
+     * @return The deleted value.
+     */
     public Object remove(Comparable key, int ndx, long time) {
         return getList(key).remove(ndx, time);
     }
