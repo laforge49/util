@@ -52,8 +52,7 @@ public class ListNode {
     }
 
     /**
-     * Returns the count of all the values in the list,
-     * including deleted values.
+     * Returns the count of all the values in the list.
      *
      * @return The count of all the values in the list.
      */

@@ -279,6 +279,17 @@ public class MapNode {
     }
 
     /**
+     * Returns the count of all the keys in the map.
+     *
+     * @return The count of all the keys in the map.
+     */
+    public int maxSize() {
+        if (isNil())
+            return 0;
+        return leftNode.maxSize() + 1 + rightNode.maxSize();
+    }
+
+    /**
      * Returns the smallest key of the non-empty lists for the given time.
      *
      * @param time    The time of the query.
