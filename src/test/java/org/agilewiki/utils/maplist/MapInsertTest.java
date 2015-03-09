@@ -9,6 +9,8 @@ public class MapInsertTest extends TestCase {
 
         assertEquals(1, m1.maxSize("1"));
 
+        assertEquals(1, m1.flatKeys(3).size());
+
         ListAccessor a1 = m1.listAccessor("1", 3);
         assertEquals("a", a1.get(0));
 

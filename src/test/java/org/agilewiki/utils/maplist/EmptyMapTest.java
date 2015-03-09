@@ -7,6 +7,8 @@ public class EmptyMapTest extends TestCase {
 
         assertEquals(0, MapNode.MAP_NIL.maxSize(""));
 
+        assertEquals(0, MapNode.MAP_NIL.flatKeys(1).size());
+
         ListAccessor la = MapNode.MAP_NIL.listAccessor("");
         assertNull(la.get(0));
     }
