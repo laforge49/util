@@ -35,4 +35,11 @@ public interface MapAccessor {
      * @return The smallest key, or null.
      */
     Comparable firstKey();
+
+    /**
+     * Returns the largest key of the non-empty lists for the given time.
+     *
+     * @return The largest key, or null.
+     */
+    Comparable lastKey();
 }

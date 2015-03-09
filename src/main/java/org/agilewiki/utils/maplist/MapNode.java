@@ -232,6 +232,23 @@ public class MapNode {
     }
 
     /**
+     * Returns the largest key of the non-empty lists for the given time.
+     *
+     * @param time    The time of the query.
+     * @return The largest key, or null.
+     */
+    public Comparable lastKey(long time) {
+        if (isNil())
+            return null;
+        Comparable k = rightNode.lastKey(time);
+        if (k != null)
+            return k;
+        if (!listNode.isEmpty(time))
+            return key;
+        return leftNode.lastKey(time);
+    }
+
+    /**
      * Returns a map accessor for the latest time.
      * But after calling add, a previously created accessor becomes invalid.
      *
@@ -269,6 +286,11 @@ public class MapNode {
             @Override
             public Comparable firstKey() {
                 return MapNode.this.firstKey(time);
+            }
+
+            @Override
+            public Comparable lastKey() {
+                return MapNode.this.lastKey(time);
             }
         };
     }
