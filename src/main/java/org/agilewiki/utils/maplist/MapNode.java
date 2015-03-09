@@ -173,7 +173,7 @@ public class MapNode {
     }
 
     /**
-     * Perform a complete copy.
+     * Perform a complete list copy.
      *
      * @return A complete, but shallow copy of the list.
      */
@@ -182,7 +182,7 @@ public class MapNode {
     }
 
     /**
-     * Copy everything except what was deleted before a given time.
+     * Copy everything in the list except what was deleted before a given time.
      * (This is a shallow copy, as the values in the list are not copied.)
      *
      * @param time The given time.
@@ -232,6 +232,50 @@ public class MapNode {
         NavigableMap<Comparable, List> map = new TreeMap<Comparable, List>();
         flatMap(map, time);
         return map;
+    }
+
+    /**
+     * Perform a complete copy.
+     *
+     * @return A complete, but shallow copy of the list.
+     */
+    public MapNode copyMap() {
+        return copyMap(0L);
+    }
+
+    /**
+     * Copy everything except what was deleted before a given time.
+     * (This is a shallow copy, as the values in the lists are not copied.)
+     *
+     * @param time The given time.
+     * @return A shortened copy of the map without some historical values.
+     */
+    public MapNode copyMap(long time) {
+        return copyMap(MAP_NIL, time);
+    }
+
+    protected MapNode copyMap(MapNode n, long time) {
+        if (isNil())
+            return n;
+        n = leftNode.copyMap(n, time);
+        n = n.addList(key, listNode.copyList(time));
+        return leftNode.copyMap(n, time);
+    }
+
+    protected MapNode addList(Comparable key, ListNode listNode) {
+        if (listNode.isNil())
+            return this;
+        if (isNil()) {
+            return new MapNode(1, MAP_NIL, MAP_NIL, listNode, key);
+        }
+        int c = key.compareTo(this.key);
+        if (c < 0)
+            leftNode = leftNode.addList(key, listNode);
+        else if (c == 0) {
+            throw new IllegalArgumentException("duplicate key not supported");
+        } else
+            rightNode = rightNode.addList(key, listNode);
+        return skew().split();
     }
 
     /**
