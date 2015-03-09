@@ -17,6 +17,13 @@ public interface MapAccessor {
     long time();
 
     /**
+     * Returns the count of all the keys with a non-empty list.
+     *
+     * @return The current size of the map.
+     */
+    int size();
+
+    /**
      * Returns a list accessor for the given time.
      *
      * @param key  The key for the list.

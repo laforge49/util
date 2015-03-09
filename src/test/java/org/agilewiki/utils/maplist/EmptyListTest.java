@@ -5,7 +5,7 @@ import junit.framework.TestCase;
 public class EmptyListTest extends TestCase {
     public void test() throws Exception {
 
-        assertEquals(0, ListNode.LIST_NIL.maxSize());
+        assertEquals(0, ListNode.LIST_NIL.totalSize());
 
         ListAccessor la = ListNode.LIST_NIL.listAccessor();
 

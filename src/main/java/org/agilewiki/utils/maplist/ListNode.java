@@ -52,11 +52,11 @@ public class ListNode {
     }
 
     /**
-     * Returns the count of all the values in the list.
+     * Returns the count of all the values in the list, deleted or not.
      *
      * @return The count of all the values in the list.
      */
-    public int maxSize() {
+    public int totalSize() {
         return size;
     }
 
@@ -66,6 +66,21 @@ public class ListNode {
 
     protected boolean isNil() {
         return this == LIST_NIL;
+    }
+
+    /**
+     * Returns the count of all the values currently in the list.
+     *
+     * @param time    The time of the query.
+     * @return The current size of the list.
+     */
+    public int size(long time) {
+        if (isNil())
+            return 0;
+        int s = leftNode.size(time) + rightNode.size(time);
+        if (exists(time))
+            s += 1;
+        return s;
     }
 
     /**
@@ -394,6 +409,11 @@ public class ListNode {
             @Override
             public long time() {
                 return time;
+            }
+
+            @Override
+            public int size() {
+                return ListNode.this.size(time);
             }
 
             @Override

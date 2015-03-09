@@ -60,7 +60,7 @@ public class MapNode {
      * @return The count of all the values in the list.
      */
     public int maxSize(Comparable key) {
-        return getList(key).maxSize();
+        return getList(key).totalSize();
     }
 
     /**
@@ -279,14 +279,29 @@ public class MapNode {
     }
 
     /**
-     * Returns the count of all the keys in the map.
+     * Returns the count of all the keys in the map, empty or not.
      *
      * @return The count of all the keys in the map.
      */
-    public int maxSize() {
+    public int totalSize() {
         if (isNil())
             return 0;
-        return leftNode.maxSize() + 1 + rightNode.maxSize();
+        return leftNode.totalSize() + 1 + rightNode.totalSize();
+    }
+
+    /**
+     * Returns the count of all the keys with a non-empty list.
+     *
+     * @param time    The time of the query.
+     * @return The current size of the map.
+     */
+    public int size(long time) {
+        if (isNil())
+            return 0;
+        int s = leftNode.size(time) + rightNode.size(time);
+        if (!listNode.isEmpty(time))
+            s += 1;
+        return s;
     }
 
     /**
@@ -346,6 +361,11 @@ public class MapNode {
             @Override
             public long time() {
                 return time;
+            }
+
+            @Override
+            public int size() {
+                return MapNode.this.size(time);
             }
 
             @Override

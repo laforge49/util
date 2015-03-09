@@ -23,6 +23,13 @@ public interface ListAccessor extends Iterable {
     long time();
 
     /**
+     * Returns the count of all the values currently in the list.
+     *
+     * @return The current size of the list.
+     */
+    int size();
+
+    /**
      * Returns a value if it is in range and the value exists for the given time.
      *
      * @param ndx The index of the selected value.
