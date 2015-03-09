@@ -8,6 +8,13 @@ import java.util.NavigableSet;
 public interface MapAccessor {
 
     /**
+     * Returns the time being accessed.
+     *
+     * @return The time being accessed.
+     */
+    long time();
+
+    /**
      * Returns a list accessor for the given time.
      *
      * @param key  The key for the list.
@@ -21,4 +28,11 @@ public interface MapAccessor {
      * @return A set of the keys with content at the time of the query.
      */
     NavigableSet flatKeys();
+
+    /**
+     * Returns the smallest key of the non-empty lists for the given time.
+     *
+     * @return The smallest key, or null.
+     */
+    Comparable firstKey();
 }

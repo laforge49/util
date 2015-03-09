@@ -12,5 +12,8 @@ public class MapRemoveTest extends TestCase {
         assertEquals(1, m1.maxSize("1"));
 
         assertEquals(0, m1.flatKeys(4).size());
+
+        MapAccessor ma = m1.mapAccessor();
+        assertNull(ma.firstKey());
     }
 }

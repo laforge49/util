@@ -11,5 +11,8 @@ public class EmptyMapTest extends TestCase {
 
         ListAccessor la = MapNode.MAP_NIL.listAccessor("");
         assertNull(la.get(0));
+
+        MapAccessor ma = MapNode.MAP_NIL.mapAccessor();
+        assertNull(ma.firstKey());
     }
 }

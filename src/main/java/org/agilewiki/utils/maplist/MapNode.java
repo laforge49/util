@@ -215,6 +215,23 @@ public class MapNode {
     }
 
     /**
+     * Returns the smallest key of the non-empty lists for the given time.
+     *
+     * @param time    The time of the query.
+     * @return The smallest key, or null.
+     */
+    public Comparable firstKey(long time) {
+        if (isNil())
+            return null;
+        Comparable k = leftNode.firstKey(time);
+        if (k != null)
+            return k;
+        if (!listNode.isEmpty(time))
+            return key;
+        return rightNode.firstKey(time);
+    }
+
+    /**
      * Returns a map accessor for the latest time.
      * But after calling add, a previously created accessor becomes invalid.
      *
@@ -233,6 +250,12 @@ public class MapNode {
      */
     public MapAccessor mapAccessor(long time) {
         return new MapAccessor() {
+
+            @Override
+            public long time() {
+                return time;
+            }
+
             @Override
             public ListAccessor listAccessor(Comparable key) {
                 return MapNode.this.listAccessor(key, time);
@@ -241,6 +264,11 @@ public class MapNode {
             @Override
             public NavigableSet flatKeys() {
                 return MapNode.this.flatKeys(time);
+            }
+
+            @Override
+            public Comparable firstKey() {
+                return MapNode.this.firstKey(time);
             }
         };
     }

@@ -8,6 +8,11 @@ import java.util.List;
  */
 public interface ListAccessor extends Iterable {
 
+    /**
+     * The key for the list.
+     *
+     * @return The key for the list, or null.
+     */
     Comparable key();
 
     /**
