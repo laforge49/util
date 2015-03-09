@@ -1,5 +1,7 @@
 package org.agilewiki.utils.maplist;
 
+import java.util.List;
+import java.util.NavigableMap;
 import java.util.NavigableSet;
 
 /**
@@ -27,7 +29,7 @@ public interface MapAccessor {
      *
      * @return A set of the keys with content at the time of the query.
      */
-    NavigableSet flatKeys();
+    NavigableSet<Comparable> flatKeys();
 
     /**
      * Returns the smallest key of the non-empty lists for the given time.
@@ -42,4 +44,11 @@ public interface MapAccessor {
      * @return The largest key, or null.
      */
     Comparable lastKey();
+
+    /**
+     * Returns a map of all the keys and values present at the given time.
+     *
+     * @return A map of lists.
+     */
+    NavigableMap<Comparable, List> flatMap();
 }

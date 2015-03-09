@@ -1,7 +1,6 @@
 package org.agilewiki.utils.maplist;
 
-import java.util.NavigableSet;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * A node in an
@@ -193,7 +192,7 @@ public class MapNode {
         return getList(key).copyList(time);
     }
 
-    protected void flatKeys(NavigableSet keys, long time) {
+    protected void flatKeys(NavigableSet<Comparable> keys, long time) {
         if (isNil())
             return;
         leftNode.flatKeys(keys, time);
@@ -208,10 +207,31 @@ public class MapNode {
      * @param time    The time of the query.
      * @return A set of the keys with content at the time of the query.
      */
-    public NavigableSet flatKeys(long time) {
+    public NavigableSet<Comparable> flatKeys(long time) {
         NavigableSet keys = new TreeSet<>();
         flatKeys(keys, time);
         return keys;
+    }
+
+    protected void flatMap(NavigableMap<Comparable, List> map, long time) {
+        if (isNil())
+            return;
+        leftNode.flatMap(map, time);
+        if (!listNode.isEmpty(time))
+            map.put(key, listNode.flatList(time));
+        rightNode.flatMap(map, time);
+    }
+
+    /**
+     * Returns a map of all the keys and values present at the given time.
+     *
+     * @param time    The time of the query.
+     * @return A map of lists.
+     */
+    public NavigableMap<Comparable, List> flatMap(long time) {
+        NavigableMap<Comparable, List> map = new TreeMap<Comparable, List>();
+        flatMap(map, time);
+        return map;
     }
 
     /**
@@ -279,7 +299,7 @@ public class MapNode {
             }
 
             @Override
-            public NavigableSet flatKeys() {
+            public NavigableSet<Comparable> flatKeys() {
                 return MapNode.this.flatKeys(time);
             }
 
@@ -291,6 +311,11 @@ public class MapNode {
             @Override
             public Comparable lastKey() {
                 return MapNode.this.lastKey(time);
+            }
+
+            @Override
+            public NavigableMap<Comparable, List> flatMap() {
+                return MapNode.this.flatMap(time);
             }
         };
     }
