@@ -1,5 +1,8 @@
 package org.agilewiki.utils.maplist;
 
+import java.util.NavigableSet;
+import java.util.TreeSet;
+
 /**
  * A node in an
  * <a href="http://en.wikipedia.org/wiki/AA_tree">AA Tree</a>
@@ -188,5 +191,26 @@ public class MapNode {
      */
     public ListNode copyList(Comparable key, long time) {
         return getList(key).copyList(time);
+    }
+
+    protected void flatKeys(NavigableSet keys, long time) {
+        if (isNil())
+            return;
+        leftNode.flatKeys(keys, time);
+        if (!listNode.isEmpty(time))
+            keys.add(key);
+        rightNode.flatKeys(keys, time);
+    }
+
+    /**
+     * Returns a set of all keys with non-empty lists for the given time.
+     *
+     * @param time    The time of the query.
+     * @return A set of the keys with content at the time of the query.
+     */
+    public NavigableSet flatKeys(long time) {
+        NavigableSet keys = new TreeSet<>();
+        flatKeys(keys, time);
+        return keys;
     }
 }
