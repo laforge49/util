@@ -213,4 +213,35 @@ public class MapNode {
         flatKeys(keys, time);
         return keys;
     }
+
+    /**
+     * Returns a map accessor for the latest time.
+     * But after calling add, a previously created accessor becomes invalid.
+     *
+     * @return A map accessor for the latest time.
+     */
+    public MapAccessor mapAccessor() {
+        return mapAccessor(ListNode.MAX_TIME);
+    }
+
+    /**
+     * Returns a map accessor for a given time.
+     * But after calling add, previously created accessors becomes invalid.
+     *
+     * @param time The time of the query.
+     * @return A map accessor for the given time.
+     */
+    public MapAccessor mapAccessor(long time) {
+        return new MapAccessor() {
+            @Override
+            public ListAccessor listAccessor(Comparable key) {
+                return MapNode.this.listAccessor(key, time);
+            }
+
+            @Override
+            public NavigableSet flatKeys() {
+                return MapNode.this.flatKeys(time);
+            }
+        };
+    }
 }
