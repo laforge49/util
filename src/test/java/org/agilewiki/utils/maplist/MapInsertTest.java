@@ -21,5 +21,7 @@ public class MapInsertTest extends TestCase {
         assertEquals("1", ma.lastKey());
         assertEquals(1, ma.flatMap().size());
         assertEquals(1, ma.size());
+
+        assertEquals("1", ma.higherKey(""));
     }
 }
