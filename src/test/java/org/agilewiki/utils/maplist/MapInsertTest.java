@@ -26,5 +26,7 @@ public class MapInsertTest extends TestCase {
         assertEquals("1", ma.ceilingKey(""));
         assertEquals("1", ma.ceilingKey("1"));
         assertEquals("1", ma.lowerKey("9"));
+        assertEquals("1", ma.floorKey("9"));
+        assertEquals("1", ma.floorKey("1"));
     }
 }

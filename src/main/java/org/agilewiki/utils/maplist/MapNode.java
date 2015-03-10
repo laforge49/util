@@ -402,6 +402,27 @@ public class MapNode {
     }
 
     /**
+     * Returns the key with content that is smaller than or equal to the given key.
+     *
+     * @param key     The given key.
+     * @param time    The time of the query.
+     * @return The key smaller than or equal to the given key, or null.
+     */
+    public Comparable floorKey(Comparable key, long time) {
+        if (isNil())
+            return null;
+        int c = key.compareTo(this.key);
+        if (c > 0) {
+            Comparable k = rightNode.floorKey(key, time);
+            if (k != null)
+                return k;
+        }
+        if (c >= 0 && !listNode.isEmpty(time))
+            return this.key;
+        return leftNode.floorKey(key, time);
+    }
+
+    /**
      * Returns a map accessor for the latest time.
      * But after calling add, a previously created accessor becomes invalid.
      *
@@ -464,6 +485,11 @@ public class MapNode {
             @Override
             public Comparable lowerKey(Comparable key) {
                 return MapNode.this.lowerKey(key, time);
+            }
+
+            @Override
+            public Comparable floorKey(Comparable key) {
+                return MapNode.this.floorKey(key, time);
             }
 
             @Override

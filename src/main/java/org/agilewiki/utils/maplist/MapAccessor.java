@@ -77,6 +77,14 @@ public interface MapAccessor {
     Comparable lowerKey(Comparable key);
 
     /**
+     * Returns the key with content that is smaller than or equal to the given key.
+     *
+     * @param key     The given key.
+     * @return The key smaller than or equal to the given key, or null.
+     */
+    Comparable floorKey(Comparable key);
+
+    /**
      * Returns a map of all the keys and values present at the given time.
      *
      * @return A map of lists.

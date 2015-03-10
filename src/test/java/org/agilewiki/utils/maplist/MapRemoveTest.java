@@ -22,5 +22,7 @@ public class MapRemoveTest extends TestCase {
         assertNull(ma.ceilingKey(""));
         assertNull(ma.ceilingKey("1"));
         assertNull(ma.lowerKey("9"));
+        assertNull(ma.floorKey("9"));
+        assertNull(ma.floorKey("1"));
     }
 }
