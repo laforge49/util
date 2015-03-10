@@ -360,6 +360,27 @@ public class MapNode {
     }
 
     /**
+     * Returns the next smaller key.
+     *
+     * @param key     The given key.
+     * @param time    The time of the query.
+     * @return The next smaller key with content at the time of the query.
+     */
+    public Comparable lowerKey(Comparable key, long time) {
+        if (isNil())
+            return null;
+        int c = key.compareTo(this.key);
+        if (c >= 0) {
+            Comparable k = rightNode.lowerKey(key, time);
+            if (k != null)
+                return k;
+        }
+        if (c > 0 && !listNode.isEmpty(time))
+            return this.key;
+        return leftNode.lowerKey(key, time);
+    }
+
+    /**
      * Returns a map accessor for the latest time.
      * But after calling add, a previously created accessor becomes invalid.
      *
@@ -412,6 +433,11 @@ public class MapNode {
             @Override
             public Comparable higherKey(Comparable key) {
                 return MapNode.this.higherKey(key, time);
+            }
+
+            @Override
+            public Comparable lowerKey(Comparable key) {
+                return MapNode.this.lowerKey(key, time);
             }
 
             @Override

@@ -19,5 +19,6 @@ public class MapRemoveTest extends TestCase {
         assertEquals(0, ma.flatMap().size());
 
         assertNull(ma.higherKey(""));
+        assertNull(ma.lowerKey("9"));
     }
 }

@@ -61,6 +61,14 @@ public interface MapAccessor {
     Comparable higherKey(Comparable key);
 
     /**
+     * Returns the next smaller key.
+     *
+     * @param key     The given key.
+     * @return The next smaller key with content at the time of the query.
+     */
+    Comparable lowerKey(Comparable key);
+
+    /**
      * Returns a map of all the keys and values present at the given time.
      *
      * @return A map of lists.
