@@ -343,7 +343,7 @@ public class MapNode {
      *
      * @param key     The given key.
      * @param time    The time of the query.
-     * @return The next greater key with content at the time of the query.
+     * @return The next greater key with content at the time of the query, or null.
      */
     public Comparable higherKey(Comparable key, long time) {
         if (isNil())
@@ -360,11 +360,32 @@ public class MapNode {
     }
 
     /**
+     * Returns the key with content that is greater than or equal to the given key.
+     *
+     * @param key     The given key.
+     * @param time    The time of the query.
+     * @return The key greater than or equal to the given key, or null.
+     */
+    public Comparable ceilingKey(Comparable key, long time) {
+        if (isNil())
+            return null;
+        int c = key.compareTo(this.key);
+        if (c < 0) {
+            Comparable k = leftNode.ceilingKey(key, time);
+            if (k != null)
+                return k;
+        }
+        if (c <= 0 && !listNode.isEmpty(time))
+            return this.key;
+        return rightNode.ceilingKey(key, time);
+    }
+
+    /**
      * Returns the next smaller key.
      *
      * @param key     The given key.
      * @param time    The time of the query.
-     * @return The next smaller key with content at the time of the query.
+     * @return The next smaller key with content at the time of the query, or null.
      */
     public Comparable lowerKey(Comparable key, long time) {
         if (isNil())
@@ -433,6 +454,11 @@ public class MapNode {
             @Override
             public Comparable higherKey(Comparable key) {
                 return MapNode.this.higherKey(key, time);
+            }
+
+            @Override
+            public Comparable ceilingKey(Comparable key) {
+                return MapNode.this.ceilingKey(key, time);
             }
 
             @Override

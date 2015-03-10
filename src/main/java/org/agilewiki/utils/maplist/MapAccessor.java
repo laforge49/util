@@ -53,7 +53,7 @@ public interface MapAccessor {
     Comparable lastKey();
 
     /**
-     * Returns the next greater key.
+     * Returns the next greater key, or null.
      *
      * @param key     The given key.
      * @return The next greater key with content at the time of the query.
@@ -61,7 +61,15 @@ public interface MapAccessor {
     Comparable higherKey(Comparable key);
 
     /**
-     * Returns the next smaller key.
+     * Returns the key with content that is greater than or equal to the given key.
+     *
+     * @param key     The given key.
+     * @return The key greater than or equal to the given key, or null.
+     */
+    Comparable ceilingKey(Comparable key);
+
+    /**
+     * Returns the next smaller key, or null.
      *
      * @param key     The given key.
      * @return The next smaller key with content at the time of the query.
