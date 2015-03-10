@@ -7,7 +7,7 @@ public class MapInsertTest extends TestCase {
 
         MapNode m1 = MapNode.MAP_NIL.add("1", "a", 2);
 
-        assertEquals(1, m1.maxSize("1"));
+        assertEquals(1, m1.totalSize("1"));
 
         assertEquals(1, m1.flatKeys(3).size());
 
@@ -20,5 +20,6 @@ public class MapInsertTest extends TestCase {
         assertEquals("1", ma.firstKey());
         assertEquals("1", ma.lastKey());
         assertEquals(1, ma.flatMap().size());
+        assertEquals(1, ma.size());
     }
 }

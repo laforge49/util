@@ -9,7 +9,7 @@ public class MapRemoveTest extends TestCase {
         MapNode m1 = MapNode.MAP_NIL.add("1", "a", 2);
         assertEquals("a", m1.remove("1", 0, 3));
 
-        assertEquals(1, m1.maxSize("1"));
+        assertEquals(1, m1.totalSize("1"));
 
         assertEquals(0, m1.flatKeys(4).size());
 

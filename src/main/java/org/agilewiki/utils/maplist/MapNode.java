@@ -59,7 +59,7 @@ public class MapNode {
      * @param key The list identifier.
      * @return The count of all the values in the list.
      */
-    public int maxSize(Comparable key) {
+    public int totalSize(Comparable key) {
         return getList(key).totalSize();
     }
 

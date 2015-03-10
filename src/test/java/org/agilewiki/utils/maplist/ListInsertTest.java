@@ -40,6 +40,7 @@ public class ListInsertTest extends TestCase {
         assertEquals("E", a2.get(4));
         assertEquals("F", a2.get(5));
         assertEquals("G", a2.get(6));
+        assertEquals(7, a2.size());
         assertEquals("ABCDEFG", String.join("", a2.flatList()));
         assertEquals("DEFG", String.join("", l2.flatList(5)));
 

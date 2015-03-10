@@ -23,6 +23,7 @@ public class ListRemoveTest extends TestCase {
         assertNull(l2.remove(-3, 9));
         assertNull(l2.remove(-2, 10));
         assertNull(l2.remove(-1, 11));
+        assertEquals(7, l2.totalSize());
         assertEquals("a", l2.remove(0, 12));
         assertEquals("b", l2.remove(1, 13));
         assertEquals("c", l2.remove(2, 14));
@@ -43,6 +44,7 @@ public class ListRemoveTest extends TestCase {
         ListNode copy = l2.copyList(16);
         assertEquals("e", String.join("", copy.flatList(6)));
         assertEquals("efg", String.join("", copy.flatList(15)));
+        assertEquals(3, l2.size(15));
         assertEquals("g", String.join("", copy.flatList(17)));
         Iterator it = copy.iterator(15);
         assertTrue(it.hasNext());
