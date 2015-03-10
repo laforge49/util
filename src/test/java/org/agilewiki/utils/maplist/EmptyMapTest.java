@@ -22,5 +22,7 @@ public class EmptyMapTest extends TestCase {
         assertNull(ma.ceilingKey(""));
         assertNull(ma.lowerKey("x"));
         assertNull(ma.floorKey("x"));
+
+        assertFalse(ma.iterator().hasNext());
     }
 }

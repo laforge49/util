@@ -423,6 +423,34 @@ public class MapNode {
     }
 
     /**
+     * Returns an iterator over the non-empty list accessors.
+     *
+     * @param time The time of the query.
+     * @return The iterator.
+     */
+    public Iterator<ListAccessor> iterator(long time) {
+        return new Iterator<ListAccessor>() {
+            Comparable last = null;
+
+            @Override
+            public boolean hasNext() {
+                if (last == null)
+                    return firstKey(time) != null;
+                return higherKey(last, time) != null;
+            }
+
+            @Override
+            public ListAccessor next() {
+                Comparable next = last == null ? firstKey(time) : higherKey(last, time);
+                if (next == null)
+                    throw new NoSuchElementException();
+                last = next;
+                return listAccessor(last, time);
+            }
+        };
+    }
+
+    /**
      * Returns a map accessor for the latest time.
      * But after calling add, a previously created accessor becomes invalid.
      *
@@ -490,6 +518,11 @@ public class MapNode {
             @Override
             public Comparable floorKey(Comparable key) {
                 return MapNode.this.floorKey(key, time);
+            }
+
+            @Override
+            public Iterator<ListAccessor> iterator() {
+                return MapNode.this.iterator(time);
             }
 
             @Override

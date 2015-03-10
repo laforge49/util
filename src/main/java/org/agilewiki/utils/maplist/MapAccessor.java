@@ -1,5 +1,6 @@
 package org.agilewiki.utils.maplist;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
@@ -7,7 +8,7 @@ import java.util.NavigableSet;
 /**
  * Accesses a versioned map list for a given time.
  */
-public interface MapAccessor {
+public interface MapAccessor extends Iterable<ListAccessor> {
 
     /**
      * Returns the time being accessed.
@@ -83,6 +84,13 @@ public interface MapAccessor {
      * @return The key smaller than or equal to the given key, or null.
      */
     Comparable floorKey(Comparable key);
+
+    /**
+     * Returns an iterator over the non-empty list accessors.
+     *
+     * @return The iterator.
+     */
+    Iterator<ListAccessor> iterator();
 
     /**
      * Returns a map of all the keys and values present at the given time.

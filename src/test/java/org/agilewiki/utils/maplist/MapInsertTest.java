@@ -2,6 +2,8 @@ package org.agilewiki.utils.maplist;
 
 import junit.framework.TestCase;
 
+import java.util.Iterator;
+
 public class MapInsertTest extends TestCase {
     public void test() throws Exception {
 
@@ -28,5 +30,10 @@ public class MapInsertTest extends TestCase {
         assertEquals("1", ma.lowerKey("9"));
         assertEquals("1", ma.floorKey("9"));
         assertEquals("1", ma.floorKey("1"));
+
+        Iterator<ListAccessor> it = ma.iterator();
+        assertTrue(it.hasNext());
+        assertEquals(1, it.next().size());
+        assertFalse(it.hasNext());
     }
 }
