@@ -643,4 +643,33 @@ public class ImmutableListNode {
                 created,
                 deleted);
     }
+
+    /**
+     * Perform a complete copy.
+     *
+     * @return A complete, but shallow copy of the list.
+     */
+    public ImmutableListNode copyList() {
+        return copyList(0L);
+    }
+
+    /**
+     * Copy everything except what was deleted before a given time.
+     * (This is a shallow copy, as the values in the list are not copied.)
+     *
+     * @param time The given time.
+     * @return A shortened copy of the list without some historical values.
+     */
+    public ImmutableListNode copyList(long time) {
+        return copyList(LIST_NIL, time);
+    }
+
+    protected ImmutableListNode copyList(ImmutableListNode n, long time) {
+        if (isNil())
+            return n;
+        n = leftNode.copyList(n, time);
+        if (deleted >= time)
+            n = n.add(n.size, value, created, deleted);
+        return rightNode.copyList(n, time);
+    }
 }
