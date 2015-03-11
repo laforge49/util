@@ -632,8 +632,8 @@ public class ImmutableListNode {
                     created,
                     deleted);
         }
-        ImmutableListNode n = rightNode.remove(ndx, time);
-        if (leftNode == n)
+        ImmutableListNode n = rightNode.remove(ndx - leftSize -1, time);
+        if (rightNode == n)
             return this;
         return new ImmutableListNode(
                 level,
