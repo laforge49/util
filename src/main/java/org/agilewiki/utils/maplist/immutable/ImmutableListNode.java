@@ -515,4 +515,29 @@ public class ImmutableListNode {
         } else
             return this;
     }
+
+    protected ImmutableListNode split() {
+        if (isNil())
+            return this;
+        if (rightNode.isNil() || rightNode.rightNode.isNil())
+            return this;
+        if (level == rightNode.rightNode.level) {
+            ImmutableListNode t = new ImmutableListNode(
+                    level,
+                    leftNode,
+                    rightNode.rightNode,
+                    value,
+                    created,
+                    deleted);
+            ImmutableListNode r = new ImmutableListNode(
+                    rightNode.level + 1,
+                    t,
+                    rightNode.rightNode,
+                    rightNode.value,
+                    rightNode.created,
+                    rightNode.deleted);
+            return r;
+        }
+        return this;
+    }
 }
