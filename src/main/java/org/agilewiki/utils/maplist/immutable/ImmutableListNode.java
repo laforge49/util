@@ -490,4 +490,29 @@ public class ImmutableListNode {
             }
         };
     }
+
+    protected ImmutableListNode skew() {
+        if (isNil())
+            return this;
+        if (leftNode.isNil())
+            return this;
+        if (leftNode.level == level) {
+            ImmutableListNode t = new ImmutableListNode(
+                    level,
+                    leftNode.rightNode,
+                    rightNode,
+                    value,
+                    created,
+                    deleted);
+            ImmutableListNode l = new ImmutableListNode(
+                    leftNode.level,
+                    leftNode.leftNode,
+                    t,
+                    leftNode.value,
+                    leftNode.created,
+                    leftNode.deleted);
+            return l;
+        } else
+            return this;
+    }
 }
