@@ -540,4 +540,61 @@ public class ImmutableListNode {
         }
         return this;
     }
+
+    /**
+     * Add a non-null value to the end of the list.
+     * After calling add, a previously created accessor becomes invalid.
+     *
+     * @param value The value to be added.
+     * @param time  The time the value is added.
+     * @return The revised root node.
+     */
+    public ImmutableListNode add(Object value, long time) {
+        return add(-1, value, time);
+    }
+
+    /**
+     * Add a non-null value to the list.
+     * After calling add, a previously created accessor becomes invalid.
+     *
+     * @param ndx   Where to add the value, or -1 to append to the end.
+     * @param value The value to be added.
+     * @param time  The time the value is added.
+     * @return The revised root node.
+     */
+    public ImmutableListNode add(int ndx, Object value, long time) {
+        return add(ndx, value, time, Integer.MAX_VALUE);
+    }
+
+    protected ImmutableListNode add(int ndx, Object value, long created, long deleted) {
+        if (value == null)
+            throw new IllegalArgumentException("value may not be null");
+        if (isNil()) {
+            if (ndx != 0 && ndx != -1)
+                throw new IllegalArgumentException("index out of range");
+            return new ImmutableListNode(1, LIST_NIL, LIST_NIL, value, created, deleted);
+        }
+        if (ndx == -1)
+            ndx = size;
+        int leftSize = leftNode.size;
+        ImmutableListNode t = this;
+        if (ndx <= leftSize) {
+            t = new ImmutableListNode(
+                    level,
+                    leftNode.add(ndx, value, created, deleted),
+                    rightNode,
+                    this.value,
+                    this.created,
+                    this.deleted);
+        } else {
+            t = new ImmutableListNode(
+                    level,
+                    leftNode,
+                    leftNode.add(ndx - leftSize - 1, value, created, deleted),
+                    this.value,
+                    this.created,
+                    this.deleted);
+        }
+        return t.skew().split();
+    }
 }
