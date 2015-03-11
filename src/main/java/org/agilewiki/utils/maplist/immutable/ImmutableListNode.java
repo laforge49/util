@@ -597,4 +597,50 @@ public class ImmutableListNode {
         }
         return t.skew().split();
     }
+
+    /**
+     * Mark a value as deleted.
+     *
+     * @param ndx  The index of the value.
+     * @param time The time of the deletion.
+     * @return The revised node.
+     */
+    public ImmutableListNode remove(int ndx, long time) {
+        if (isNil())
+            return this;
+        int leftSize = leftNode.size;
+        if (ndx == leftSize) {
+            if (exists(time))
+                return new ImmutableListNode(
+                        level,
+                        leftNode,
+                        rightNode,
+                        value,
+                        created,
+                        time);
+            return this;
+        }
+        if (ndx < leftSize) {
+            ImmutableListNode n = leftNode.remove(ndx, time);
+            if (leftNode == n)
+                return this;
+            return new ImmutableListNode(
+                    level,
+                    n,
+                    rightNode,
+                    value,
+                    created,
+                    deleted);
+        }
+        ImmutableListNode n = rightNode.remove(ndx, time);
+        if (leftNode == n)
+            return this;
+        return new ImmutableListNode(
+                level,
+                leftNode,
+                n,
+                value,
+                created,
+                deleted);
+    }
 }
