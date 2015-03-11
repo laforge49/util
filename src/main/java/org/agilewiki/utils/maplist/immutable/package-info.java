@@ -18,7 +18,8 @@
  *     An immutable versioning map list works a lot like the mutable form.
  *     Only an add will not invalidate older references to the map list
  *     and the method signature for remove now needs to return the new map list
- *     rather than the removed value.
+ *     rather than the removed value. The ListAccessor and MapAccessor classes
+ *     will work with both mutable and immutable map lists.
  * </p>
  * <p>
  *     Immutable versioning map lists then should be much easier to use safely than
