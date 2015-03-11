@@ -525,7 +525,7 @@ public class ImmutableListNode {
             ImmutableListNode t = new ImmutableListNode(
                     level,
                     leftNode,
-                    rightNode.rightNode,
+                    rightNode.leftNode,
                     value,
                     created,
                     deleted);
@@ -590,7 +590,7 @@ public class ImmutableListNode {
             t = new ImmutableListNode(
                     level,
                     leftNode,
-                    leftNode.add(ndx - leftSize - 1, value, created, deleted),
+                    rightNode.add(ndx - leftSize - 1, value, created, deleted),
                     this.value,
                     this.created,
                     this.deleted);
