@@ -609,4 +609,13 @@ public class ListNode {
             n = n.add(n.size, value, created, deleted);
         return rightNode.copyList(n, time);
     }
+
+    public void clearList(long time) {
+        if (isNil())
+            return;
+        leftNode.clearList(time);
+        if (exists(time))
+            deleted = time;
+        rightNode.clearList(time);
+    }
 }

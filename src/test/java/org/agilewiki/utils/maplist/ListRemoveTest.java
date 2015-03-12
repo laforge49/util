@@ -8,6 +8,8 @@ public class ListRemoveTest extends TestCase {
     public void test() throws Exception {
         ListNode l1 = ListNode.LIST_NIL;
 
+        l1.clearList(1);
+
         assertNull(l1.remove(-1, 1));
         assertNull(l1.remove(0, 1));
         assertNull(l1.remove(1, 1));
@@ -54,5 +56,8 @@ public class ListRemoveTest extends TestCase {
         assertTrue(it.hasNext());
         assertEquals("g", it.next());
         assertFalse(it.hasNext());
+        assertEquals(2, copy.size(16));
+        copy.clearList(30);
+        assertEquals(0, copy.size(30));
     }
 }
