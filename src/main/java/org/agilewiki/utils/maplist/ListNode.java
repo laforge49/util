@@ -610,12 +610,12 @@ public class ListNode {
         return rightNode.copyList(n, time);
     }
 
-    public void clearList(long time) {
+    public void clear(long time) {
         if (isNil())
             return;
-        leftNode.clearList(time);
+        leftNode.clear(time);
         if (exists(time))
             deleted = time;
-        rightNode.clearList(time);
+        rightNode.clear(time);
     }
 }
