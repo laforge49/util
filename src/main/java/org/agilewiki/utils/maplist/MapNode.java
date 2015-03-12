@@ -197,6 +197,22 @@ public class MapNode {
     }
 
     /**
+     * Replace the current content of a key, if any, with a new value.
+     * As with add, any existing accessors will be invalidated.
+     *
+     * @param key   The key of the list.
+     * @param value The new non-null value to be added to the list.
+     * @param time  The time of the update.
+     * @return The new tree root.
+     */
+    public MapNode set(Comparable key, Object value, long time) {
+        if (value == null)
+            throw new IllegalArgumentException("value may not be null");
+        clearList(key, time);
+        return add(key, value, time);
+    }
+
+    /**
      * Perform a complete list copy.
      *
      * @return A complete, but shallow copy of the list.
@@ -228,7 +244,7 @@ public class MapNode {
     /**
      * Returns a set of all keys with non-empty lists for the given time.
      *
-     * @param time    The time of the query.
+     * @param time The time of the query.
      * @return A set of the keys with content at the time of the query.
      */
     public NavigableSet<Comparable> flatKeys(long time) {
@@ -249,7 +265,7 @@ public class MapNode {
     /**
      * Returns a map of all the keys and values present at the given time.
      *
-     * @param time    The time of the query.
+     * @param time The time of the query.
      * @return A map of lists.
      */
     public NavigableMap<Comparable, List> flatMap(long time) {
@@ -316,7 +332,7 @@ public class MapNode {
     /**
      * Returns the count of all the keys with a non-empty list.
      *
-     * @param time    The time of the query.
+     * @param time The time of the query.
      * @return The current size of the map.
      */
     public int size(long time) {
@@ -331,7 +347,7 @@ public class MapNode {
     /**
      * Returns the smallest key of the non-empty lists for the given time.
      *
-     * @param time    The time of the query.
+     * @param time The time of the query.
      * @return The smallest key, or null.
      */
     public Comparable firstKey(long time) {
@@ -348,7 +364,7 @@ public class MapNode {
     /**
      * Returns the largest key of the non-empty lists for the given time.
      *
-     * @param time    The time of the query.
+     * @param time The time of the query.
      * @return The largest key, or null.
      */
     public Comparable lastKey(long time) {
@@ -365,8 +381,8 @@ public class MapNode {
     /**
      * Returns the next greater key.
      *
-     * @param key     The given key.
-     * @param time    The time of the query.
+     * @param key  The given key.
+     * @param time The time of the query.
      * @return The next greater key with content at the time of the query, or null.
      */
     public Comparable higherKey(Comparable key, long time) {
@@ -386,8 +402,8 @@ public class MapNode {
     /**
      * Returns the key with content that is greater than or equal to the given key.
      *
-     * @param key     The given key.
-     * @param time    The time of the query.
+     * @param key  The given key.
+     * @param time The time of the query.
      * @return The key greater than or equal to the given key, or null.
      */
     public Comparable ceilingKey(Comparable key, long time) {
@@ -407,8 +423,8 @@ public class MapNode {
     /**
      * Returns the next smaller key.
      *
-     * @param key     The given key.
-     * @param time    The time of the query.
+     * @param key  The given key.
+     * @param time The time of the query.
      * @return The next smaller key with content at the time of the query, or null.
      */
     public Comparable lowerKey(Comparable key, long time) {
@@ -428,8 +444,8 @@ public class MapNode {
     /**
      * Returns the key with content that is smaller than or equal to the given key.
      *
-     * @param key     The given key.
-     * @param time    The time of the query.
+     * @param key  The given key.
+     * @param time The time of the query.
      * @return The key smaller than or equal to the given key, or null.
      */
     public Comparable floorKey(Comparable key, long time) {
