@@ -201,15 +201,27 @@ public class ImmutableMapNode {
      * @return The revised node.
      */
     public ImmutableMapNode remove(Comparable key, int ndx, long time) {
-        ImmutableListNode ln = getList(key).remove(ndx, time);
-        if (ln == listNode)
+        if (key == null)
+            throw new IllegalArgumentException("key may not be null");
+        if (isNil())
             return this;
-        return new ImmutableMapNode(
-                level,
-                leftNode,
-                rightNode,
-                ln,
-                key);
+        int c = key.compareTo(this.key);
+        if (c < 0) {
+            ImmutableMapNode n = leftNode.remove(key, ndx, time);
+            if (n == leftNode)
+                return this;
+            return new ImmutableMapNode(level, n, rightNode, listNode, key);
+        } else if (c == 0) {
+            ImmutableListNode n = listNode.remove(ndx, time);
+            if (n == listNode)
+                return this;
+            return new ImmutableMapNode(level, leftNode, rightNode, n, key);
+        } else {
+            ImmutableMapNode n = rightNode.remove(key, ndx, time);
+            if (n == rightNode)
+                return this;
+            return new ImmutableMapNode(level, leftNode, n, listNode, key);
+        }
     }
 
     /**
