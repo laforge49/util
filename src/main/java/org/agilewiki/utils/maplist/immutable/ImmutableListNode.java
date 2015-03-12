@@ -667,4 +667,20 @@ public class ImmutableListNode {
             n = n.add(n.size, value, created, deleted);
         return rightNode.copyList(n, time);
     }
+
+    /**
+     * Empty the list by marking all the existing values as deleted.
+     *
+     * @param time The time of the deletion.
+     * @return The currently empty versioned list.
+     */
+    public ImmutableListNode clearList(long time) {
+        if (isNil())
+            return this;
+        ImmutableListNode ln = leftNode.clearList(time);
+        ImmutableListNode rn = rightNode.clearList(time);
+        if (ln == leftNode && rn == rightNode && !exists(time))
+            return this;
+        return new ImmutableListNode(level, ln, rn, value, created, time);
+    }
 }

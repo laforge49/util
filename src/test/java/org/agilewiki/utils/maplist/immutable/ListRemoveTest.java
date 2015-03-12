@@ -56,5 +56,8 @@ public class ListRemoveTest extends TestCase {
         assertTrue(it.hasNext());
         assertEquals("g", it.next());
         assertFalse(it.hasNext());
+
+        copy = copy.clearList(30);
+        assertEquals(0, copy.size(30));
     }
 }
