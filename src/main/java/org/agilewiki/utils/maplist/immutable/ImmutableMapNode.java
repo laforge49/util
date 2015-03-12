@@ -255,6 +255,27 @@ public class ImmutableMapNode {
         }
     }
 
+    public ImmutableMapNode set(Comparable key, Object value, long time) {
+        if (value == null)
+            throw new IllegalArgumentException("value may not be null");
+        if (isNil()) {
+            ImmutableListNode listNode = ImmutableListNode.LIST_NIL.add(value, time);
+            return new ImmutableMapNode(1, MAP_NIL, MAP_NIL, listNode, key);
+        }
+        int c = key.compareTo(this.key);
+        if (c < 0) {
+            ImmutableMapNode n = leftNode.set(key, value, time);
+            return new ImmutableMapNode(level, n, rightNode, listNode, key);
+        } else if (c == 0) {
+            ImmutableListNode n = listNode.clearList(time);
+            n = n.add(value, time);
+            return new ImmutableMapNode(level, leftNode, rightNode, n, key);
+        } else {
+            ImmutableMapNode n = rightNode.set(key, value, time);
+            return new ImmutableMapNode(level, leftNode, n, listNode, key);
+        }
+    }
+
     /**
      * Empty the map by marking all the existing values as deleted.
      *

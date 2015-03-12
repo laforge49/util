@@ -7,6 +7,7 @@ public class MapRemoveTest extends TestCase {
     public void test() throws Exception {
         assertEquals(ImmutableMapNode.MAP_NIL, ImmutableMapNode.MAP_NIL.remove("", 0, 1));
         ImmutableMapNode.MAP_NIL.clearMap(1);
+        assertEquals(1, ImmutableMapNode.MAP_NIL.set("1", "a", 1).size(1));
 
         ImmutableMapNode m1 = ImmutableMapNode.MAP_NIL.add("1", "a", 2);
         m1 = m1.remove("1", 0, 3);
