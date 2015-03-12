@@ -68,7 +68,6 @@ public class ImmutableMapNode {
 
     /**
      * Returns a list accessor for the latest time.
-     * But after calling add, a previously created accessor becomes invalid.
      *
      * @param key The key for the list.
      * @return A list accessor for the latest time.
@@ -79,7 +78,6 @@ public class ImmutableMapNode {
 
     /**
      * Returns a list accessor for the given time.
-     * But after calling add, a previously created accessor becomes invalid.
      *
      * @param key  The key for the list.
      * @param time The time of the query.
@@ -137,7 +135,6 @@ public class ImmutableMapNode {
 
     /**
      * Add a non-null value to the end of the list.
-     * After calling add, a previously created accessor becomes invalid.
      *
      * @param key   The key of the list.
      * @param value The value to be added.
@@ -150,7 +147,6 @@ public class ImmutableMapNode {
 
     /**
      * Add a non-null value to the list.
-     * After calling add, a previously created accessor becomes invalid.
      *
      * @param key   The key of the list.
      * @param ndx   Where to add the value.
@@ -518,7 +514,6 @@ public class ImmutableMapNode {
 
     /**
      * Returns a map accessor for a given time.
-     * But after calling add, previously created accessors becomes invalid.
      *
      * @param time The time of the query.
      * @return A map accessor for the given time.

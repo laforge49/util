@@ -375,7 +375,6 @@ public class ImmutableListNode {
 
     /**
      * Returns a list accessor for the latest time.
-     * But after calling add, a previously created accessor becomes invalid.
      *
      * @return A list accessor for the latest time.
      */
@@ -385,7 +384,6 @@ public class ImmutableListNode {
 
     /**
      * Returns a list accessor for the latest time.
-     * But after calling add, a previously created accessor becomes invalid.
      *
      * @param key The key for the list.
      * @return A list accessor for the latest time.
@@ -396,7 +394,6 @@ public class ImmutableListNode {
 
     /**
      * Returns a list accessor for the given time.
-     * But after calling add, a previously created accessor becomes invalid.
      *
      * @param key  The key for the list.
      * @param time The time of the query.
@@ -543,7 +540,6 @@ public class ImmutableListNode {
 
     /**
      * Add a non-null value to the end of the list.
-     * After calling add, a previously created accessor becomes invalid.
      *
      * @param value The value to be added.
      * @param time  The time the value is added.
@@ -555,7 +551,6 @@ public class ImmutableListNode {
 
     /**
      * Add a non-null value to the list.
-     * After calling add, a previously created accessor becomes invalid.
      *
      * @param ndx   Where to add the value, or -1 to append to the end.
      * @param value The value to be added.
