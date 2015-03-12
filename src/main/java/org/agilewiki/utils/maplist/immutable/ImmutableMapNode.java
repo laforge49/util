@@ -1,35 +1,38 @@
-package org.agilewiki.utils.maplist;
+package org.agilewiki.utils.maplist.immutable;
+
+import org.agilewiki.utils.maplist.ListAccessor;
+import org.agilewiki.utils.maplist.MapAccessor;
 
 import java.util.*;
 
 /**
- * A node in an
- * <a href="http://en.wikipedia.org/wiki/AA_tree">AA Tree</a>
- * representing a map of versioned lists.
+ * An immutable map of versioned lists.
  */
-public class MapNode {
+public class ImmutableMapNode {
     /**
      * The root node of an empty tree.
      */
-    public final static MapNode MAP_NIL = new MapNode();
+    public final static ImmutableMapNode MAP_NIL = new ImmutableMapNode();
 
-    protected int level;
-    protected MapNode leftNode;
-    protected MapNode rightNode;
-    protected ListNode listNode;
-    protected Comparable key;
+    protected final int level;
+    protected final ImmutableMapNode leftNode;
+    protected final ImmutableMapNode rightNode;
+    protected final ImmutableListNode listNode;
+    protected final Comparable key;
 
-    protected MapNode() {
+    protected ImmutableMapNode() {
+        level = 0;
         leftNode = this;
         rightNode = this;
-        listNode = ListNode.LIST_NIL;
+        listNode = ImmutableListNode.LIST_NIL;
+        key = null;
     }
 
-    protected MapNode(int level,
-                      MapNode leftNode,
-                      MapNode rightNode,
-                      ListNode listNode,
-                      Comparable key) {
+    protected ImmutableMapNode(int level,
+                               ImmutableMapNode leftNode,
+                               ImmutableMapNode rightNode,
+                               ImmutableListNode listNode,
+                               Comparable key) {
         this.level = level;
         this.leftNode = leftNode;
         this.rightNode = rightNode;
@@ -41,7 +44,7 @@ public class MapNode {
         return this == MAP_NIL;
     }
 
-    protected ListNode getList(Comparable key) {
+    protected ImmutableListNode getList(Comparable key) {
         if (isNil())
             return listNode;
         int c = key.compareTo(this.key);
@@ -86,30 +89,47 @@ public class MapNode {
         return getList(key).listAccessor(key, time);
     }
 
-    protected MapNode skew() {
+    protected ImmutableMapNode skew() {
         if (isNil())
             return this;
         if (leftNode.isNil())
             return this;
         if (leftNode.level == level) {
-            MapNode l = leftNode;
-            leftNode = l.rightNode;
-            l.rightNode = this;
+            ImmutableMapNode t = new ImmutableMapNode(
+                    level,
+                    leftNode.rightNode,
+                    rightNode,
+                    listNode,
+                    key);
+            ImmutableMapNode l = new ImmutableMapNode(
+                    leftNode.level,
+                    leftNode.leftNode,
+                    t,
+                    leftNode.listNode,
+                    leftNode.key);
             return l;
         } else
             return this;
     }
 
-    protected MapNode split() {
+    protected ImmutableMapNode split() {
         if (isNil())
             return this;
         if (rightNode.isNil() || rightNode.rightNode.isNil())
             return this;
         if (level == rightNode.rightNode.level) {
-            MapNode r = rightNode;
-            rightNode = r.leftNode;
-            r.leftNode = this;
-            r.level += 1;
+            ImmutableMapNode t = new ImmutableMapNode(
+                    level,
+                    leftNode,
+                    rightNode.leftNode,
+                    listNode,
+                    key);
+            ImmutableMapNode r = new ImmutableMapNode(
+                    rightNode.level + 1,
+                    t,
+                    rightNode.rightNode,
+                    rightNode.listNode,
+                    rightNode.key);
             return r;
         }
         return this;
@@ -124,7 +144,7 @@ public class MapNode {
      * @param time  The time the value is added.
      * @return The revised root node.
      */
-    public MapNode add(Comparable key, Object value, long time) {
+    public ImmutableMapNode add(Comparable key, Object value, long time) {
         return add(key, -1, value, time);
     }
 
@@ -138,26 +158,42 @@ public class MapNode {
      * @param time  The time the value is added.
      * @return The revised root node.
      */
-    public MapNode add(Comparable key, int ndx, Object value, long time) {
+    public ImmutableMapNode add(Comparable key, int ndx, Object value, long time) {
         return add(key, ndx, value, time, Integer.MAX_VALUE);
     }
 
-    protected MapNode add(Comparable key, int ndx, Object value, long created, long deleted) {
+    protected ImmutableMapNode add(Comparable key, int ndx, Object value, long created, long deleted) {
         if (key == null)
             throw new IllegalArgumentException("key may not be null");
         if (isNil()) {
-            ListNode listNode = ListNode.LIST_NIL.add(ndx, value, created, deleted);
-            return new MapNode(1, MAP_NIL, MAP_NIL, listNode, key);
+            ImmutableListNode listNode = ImmutableListNode.LIST_NIL.add(ndx, value, created, deleted);
+            return new ImmutableMapNode(1, MAP_NIL, MAP_NIL, listNode, key);
         }
+        ImmutableMapNode t;
         int c = key.compareTo(this.key);
-        if (c < 0)
-            leftNode = leftNode.add(key, ndx, value, created, deleted);
-        else if (c == 0) {
-            listNode = listNode.add(ndx, value, created, deleted);
-            return this;
-        } else
-            rightNode = rightNode.add(key, ndx, value, created, deleted);
-        return skew().split();
+        if (c < 0) {
+            t = new ImmutableMapNode(
+                    level,
+                    leftNode.add(key, ndx, value, created, deleted),
+                    rightNode,
+                    listNode,
+                    key);
+        } else if (c == 0) {
+            return new ImmutableMapNode(
+                    level,
+                    leftNode,
+                    rightNode,
+                    listNode.add(ndx, value, created, deleted),
+                    key);
+        } else {
+            t = new ImmutableMapNode(
+                    level,
+                    leftNode,
+                    rightNode.add(key, ndx, value, created, deleted),
+                    listNode,
+                    key);
+        }
+        return t.skew().split();
     }
 
     /**
@@ -166,10 +202,18 @@ public class MapNode {
      * @param key  The key of the list.
      * @param ndx  The index of the value.
      * @param time The time of the deletion.
-     * @return The deleted value.
+     * @return The revised node.
      */
-    public Object remove(Comparable key, int ndx, long time) {
-        return getList(key).remove(ndx, time);
+    public ImmutableMapNode remove(Comparable key, int ndx, long time) {
+        ImmutableListNode ln = getList(key).remove(ndx, time);
+        if (ln == listNode)
+            return this;
+        return new ImmutableMapNode(
+                level,
+                leftNode,
+                rightNode,
+                ln,
+                key);
     }
 
     /**
@@ -177,7 +221,7 @@ public class MapNode {
      *
      * @return A complete, but shallow copy of the list.
      */
-    public ListNode copyList(Comparable key) {
+    public ImmutableListNode copyList(Comparable key) {
         return getList(key).copyList();
     }
 
@@ -188,7 +232,7 @@ public class MapNode {
      * @param time The given time.
      * @return A shortened copy of the list without some historical values.
      */
-    public ListNode copyList(Comparable key, long time) {
+    public ImmutableListNode copyList(Comparable key, long time) {
         return getList(key).copyList(time);
     }
 
@@ -239,7 +283,7 @@ public class MapNode {
      *
      * @return A complete, but shallow copy of the list.
      */
-    public MapNode copyMap() {
+    public ImmutableMapNode copyMap() {
         return copyMap(0L);
     }
 
@@ -250,11 +294,11 @@ public class MapNode {
      * @param time The given time.
      * @return A shortened copy of the map without some historical values.
      */
-    public MapNode copyMap(long time) {
+    public ImmutableMapNode copyMap(long time) {
         return copyMap(MAP_NIL, time);
     }
 
-    protected MapNode copyMap(MapNode n, long time) {
+    protected ImmutableMapNode copyMap(ImmutableMapNode n, long time) {
         if (isNil())
             return n;
         n = leftNode.copyMap(n, time);
@@ -262,20 +306,32 @@ public class MapNode {
         return leftNode.copyMap(n, time);
     }
 
-    protected MapNode addList(Comparable key, ListNode listNode) {
+    protected ImmutableMapNode addList(Comparable key, ImmutableListNode listNode) {
         if (listNode.isNil())
             return this;
         if (isNil()) {
-            return new MapNode(1, MAP_NIL, MAP_NIL, listNode, key);
+            return new ImmutableMapNode(1, MAP_NIL, MAP_NIL, listNode, key);
         }
+        ImmutableMapNode t;
         int c = key.compareTo(this.key);
-        if (c < 0)
-            leftNode = leftNode.addList(key, listNode);
-        else if (c == 0) {
+        if (c < 0) {
+            t = new ImmutableMapNode(
+                    level,
+                    leftNode.addList(key, listNode),
+                    rightNode,
+                    listNode,
+                    key);
+        } else if (c == 0) {
             throw new IllegalArgumentException("duplicate key not supported");
-        } else
-            rightNode = rightNode.addList(key, listNode);
-        return skew().split();
+        } else {
+            t = new ImmutableMapNode(
+                    level,
+                    leftNode,
+                    rightNode.addList(key, listNode),
+                    listNode,
+                    key);
+        }
+        return t.skew().split();
     }
 
     /**
@@ -457,7 +513,7 @@ public class MapNode {
      * @return A map accessor for the latest time.
      */
     public MapAccessor mapAccessor() {
-        return mapAccessor(ListNode.MAX_TIME);
+        return mapAccessor(ImmutableListNode.MAX_TIME);
     }
 
     /**
@@ -477,57 +533,57 @@ public class MapNode {
 
             @Override
             public int size() {
-                return MapNode.this.size(time);
+                return ImmutableMapNode.this.size(time);
             }
 
             @Override
             public ListAccessor listAccessor(Comparable key) {
-                return MapNode.this.listAccessor(key, time);
+                return ImmutableMapNode.this.listAccessor(key, time);
             }
 
             @Override
             public NavigableSet<Comparable> flatKeys() {
-                return MapNode.this.flatKeys(time);
+                return ImmutableMapNode.this.flatKeys(time);
             }
 
             @Override
             public Comparable firstKey() {
-                return MapNode.this.firstKey(time);
+                return ImmutableMapNode.this.firstKey(time);
             }
 
             @Override
             public Comparable lastKey() {
-                return MapNode.this.lastKey(time);
+                return ImmutableMapNode.this.lastKey(time);
             }
 
             @Override
             public Comparable higherKey(Comparable key) {
-                return MapNode.this.higherKey(key, time);
+                return ImmutableMapNode.this.higherKey(key, time);
             }
 
             @Override
             public Comparable ceilingKey(Comparable key) {
-                return MapNode.this.ceilingKey(key, time);
+                return ImmutableMapNode.this.ceilingKey(key, time);
             }
 
             @Override
             public Comparable lowerKey(Comparable key) {
-                return MapNode.this.lowerKey(key, time);
+                return ImmutableMapNode.this.lowerKey(key, time);
             }
 
             @Override
             public Comparable floorKey(Comparable key) {
-                return MapNode.this.floorKey(key, time);
+                return ImmutableMapNode.this.floorKey(key, time);
             }
 
             @Override
             public Iterator<ListAccessor> iterator() {
-                return MapNode.this.iterator(time);
+                return ImmutableMapNode.this.iterator(time);
             }
 
             @Override
             public NavigableMap<Comparable, List> flatMap() {
-                return MapNode.this.flatMap(time);
+                return ImmutableMapNode.this.flatMap(time);
             }
         };
     }
