@@ -225,6 +225,37 @@ public class ImmutableMapNode {
     }
 
     /**
+     * Empty the list by marking all the existing values as deleted.
+     *
+     * @param key  The key of the list.
+     * @param time The time of the deletion.
+     * @return The revised node.
+     */
+    public ImmutableMapNode clearList(Comparable key, long time) {
+        if (key == null)
+            throw new IllegalArgumentException("key may not be null");
+        if (isNil())
+            return this;
+        int c = key.compareTo(this.key);
+        if (c < 0) {
+            ImmutableMapNode n = leftNode.clearList(key, time);
+            if (n == leftNode)
+                return this;
+            return new ImmutableMapNode(level, n, rightNode, listNode, key);
+        } else if (c == 0) {
+            ImmutableListNode n = listNode.clearList(time);
+            if (n == listNode)
+                return this;
+            return new ImmutableMapNode(level, leftNode, rightNode, n, key);
+        } else {
+            ImmutableMapNode n = rightNode.clearList(key, time);
+            if (n == rightNode)
+                return this;
+            return new ImmutableMapNode(level, leftNode, n, listNode, key);
+        }
+    }
+
+    /**
      * Perform a complete list copy.
      *
      * @return A complete, but shallow copy of the list.
@@ -256,7 +287,7 @@ public class ImmutableMapNode {
     /**
      * Returns a set of all keys with non-empty lists for the given time.
      *
-     * @param time    The time of the query.
+     * @param time The time of the query.
      * @return A set of the keys with content at the time of the query.
      */
     public NavigableSet<Comparable> flatKeys(long time) {
@@ -277,7 +308,7 @@ public class ImmutableMapNode {
     /**
      * Returns a map of all the keys and values present at the given time.
      *
-     * @param time    The time of the query.
+     * @param time The time of the query.
      * @return A map of lists.
      */
     public NavigableMap<Comparable, List> flatMap(long time) {
@@ -356,7 +387,7 @@ public class ImmutableMapNode {
     /**
      * Returns the count of all the keys with a non-empty list.
      *
-     * @param time    The time of the query.
+     * @param time The time of the query.
      * @return The current size of the map.
      */
     public int size(long time) {
@@ -371,7 +402,7 @@ public class ImmutableMapNode {
     /**
      * Returns the smallest key of the non-empty lists for the given time.
      *
-     * @param time    The time of the query.
+     * @param time The time of the query.
      * @return The smallest key, or null.
      */
     public Comparable firstKey(long time) {
@@ -388,7 +419,7 @@ public class ImmutableMapNode {
     /**
      * Returns the largest key of the non-empty lists for the given time.
      *
-     * @param time    The time of the query.
+     * @param time The time of the query.
      * @return The largest key, or null.
      */
     public Comparable lastKey(long time) {
@@ -405,8 +436,8 @@ public class ImmutableMapNode {
     /**
      * Returns the next greater key.
      *
-     * @param key     The given key.
-     * @param time    The time of the query.
+     * @param key  The given key.
+     * @param time The time of the query.
      * @return The next greater key with content at the time of the query, or null.
      */
     public Comparable higherKey(Comparable key, long time) {
@@ -426,8 +457,8 @@ public class ImmutableMapNode {
     /**
      * Returns the key with content that is greater than or equal to the given key.
      *
-     * @param key     The given key.
-     * @param time    The time of the query.
+     * @param key  The given key.
+     * @param time The time of the query.
      * @return The key greater than or equal to the given key, or null.
      */
     public Comparable ceilingKey(Comparable key, long time) {
@@ -447,8 +478,8 @@ public class ImmutableMapNode {
     /**
      * Returns the next smaller key.
      *
-     * @param key     The given key.
-     * @param time    The time of the query.
+     * @param key  The given key.
+     * @param time The time of the query.
      * @return The next smaller key with content at the time of the query, or null.
      */
     public Comparable lowerKey(Comparable key, long time) {
@@ -468,8 +499,8 @@ public class ImmutableMapNode {
     /**
      * Returns the key with content that is smaller than or equal to the given key.
      *
-     * @param key     The given key.
-     * @param time    The time of the query.
+     * @param key  The given key.
+     * @param time The time of the query.
      * @return The key smaller than or equal to the given key, or null.
      */
     public Comparable floorKey(Comparable key, long time) {

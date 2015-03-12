@@ -74,7 +74,7 @@ public class ImmutableListNode {
     /**
      * Returns the count of all the values currently in the list.
      *
-     * @param time    The time of the query.
+     * @param time The time of the query.
      * @return The current size of the list.
      */
     public int size(long time) {
@@ -627,7 +627,7 @@ public class ImmutableListNode {
                     created,
                     deleted);
         }
-        ImmutableListNode n = rightNode.remove(ndx - leftSize -1, time);
+        ImmutableListNode n = rightNode.remove(ndx - leftSize - 1, time);
         if (rightNode == n)
             return this;
         return new ImmutableListNode(
