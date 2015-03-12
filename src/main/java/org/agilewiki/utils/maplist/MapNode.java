@@ -173,6 +173,30 @@ public class MapNode {
     }
 
     /**
+     * Empty the list by marking all the existing values as deleted..
+     *
+     * @param key  The key of the list.
+     * @param time The time of the deletion.
+     */
+    public void clearList(Comparable key, long time) {
+        getList(key).clearList(time);
+    }
+
+    /**
+     * Empty the map by clearing all the lists.
+     *
+     * @param time The time of the deletion.
+     */
+    public void clearMap(long time) {
+        if (isNil())
+            return;
+        leftNode.clearMap(time);
+        if (!listNode.isEmpty(time))
+            listNode.clearList(time);
+        rightNode.clearMap(time);
+    }
+
+    /**
      * Perform a complete list copy.
      *
      * @return A complete, but shallow copy of the list.

@@ -610,6 +610,11 @@ public class ListNode {
         return rightNode.copyList(n, time);
     }
 
+    /**
+     * Empty the list by marking all the existing values as deleted.
+     *
+     * @param time The time of the deletion.
+     */
     public void clearList(long time) {
         if (isNil())
             return;
