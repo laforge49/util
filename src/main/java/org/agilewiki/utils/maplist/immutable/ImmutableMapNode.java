@@ -256,6 +256,26 @@ public class ImmutableMapNode {
     }
 
     /**
+     * Empty the map by marking all the existing values as deleted.
+     *
+     * @param time The time of the deletion.
+     * @return The currently empty versioned map.
+     */
+    public ImmutableMapNode clearMap(long time) {
+        if (isNil())
+            return this;
+        ImmutableMapNode ln = leftNode.clearMap(time);
+        ImmutableMapNode rn = rightNode.clearMap(time);
+        if (ln == leftNode && rn == rightNode && listNode.isEmpty(time))
+            return this;
+        return new ImmutableMapNode(level,
+                ln,
+                rn,
+                listNode.clearList(time),
+                key);
+    }
+
+    /**
      * Perform a complete list copy.
      *
      * @return A complete, but shallow copy of the list.
