@@ -9,7 +9,7 @@ public class IntegerFactory implements DurableFactory {
     /**
      * The durable id for this factory.
      */
-    public final static char INTEGER_ID = 'N';
+    public final static char INTEGER_ID = 'I';
 
     /**
      * Register this factory.
