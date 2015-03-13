@@ -5,11 +5,13 @@ import java.nio.ByteBuffer;
 /**
  * Defines how true is serialized / deserialized.
  */
-public class TrueFactory implements DurableFactory {
+public class BooleanFactory implements DurableFactory {
+    protected static FactoryRegistry _factoryRegistry;
+
     /**
      * The durable id for this factory.
      */
-    public final static char TRUE_ID = 't';
+    public final static char BOOLEAN_ID = 't';
 
     /**
      * Register this factory.
@@ -17,23 +19,23 @@ public class TrueFactory implements DurableFactory {
      * @param factoryRegistry    The registry.
      */
     public static void register(FactoryRegistry factoryRegistry) {
-        factoryRegistry.register(new TrueFactory());
+        _factoryRegistry = factoryRegistry;
+        factoryRegistry.register(new BooleanFactory());
+    }
+
+    @Override
+    public DurableFactory getDurableFactory(Object durable) {
+        return _factoryRegistry.getDurableFactory((Boolean) durable ? 't' : 'f');
     }
 
     @Override
     public char getId() {
-        return TRUE_ID;
+        return BOOLEAN_ID;
     }
 
     @Override
     public Class getDurableClass() {
-        return getClass();
-    }
-
-    @Override
-    public void match(Object durable) {
-        if (!durable.equals(true))
-            throw new IllegalArgumentException("The immutable object is not true");
+        return Boolean.class;
     }
 
     @Override
@@ -43,10 +45,11 @@ public class TrueFactory implements DurableFactory {
 
     @Override
     public void serialize(Object durable, ByteBuffer byteBuffer) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Boolean deserialize(ByteBuffer byteBuffer) {
-        return true;
+        throw new UnsupportedOperationException();
     }
 }

@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
  * Defines how a class of immutable is serialized / deserialized.
  */
 public interface DurableFactory {
+
     /**
      * Returns a char used to identify the durable factory in a serialized object.
      *
@@ -19,6 +20,26 @@ public interface DurableFactory {
      * @return
      */
     Class getDurableClass();
+
+    /**
+     * Returns a value-specific factory.
+     *
+     * @param durable    The immutable object.
+     * @return The durable factory specific to the value.
+     */
+    default DurableFactory getDurableFactory(Object durable) {
+        return this;
+    }
+
+    /**
+     * Returns a value-specific durable id.
+     *
+     * @param durable    The immutable object.
+     * @return The value-specific durable id.
+     */
+    default char getId(Object durable) {
+        return getId();
+    }
 
     /**
      * Validate that the immutable object is a match for the factory.
@@ -51,7 +72,7 @@ public interface DurableFactory {
             byteBuffer.putChar(NullFactory.NULL_ID);
             return;
         }
-        byteBuffer.putChar(getId());
+        byteBuffer.putChar(getId(durable));
         serialize(durable, byteBuffer);
     }
 

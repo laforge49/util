@@ -27,7 +27,7 @@ public class FalseFactory implements DurableFactory {
 
     @Override
     public Class getDurableClass() {
-        return Boolean.class;
+        return getClass();
     }
 
     @Override
