@@ -1,0 +1,46 @@
+package org.agilewiki.utils.durable;
+
+import java.nio.ByteBuffer;
+
+/**
+ * Defines how a class of immutable is serialized / deserialized.
+ */
+public interface DurableFactory {
+    /**
+     * Returns a char used to identify the durable factory in a serialized object.
+     *
+     * @return A char used to identify the factory.
+     */
+    char getId();
+
+    /**
+     * Returns the class of an immutable that the factory serializes / deserializes.
+     *
+     * @return
+     */
+    Class getDurableClass();
+
+    /**
+     * Returns the size of a byte array needed to serialize the durable object.
+     *
+     * @param durable    The immutable object to be serialized.
+     * @return The size in bytes of the serialized data.
+     */
+    int getDurableLength(Object durable);
+
+    /**
+     * Serialize an immutable object into a ByteBuffer.
+     *
+     * @param durable       The immutable object to be serialized.
+     * @param byteBuffer    Where the serialized data is to be placed.
+     */
+    void serialize(Object durable, ByteBuffer byteBuffer);
+
+    /**
+     * Deserialize an immutable object from the content of a ByteBuffer.
+     *
+     * @param durable       The immutable object to be deserialized.
+     * @param byteBuffer    Holds the data used to create the immutable object.
+     */
+    void deserialize(Object durable, ByteBuffer byteBuffer);
+}
