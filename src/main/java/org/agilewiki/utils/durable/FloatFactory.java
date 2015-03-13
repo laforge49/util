@@ -13,11 +13,9 @@ public class FloatFactory implements DurableFactory {
 
     /**
      * Register this factory.
-     *
-     * @param factoryRegistry    The registry.
      */
-    public static void register(FactoryRegistry factoryRegistry) {
-        factoryRegistry.register(new FloatFactory());
+    public static void register() {
+        FactoryRegistry.register(new FloatFactory());
     }
 
     @Override

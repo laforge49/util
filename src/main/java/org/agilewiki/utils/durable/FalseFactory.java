@@ -13,11 +13,9 @@ public class FalseFactory implements DurableFactory {
 
     /**
      * Register this factory.
-     *
-     * @param factoryRegistry    The registry.
      */
-    public static void register(FactoryRegistry factoryRegistry) {
-        factoryRegistry.register(new FalseFactory());
+    public static void register() {
+        FactoryRegistry.register(new FalseFactory());
     }
 
     @Override

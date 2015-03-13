@@ -13,11 +13,9 @@ public class IntegerFactory implements DurableFactory {
 
     /**
      * Register this factory.
-     *
-     * @param factoryRegistry    The registry.
      */
-    public static void register(FactoryRegistry factoryRegistry) {
-        factoryRegistry.register(new IntegerFactory());
+    public static void register() {
+        FactoryRegistry.register(new IntegerFactory());
     }
 
     @Override

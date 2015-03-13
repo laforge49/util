@@ -6,16 +6,15 @@ import java.nio.ByteBuffer;
 
 public class NullTest extends TestCase {
     public void test() throws Exception {
-        FactoryRegistry factoryRegistry = new FactoryRegistry();
         ByteBuffer byteBuffer = ByteBuffer.allocate(100);
         Integer integer1 = null;
-        DurableFactory durableFactory1 = factoryRegistry.getDurableFactory(integer1);
+        DurableFactory durableFactory1 = FactoryRegistry.getDurableFactory(integer1);
         assertTrue(durableFactory1 instanceof NullFactory);
         assertEquals(0, durableFactory1.getDurableLength(integer1));
         durableFactory1.writeDurable(integer1, byteBuffer);
         assertEquals(2, byteBuffer.position());
         byteBuffer.flip();
-        DurableFactory durableFactory2 = factoryRegistry.readId(byteBuffer);
+        DurableFactory durableFactory2 = FactoryRegistry.readId(byteBuffer);
         assertTrue(durableFactory2 instanceof NullFactory);
         Object object2 = durableFactory2.deserialize(byteBuffer);
         assertEquals(2, byteBuffer.position());

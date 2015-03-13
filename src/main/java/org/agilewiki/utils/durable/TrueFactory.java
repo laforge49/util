@@ -13,11 +13,9 @@ public class TrueFactory implements DurableFactory {
 
     /**
      * Register this factory.
-     *
-     * @param factoryRegistry    The registry.
      */
-    public static void register(FactoryRegistry factoryRegistry) {
-        factoryRegistry.register(new TrueFactory());
+    public static void register() {
+        FactoryRegistry.register(new TrueFactory());
     }
 
     @Override

@@ -6,8 +6,6 @@ import java.nio.ByteBuffer;
  * Defines how true is serialized / deserialized.
  */
 public class BooleanFactory implements DurableFactory {
-    protected static FactoryRegistry _factoryRegistry;
-
     /**
      * The durable id for this factory.
      */
@@ -15,17 +13,14 @@ public class BooleanFactory implements DurableFactory {
 
     /**
      * Register this factory.
-     *
-     * @param factoryRegistry    The registry.
      */
-    public static void register(FactoryRegistry factoryRegistry) {
-        _factoryRegistry = factoryRegistry;
-        factoryRegistry.register(new BooleanFactory());
+    public static void register() {
+        FactoryRegistry.register(new BooleanFactory());
     }
 
     @Override
     public DurableFactory getDurableFactory(Object durable) {
-        return _factoryRegistry.getDurableFactory((Boolean) durable ? 't' : 'f');
+        return FactoryRegistry.getDurableFactory((Boolean) durable ? 't' : 'f');
     }
 
     @Override

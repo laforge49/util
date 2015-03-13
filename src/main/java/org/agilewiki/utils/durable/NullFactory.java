@@ -13,11 +13,9 @@ public class NullFactory implements DurableFactory {
 
     /**
      * Register this factory.
-     *
-     * @param factoryRegistry    The registry.
      */
-    public static void register(FactoryRegistry factoryRegistry) {
-        factoryRegistry.register(new NullFactory());
+    public static void register() {
+        FactoryRegistry.register(new NullFactory());
     }
 
     @Override

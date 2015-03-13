@@ -14,11 +14,9 @@ public class StringFactory implements DurableFactory {
 
     /**
      * Register this factory.
-     *
-     * @param factoryRegistry    The registry.
      */
-    public static void register(FactoryRegistry factoryRegistry) {
-        factoryRegistry.register(new StringFactory());
+    public static void register() {
+        FactoryRegistry.register(new StringFactory());
     }
 
     @Override

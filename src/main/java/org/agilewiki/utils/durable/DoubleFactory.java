@@ -13,11 +13,9 @@ public class DoubleFactory implements DurableFactory {
 
     /**
      * Register this factory.
-     *
-     * @param factoryRegistry    The registry.
      */
-    public static void register(FactoryRegistry factoryRegistry) {
-        factoryRegistry.register(new DoubleFactory());
+    public static void register() {
+        FactoryRegistry.register(new DoubleFactory());
     }
 
     @Override

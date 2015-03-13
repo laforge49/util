@@ -7,27 +7,28 @@ import java.util.concurrent.ConcurrentHashMap;
  * A durable factory registry.
  */
 public class FactoryRegistry {
+
+    protected final static ConcurrentHashMap<Character, DurableFactory> idMap =
+            new ConcurrentHashMap<>(16, 0.75f, 1);
+    protected final static ConcurrentHashMap<Class, DurableFactory> classMap =
+            new ConcurrentHashMap<>(16, 0.75f, 1);
+
     /**
-     * Create and initialize a factory registry.
+     * Initialize the factory registry.
      */
-    public FactoryRegistry() {
-        NullFactory.register(this);
-        IntegerFactory.register(this);
-        FloatFactory.register(this);
-        LongFactory.register(this);
-        DoubleFactory.register(this);
-        BooleanFactory.register(this);
-        TrueFactory.register(this);
-        FalseFactory.register(this);
-        StringFactory.register(this);
+    static {
+        NullFactory.register();
+        IntegerFactory.register();
+        FloatFactory.register();
+        LongFactory.register();
+        DoubleFactory.register();
+        BooleanFactory.register();
+        TrueFactory.register();
+        FalseFactory.register();
+        StringFactory.register();
     }
 
-    protected final ConcurrentHashMap<Character, DurableFactory> idMap =
-            new ConcurrentHashMap<>(16, 0.75f, 1);
-    protected final ConcurrentHashMap<Class, DurableFactory> classMap =
-            new ConcurrentHashMap<>(16, 0.75f, 1);
-
-    public DurableFactory getDurableFactory(char id) {
+    public static DurableFactory getDurableFactory(char id) {
         return idMap.get(id);
     }
 
@@ -36,7 +37,7 @@ public class FactoryRegistry {
      *
      * @param durableFactory    The factory to be registered.
      */
-    public void register(DurableFactory durableFactory) {
+    public static void register(DurableFactory durableFactory) {
         idMap.put(durableFactory.getId(), durableFactory);
         classMap.put(durableFactory.getDurableClass(), durableFactory);
     }
@@ -48,7 +49,7 @@ public class FactoryRegistry {
      * @return The durable factory instance.
      * @throws java.lang.IllegalStateException when the durable id is not recognized.
      */
-    public DurableFactory readId(ByteBuffer byteBuffer) {
+    public static DurableFactory readId(ByteBuffer byteBuffer) {
         char id = byteBuffer.getChar();
         DurableFactory durableFactory = idMap.get(id);
         if (durableFactory == null)
@@ -64,7 +65,7 @@ public class FactoryRegistry {
      * @return The durable factory.
      * @throws java.lang.IllegalArgumentException when the durable class is not recognized.
      */
-    public DurableFactory getDurableFactory(Object durable) {
+    public static DurableFactory getDurableFactory(Object durable) {
         Class c = durable == null ? NullFactory.class : durable.getClass();
         DurableFactory durableFactory = classMap.get(c);
         if (durableFactory == null) {
