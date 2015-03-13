@@ -21,6 +21,17 @@ public interface DurableFactory {
     Class getDurableClass();
 
     /**
+     * Validate that the immutable object is a match for the factory.
+     *
+     * @param durable    The immutable object.
+     * @throws java.lang.IllegalArgumentException when the object is not a match.
+     */
+    default void match(Object durable) {
+        if (durable.getClass() != getDurableClass())
+            throw new IllegalArgumentException("The immutable object is not a match");
+    }
+
+    /**
      * Returns the size of a byte array needed to serialize the durable object.
      *
      * @param durable    The immutable object to be serialized.
