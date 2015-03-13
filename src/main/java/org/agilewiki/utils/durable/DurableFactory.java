@@ -41,6 +41,15 @@ public interface DurableFactory {
     int getDurableLength(Object durable);
 
     /**
+     * Write the durable id to a byte buffer.
+     *
+     * @param byteBuffer    The byte buffer.
+     */
+    default void writeId(ByteBuffer byteBuffer) {
+        byteBuffer.putChar(getId());
+    }
+
+    /**
      * Serialize an immutable object into a ByteBuffer.
      *
      * @param durable       The immutable object to be serialized.

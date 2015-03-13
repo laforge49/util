@@ -33,8 +33,6 @@ public class NullFactory implements DurableFactory {
 
     @Override
     public void serialize(Object durable, ByteBuffer byteBuffer) {
-        match(durable);
-        byteBuffer.putChar(getId());
     }
 
     @Override
