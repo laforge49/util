@@ -7,6 +7,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * A durable factory registry.
  */
 public class FactoryRegistry {
+    /**
+     * Create and initialize a factory registry.
+     */
+    public FactoryRegistry() {
+        NullFactory.register(this);
+        IntegerFactory.register(this);
+    }
+
     protected final ConcurrentHashMap<Character, DurableFactory> idMap =
             new ConcurrentHashMap<>(16, 0.75f, 1);
     protected final ConcurrentHashMap<Class, DurableFactory> classMap =

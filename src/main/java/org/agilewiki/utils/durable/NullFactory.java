@@ -21,12 +21,20 @@ public class NullFactory implements DurableFactory {
     }
 
     @Override
+    public void match(Object durable) {
+        if (durable != null)
+            throw new IllegalArgumentException("The immutable object is not null");
+    }
+
+    @Override
     public int getDurableLength(Object durable) {
         return 0;
     }
 
     @Override
     public void serialize(Object durable, ByteBuffer byteBuffer) {
+        match(durable);
+        byteBuffer.putChar(getId());
     }
 
     @Override

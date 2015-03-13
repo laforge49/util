@@ -33,6 +33,7 @@ public interface DurableFactory {
 
     /**
      * Returns the size of a byte array needed to serialize the durable object.
+     * This does not include the space needed for the durable id.
      *
      * @param durable    The immutable object to be serialized.
      * @return The size in bytes of the serialized data.

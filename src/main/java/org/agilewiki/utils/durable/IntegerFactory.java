@@ -27,6 +27,8 @@ public class IntegerFactory implements DurableFactory {
 
     @Override
     public void serialize(Object durable, ByteBuffer byteBuffer) {
+        match(durable);
+        byteBuffer.putChar(getId());
         byteBuffer.putInt((Integer) durable);
     }
 
