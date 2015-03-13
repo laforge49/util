@@ -14,6 +14,7 @@ public class FactoryRegistry {
         NullFactory.register(this);
         IntegerFactory.register(this);
         FloatFactory.register(this);
+        LongFactory.register(this);
     }
 
     protected final ConcurrentHashMap<Character, DurableFactory> idMap =
