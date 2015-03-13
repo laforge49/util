@@ -13,6 +13,7 @@ public class FactoryRegistry {
     public FactoryRegistry() {
         NullFactory.register(this);
         IntegerFactory.register(this);
+        FloatFactory.register(this);
     }
 
     protected final ConcurrentHashMap<Character, DurableFactory> idMap =

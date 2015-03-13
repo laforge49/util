@@ -11,6 +11,7 @@ public class NullTest extends TestCase {
         Integer integer1 = null;
         DurableFactory durableFactory1 = factoryRegistry.getDurableFactory(integer1);
         assertTrue(durableFactory1 instanceof NullFactory);
+        assertEquals(0, durableFactory1.getDurableLength(integer1));
         durableFactory1.writeDurable(integer1, byteBuffer);
         assertEquals(2, byteBuffer.position());
         byteBuffer.flip();
