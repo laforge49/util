@@ -16,6 +16,8 @@ public class FactoryRegistry {
         FloatFactory.register(this);
         LongFactory.register(this);
         DoubleFactory.register(this);
+        TrueFactory.register(this);
+        FalseFactory.register(this);
     }
 
     protected final ConcurrentHashMap<Character, DurableFactory> idMap =
@@ -59,8 +61,15 @@ public class FactoryRegistry {
     public DurableFactory getDurableFactory(Object durable) {
         Class c = durable == null ? NullFactory.class : durable.getClass();
         DurableFactory durableFactory = classMap.get(c);
-        if (durableFactory == null)
+        if (durableFactory == null) {
             throw new IllegalArgumentException("Unknown class: " + c.getName());
+        }
+        if (durable instanceof Boolean) {
+            if (durable.equals(true))
+                return idMap.get('t');
+            else
+                return idMap.get('f');
+        }
         return durableFactory;
     }
 }

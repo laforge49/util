@@ -3,13 +3,13 @@ package org.agilewiki.utils.durable;
 import java.nio.ByteBuffer;
 
 /**
- * Defines how null is serialized / deserialized.
+ * Defines how true is serialized / deserialized.
  */
-public class NullFactory implements DurableFactory {
+public class TrueFactory implements DurableFactory {
     /**
      * The durable id for this factory.
      */
-    public final static char NULL_ID = 'N';
+    public final static char TRUE_ID = 't';
 
     /**
      * Register this factory.
@@ -17,23 +17,23 @@ public class NullFactory implements DurableFactory {
      * @param factoryRegistry    The registry.
      */
     public static void register(FactoryRegistry factoryRegistry) {
-        factoryRegistry.register(new NullFactory());
+        factoryRegistry.register(new TrueFactory());
     }
 
     @Override
     public char getId() {
-        return NULL_ID;
+        return TRUE_ID;
     }
 
     @Override
     public Class getDurableClass() {
-        return getClass();
+        return Boolean.class;
     }
 
     @Override
     public void match(Object durable) {
-        if (durable != null)
-            throw new IllegalArgumentException("The immutable object is not null");
+        if (!durable.equals(true))
+            throw new IllegalArgumentException("The immutable object is not true");
     }
 
     @Override
@@ -46,7 +46,7 @@ public class NullFactory implements DurableFactory {
     }
 
     @Override
-    public Void deserialize(ByteBuffer byteBuffer) {
-        return null;
+    public Boolean deserialize(ByteBuffer byteBuffer) {
+        return true;
     }
 }
