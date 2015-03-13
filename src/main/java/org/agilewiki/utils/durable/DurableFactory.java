@@ -41,12 +41,18 @@ public interface DurableFactory {
     int getDurableLength(Object durable);
 
     /**
-     * Write the durable id to a byte buffer.
+     * Write the durable to a byte buffer.
      *
+     * @param durable       The immutable object to be serialized.
      * @param byteBuffer    The byte buffer.
      */
-    default void writeId(ByteBuffer byteBuffer) {
+    default void writeDurable(Object durable, ByteBuffer byteBuffer) {
+        if (durable == null) {
+            byteBuffer.putChar(NullFactory.NULL_ID);
+            return;
+        }
         byteBuffer.putChar(getId());
+        serialize(durable, byteBuffer);
     }
 
     /**

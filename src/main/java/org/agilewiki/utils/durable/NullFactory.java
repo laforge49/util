@@ -6,13 +6,23 @@ import java.nio.ByteBuffer;
  * Defines how a null is serialized / deserialized.
  */
 public class NullFactory implements DurableFactory {
+    /**
+     * The durable id for this factory.
+     */
+    public final static char NULL_ID = 'N';
+
+    /**
+     * Register this factory.
+     *
+     * @param factoryRegistry    The registry.
+     */
     public static void register(FactoryRegistry factoryRegistry) {
         factoryRegistry.register(new NullFactory());
     }
 
     @Override
     public char getId() {
-        return 'N';
+        return NULL_ID;
     }
 
     @Override
