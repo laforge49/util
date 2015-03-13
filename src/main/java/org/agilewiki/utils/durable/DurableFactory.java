@@ -39,8 +39,8 @@ public interface DurableFactory {
     /**
      * Deserialize an immutable object from the content of a ByteBuffer.
      *
-     * @param durable       The immutable object to be deserialized.
      * @param byteBuffer    Holds the data used to create the immutable object.
+     * @return The deserialized object.
      */
-    void deserialize(Object durable, ByteBuffer byteBuffer);
+    Object deserialize(ByteBuffer byteBuffer);
 }
