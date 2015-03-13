@@ -19,6 +19,7 @@ public class FactoryRegistry {
         BooleanFactory.register(this);
         TrueFactory.register(this);
         FalseFactory.register(this);
+        StringFactory.register(this);
     }
 
     protected final ConcurrentHashMap<Character, DurableFactory> idMap =
