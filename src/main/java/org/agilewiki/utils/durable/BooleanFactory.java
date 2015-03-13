@@ -11,7 +11,7 @@ public class BooleanFactory implements DurableFactory {
     /**
      * The durable id for this factory.
      */
-    public final static char BOOLEAN_ID = 't';
+    public final static char BOOLEAN_ID = 'B';
 
     /**
      * Register this factory.
