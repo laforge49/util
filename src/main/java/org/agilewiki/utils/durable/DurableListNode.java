@@ -719,7 +719,7 @@ public class DurableListNode {
             return 2;
         return 22 +
                 leftNode.getDurableLength() +
-                FactoryRegistry.getDurableFactory(value).getDurableLength(value) +
+                valueFactory.getDurableLength(value) +
                 rightNode.getDurableLength();
     }
 
