@@ -10,7 +10,7 @@ public class IntegerTest extends TestCase {
         Integer integer1 = 42;
         DurableFactory durableFactory1 = FactoryRegistry.getDurableFactory(integer1);
         assertTrue(durableFactory1 instanceof IntegerFactory);
-        assertEquals(4, durableFactory1.getDurableLength(integer1));
+        assertEquals(6, durableFactory1.getDurableLength(integer1));
         durableFactory1.writeDurable(integer1, byteBuffer);
         assertEquals(6, byteBuffer.position());
         byteBuffer.flip();

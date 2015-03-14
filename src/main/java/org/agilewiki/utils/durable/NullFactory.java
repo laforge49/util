@@ -36,7 +36,7 @@ public class NullFactory implements DurableFactory {
 
     @Override
     public int getDurableLength(Object durable) {
-        return 0;
+        return 2;
     }
 
     @Override

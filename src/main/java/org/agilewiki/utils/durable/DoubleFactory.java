@@ -31,8 +31,8 @@ public class DoubleFactory implements DurableFactory {
     @Override
     public int getDurableLength(Object durable) {
         if (durable == null)
-            return 0;
-        return 8;
+            return 2;
+        return 10;
     }
 
     @Override

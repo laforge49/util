@@ -31,8 +31,8 @@ public class FloatFactory implements DurableFactory {
     @Override
     public int getDurableLength(Object durable) {
         if (durable == null)
-            return 0;
-        return 4;
+            return 2;
+        return 6;
     }
 
     @Override

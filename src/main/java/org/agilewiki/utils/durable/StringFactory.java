@@ -32,8 +32,8 @@ public class StringFactory implements DurableFactory {
     @Override
     public int getDurableLength(Object durable) {
         if (durable == null)
-            return 0;
-        return 4 + 2 * ((String) durable).length();
+            return 2;
+        return 6 + 2 * ((String) durable).length();
     }
 
     @Override

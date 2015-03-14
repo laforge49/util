@@ -10,7 +10,7 @@ public class StringTest extends TestCase {
         String string1 = "abc";
         DurableFactory durableFactory1 = FactoryRegistry.getDurableFactory(string1);
         assertTrue(durableFactory1 instanceof StringFactory);
-        assertEquals(10, durableFactory1.getDurableLength(string1));
+        assertEquals(12, durableFactory1.getDurableLength(string1));
         durableFactory1.writeDurable(string1, byteBuffer);
         assertEquals(12, byteBuffer.position());
         byteBuffer.flip();

@@ -10,7 +10,7 @@ public class FloatTest extends TestCase {
         Float float1 = 42.0f;
         DurableFactory durableFactory1 = FactoryRegistry.getDurableFactory(float1);
         assertTrue(durableFactory1 instanceof FloatFactory);
-        assertEquals(4, durableFactory1.getDurableLength(float1));
+        assertEquals(6, durableFactory1.getDurableLength(float1));
         durableFactory1.writeDurable(float1, byteBuffer);
         assertEquals(6, byteBuffer.position());
         byteBuffer.flip();

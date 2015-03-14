@@ -10,7 +10,7 @@ public class LongTest extends TestCase {
         Long long1 = 42L;
         DurableFactory durableFactory1 = FactoryRegistry.getDurableFactory(long1);
         assertTrue(durableFactory1 instanceof LongFactory);
-        assertEquals(8, durableFactory1.getDurableLength(long1));
+        assertEquals(10, durableFactory1.getDurableLength(long1));
         durableFactory1.writeDurable(long1, byteBuffer);
         assertEquals(10, byteBuffer.position());
         byteBuffer.flip();

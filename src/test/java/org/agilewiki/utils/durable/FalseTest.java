@@ -10,7 +10,7 @@ public class FalseTest extends TestCase {
         Boolean boolean1 = false;
         DurableFactory durableFactory1 = FactoryRegistry.getDurableFactory(boolean1);
         assertTrue(durableFactory1 instanceof FalseFactory);
-        assertEquals(0, durableFactory1.getDurableLength(boolean1));
+        assertEquals(2, durableFactory1.getDurableLength(boolean1));
         durableFactory1.writeDurable(boolean1, byteBuffer);
         assertEquals(2, byteBuffer.position());
         byteBuffer.flip();
