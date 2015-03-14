@@ -728,6 +728,6 @@ public class DurableListNode {
         byteBuffer.putLong(deleted);
         leftNode.writeDurable(byteBuffer);
         FactoryRegistry.getDurableFactory(value).writeDurable(value, byteBuffer);
-        leftNode.writeDurable(byteBuffer);
+        rightNode.writeDurable(byteBuffer);
     }
 }

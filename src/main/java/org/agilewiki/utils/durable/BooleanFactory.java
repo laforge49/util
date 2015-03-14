@@ -20,7 +20,8 @@ public class BooleanFactory implements DurableFactory {
 
     @Override
     public DurableFactory getDurableFactory(Object durable) {
-        return FactoryRegistry.getDurableFactory((Boolean) durable ? 't' : 'f');
+        return FactoryRegistry.getDurableFactory(
+                (Boolean) durable ? TrueFactory.TRUE_ID : FalseFactory.FALSE_ID);
     }
 
     @Override
