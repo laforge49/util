@@ -3,20 +3,20 @@ package org.agilewiki.utils.durable;
 import java.nio.ByteBuffer;
 
 /**
- * Defines how a nil list node is serialized / deserialized.
+ * Defines how a nil map node is serialized / deserialized.
  */
-public class NilListNodeFactory implements DurableFactory {
+public class NilMapNodeFactory implements DurableFactory {
 
     /**
      * Register this factory.
      */
     public static void register() {
-        FactoryRegistry.register(new NilListNodeFactory());
+        FactoryRegistry.register(new NilMapNodeFactory());
     }
 
     @Override
     public char getId() {
-        return DurableListNode.LIST_NIL_ID;
+        return DurableMapNode.MAP_NIL_ID;
     }
 
     @Override
@@ -26,8 +26,8 @@ public class NilListNodeFactory implements DurableFactory {
 
     @Override
     public void match(Object durable) {
-        if (!((DurableListNode) durable).isNil())
-            throw new IllegalArgumentException("The immutable object is not a nil list node");
+        if (!((DurableMapNode) durable).isNil())
+            throw new IllegalArgumentException("The immutable object is not a nil map node");
     }
 
     @Override
@@ -40,7 +40,7 @@ public class NilListNodeFactory implements DurableFactory {
     }
 
     @Override
-    public DurableListNode deserialize(ByteBuffer byteBuffer) {
-        return DurableListNode.LIST_NIL;
+    public DurableMapNode deserialize(ByteBuffer byteBuffer) {
+        return DurableMapNode.MAP_NIL;
     }
 }

@@ -28,6 +28,8 @@ public class FactoryRegistry {
         StringFactory.register();
         DurableListNodeFactory.register();
         NilListNodeFactory.register();
+        DurableMapNodeFactory.register();
+        NilMapNodeFactory.register();
     }
 
     public static DurableFactory getDurableFactory(char id) {
