@@ -2,6 +2,7 @@ package org.agilewiki.utils.durable;
 
 import org.agilewiki.utils.maplist.ListAccessor;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -11,6 +12,9 @@ import java.util.NoSuchElementException;
  * An immutable versioning list.
  */
 public class DurableListNode {
+    public final static char LIST_NODE_ID = 'l';
+    public final static char LIST_NIL_ID = '1';
+
     /**
      * A time after all insertions and deletions.
      */
@@ -682,5 +686,48 @@ public class DurableListNode {
         if (ln == leftNode && rn == rightNode && !exists(time))
             return this;
         return new DurableListNode(level, ln, rn, value, created, time);
+    }
+
+    /**
+     * Returns the size of a byte array needed to serialize this object,
+     * including the space needed for the durable id.
+     *
+     * @return The size in bytes of the serialized data.
+     */
+    int getDurableLength() {
+        if (isNil())
+            return 2;
+        return 20 +
+                leftNode.getDurableLength() +
+                FactoryRegistry.getDurableFactory(value).getDurableLength(value) +
+                rightNode.getDurableLength();
+    }
+
+    /**
+     * Write the durable to a byte buffer.
+     *
+     * @param byteBuffer    The byte buffer.
+     */
+    public void writeDurable(ByteBuffer byteBuffer) {
+        if (isNil()) {
+            byteBuffer.putChar(LIST_NIL_ID);
+            return;
+        }
+        byteBuffer.putChar(LIST_NODE_ID);
+        serialize(byteBuffer);
+    }
+
+    /**
+     * Serialize this object into a ByteBuffer.
+     *
+     * @param byteBuffer    Where the serialized data is to be placed.
+     */
+    public void serialize(ByteBuffer byteBuffer) {
+        byteBuffer.putInt(level);
+        byteBuffer.putLong(created);
+        byteBuffer.putLong(deleted);
+        leftNode.writeDurable(byteBuffer);
+        FactoryRegistry.getDurableFactory(value).writeDurable(value, byteBuffer);
+        leftNode.writeDurable(byteBuffer);
     }
 }
