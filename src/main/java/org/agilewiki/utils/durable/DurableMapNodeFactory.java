@@ -16,7 +16,7 @@ public class DurableMapNodeFactory implements DurableFactory {
 
     @Override
     public DurableFactory getDurableFactory(Object durable) {
-        if (((DurableListNode) durable).isNil())
+        if (((DurableMapNode) durable).isNil())
             return FactoryRegistry.getDurableFactory(DurableMapNode.MAP_NIL_ID);
         return this;
     }
