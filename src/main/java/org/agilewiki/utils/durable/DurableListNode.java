@@ -33,6 +33,7 @@ public class DurableListNode {
     protected final long deleted;
     protected final int size;
     protected final DurableFactory valueFactory;
+    protected final int durableLength;
 
     protected DurableListNode() {
         level = 0;
@@ -43,6 +44,7 @@ public class DurableListNode {
         deleted = 0L;
         size = 0;
         valueFactory = null;
+        durableLength = 2;
     }
 
     protected DurableListNode(int level,
@@ -76,6 +78,10 @@ public class DurableListNode {
         this.deleted = deleted;
         size = leftNode.size + rightNode.size + 1;
         this.valueFactory = valueFactory;
+        durableLength = 22 +
+                leftNode.getDurableLength() +
+                valueFactory.getDurableLength(value) +
+                rightNode.getDurableLength();
     }
 
     /**
@@ -715,12 +721,7 @@ public class DurableListNode {
      * @return The size in bytes of the serialized data.
      */
     int getDurableLength() {
-        if (isNil())
-            return 2;
-        return 22 +
-                leftNode.getDurableLength() +
-                valueFactory.getDurableLength(value) +
-                rightNode.getDurableLength();
+        return durableLength;
     }
 
     /**

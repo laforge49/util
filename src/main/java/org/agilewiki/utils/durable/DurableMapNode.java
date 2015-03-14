@@ -24,6 +24,7 @@ public class DurableMapNode {
     protected final DurableListNode listNode;
     protected final Comparable key;
     protected final DurableFactory keyFactory;
+    protected final int durableLength;
 
     protected DurableMapNode() {
         level = 0;
@@ -32,6 +33,7 @@ public class DurableMapNode {
         listNode = DurableListNode.LIST_NIL;
         key = null;
         keyFactory = null;
+        durableLength = 2;
     }
 
     protected DurableMapNode(int level,
@@ -59,6 +61,11 @@ public class DurableMapNode {
         this.listNode = listNode;
         this.key = key;
         this.keyFactory = keyFactory;
+        durableLength = 6 +
+                keyFactory.getDurableLength(key) +
+                leftNode.getDurableLength() +
+                listNode.getDurableLength() +
+                rightNode.getDurableLength();
     }
 
     protected boolean isNil() {
@@ -695,13 +702,7 @@ public class DurableMapNode {
      * @return The size in bytes of the serialized data.
      */
     int getDurableLength() {
-        if (isNil())
-            return 2;
-        return 6 +
-                keyFactory.getDurableLength(key) +
-                leftNode.getDurableLength() +
-                listNode.getDurableLength() +
-                rightNode.getDurableLength();
+        return durableLength;
     }
 
     /**
