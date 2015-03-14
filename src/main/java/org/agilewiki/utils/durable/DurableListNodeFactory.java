@@ -48,10 +48,10 @@ public class DurableListNodeFactory implements DurableFactory {
         long deleted = byteBuffer.getLong();
         DurableFactory f = FactoryRegistry.readId(byteBuffer);
         DurableListNode leftNode = (DurableListNode) f.deserialize(byteBuffer);
-        f = FactoryRegistry.readId(byteBuffer);
-        Object value = f.deserialize(byteBuffer);
+        DurableFactory valueFactory = FactoryRegistry.readId(byteBuffer);
+        Object value = valueFactory.deserialize(byteBuffer);
         f = FactoryRegistry.readId(byteBuffer);
         DurableListNode rightNode = (DurableListNode) f.deserialize(byteBuffer);
-        return new DurableListNode(level, leftNode, rightNode, value, created, deleted);
+        return new DurableListNode(level, leftNode, rightNode, value, created, deleted, valueFactory);
     }
 }

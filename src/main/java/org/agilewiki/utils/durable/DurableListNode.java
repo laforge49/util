@@ -32,6 +32,7 @@ public class DurableListNode {
     protected final long created;
     protected final long deleted;
     protected final int size;
+    protected final DurableFactory valueFactory;
 
     protected DurableListNode() {
         level = 0;
@@ -41,6 +42,7 @@ public class DurableListNode {
         created = 0L;
         deleted = 0L;
         size = 0;
+        valueFactory = null;
     }
 
     protected DurableListNode(int level,
@@ -49,6 +51,23 @@ public class DurableListNode {
                               Object value,
                               long created,
                               long deleted) {
+        this(
+                level,
+                leftNode,
+                rightNode,
+                value,
+                created,
+                deleted,
+                FactoryRegistry.getDurableFactory(value));
+    }
+
+    protected DurableListNode(int level,
+                              DurableListNode leftNode,
+                              DurableListNode rightNode,
+                              Object value,
+                              long created,
+                              long deleted,
+                              DurableFactory valueFactory) {
         this.level = level;
         this.leftNode = leftNode;
         this.rightNode = rightNode;
@@ -56,6 +75,7 @@ public class DurableListNode {
         this.created = created;
         this.deleted = deleted;
         size = leftNode.size + rightNode.size + 1;
+        this.valueFactory = valueFactory;
     }
 
     /**
@@ -727,7 +747,7 @@ public class DurableListNode {
         byteBuffer.putLong(created);
         byteBuffer.putLong(deleted);
         leftNode.writeDurable(byteBuffer);
-        FactoryRegistry.getDurableFactory(value).writeDurable(value, byteBuffer);
+        valueFactory.writeDurable(value, byteBuffer);
         rightNode.writeDurable(byteBuffer);
     }
 }
