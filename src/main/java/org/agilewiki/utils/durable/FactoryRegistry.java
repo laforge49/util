@@ -26,6 +26,8 @@ public class FactoryRegistry {
         TrueFactory.register();
         FalseFactory.register();
         StringFactory.register();
+        DurableListNodeFactory.register();
+        NilListNodeFactory.register();
     }
 
     public static DurableFactory getDurableFactory(char id) {
