@@ -5,7 +5,7 @@
 
     <groupId>org.agilewiki.utils</groupId>
     <artifactId>utils</artifactId>
-    <version>0.4.0</version>
+    <version>0.5.0</version>
     <packaging>jar</packaging>
     <name>utils</name>
     <description>Java utility classes</description>
