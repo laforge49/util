@@ -43,6 +43,7 @@ public class LazyDurableListNodeFactory implements LazyDurableFactory {
 
     @Override
     public LazyDurableListNode deserialize(ByteBuffer byteBuffer) {
+        int durableLength = byteBuffer.getInt();
         int level = byteBuffer.getInt();
         long created = byteBuffer.getLong();
         long deleted = byteBuffer.getLong();
@@ -52,6 +53,7 @@ public class LazyDurableListNodeFactory implements LazyDurableFactory {
         Object value = valueFactory.deserialize(byteBuffer);
         f = FactoryRegistry.readId(byteBuffer);
         LazyDurableListNode rightNode = (LazyDurableListNode) f.deserialize(byteBuffer);
-        return new LazyDurableListNode(level, leftNode, rightNode, value, created, deleted, valueFactory);
+        return new LazyDurableListNode(
+                durableLength, level, leftNode, rightNode, value, created, deleted, valueFactory);
     }
 }

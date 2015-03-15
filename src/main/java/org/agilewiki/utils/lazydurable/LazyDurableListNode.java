@@ -70,6 +70,28 @@ public class LazyDurableListNode {
                                   long created,
                                   long deleted,
                                   LazyDurableFactory valueFactory) {
+        this(26 +
+                        leftNode.getDurableLength() +
+                        valueFactory.getDurableLength(value) +
+                        rightNode.getDurableLength(),
+                level,
+                leftNode,
+                rightNode,
+                value,
+                created,
+                deleted,
+                valueFactory);
+    }
+
+    protected LazyDurableListNode(int durableLength,
+                                  int level,
+                                  LazyDurableListNode leftNode,
+                                  LazyDurableListNode rightNode,
+                                  Object value,
+                                  long created,
+                                  long deleted,
+                                  LazyDurableFactory valueFactory) {
+        this.durableLength = durableLength;
         this.level = level;
         this.leftNode = leftNode;
         this.rightNode = rightNode;
@@ -78,10 +100,6 @@ public class LazyDurableListNode {
         this.deleted = deleted;
         size = leftNode.size + rightNode.size + 1;
         this.valueFactory = valueFactory;
-        durableLength = 22 +
-                leftNode.getDurableLength() +
-                valueFactory.getDurableLength(value) +
-                rightNode.getDurableLength();
     }
 
     /**
@@ -744,6 +762,7 @@ public class LazyDurableListNode {
      * @param byteBuffer    Where the serialized data is to be placed.
      */
     public void serialize(ByteBuffer byteBuffer) {
+        byteBuffer.putInt(durableLength);
         byteBuffer.putInt(level);
         byteBuffer.putLong(created);
         byteBuffer.putLong(deleted);
