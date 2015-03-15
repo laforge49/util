@@ -427,9 +427,7 @@ public class DurableListNodeData {
      * @return Revised root node.
      */
     public LazyDurableListNode skew() {
-        if (isNil())
-            return thisNode;
-        if (leftNode.isNil())
+        if (isNil() || leftNode.isNil())
             return thisNode;
         DurableListNodeData leftData = leftNode.getData();
         if (leftData.level == level) {
@@ -452,6 +450,66 @@ public class DurableListNodeData {
             return l;
         } else
             return thisNode;
+    }
+
+    /**
+     * AA Tree split
+     *
+     * @return The revised root node.
+     */
+    public LazyDurableListNode split() {
+        if (isNil() || rightNode.isNil())
+            return thisNode;
+        DurableListNodeData rightData = rightNode.getData();
+        if (rightData.rightNode.isNil())
+            return thisNode;
+        if (level == rightData.rightNode.getData().level) {
+            LazyDurableListNode t = new LazyDurableListNode(
+                    level,
+                    totalSize,
+                    created,
+                    deleted,
+                    leftNode,
+                    value,
+                    rightData.leftNode);
+            LazyDurableListNode r = new LazyDurableListNode(
+                    rightData.level + 1,
+                    rightData.totalSize,
+                    rightData.created,
+                    rightData.deleted,
+                    t,
+                    rightData.value,
+                    rightData.rightNode);
+            return r;
+        }
+        return thisNode;
+    }
+
+    protected LazyDurableListNode add(int ndx, Object value, long created, long deleted) {
+        if (ndx == -1)
+            ndx = totalSize;
+        int leftSize = leftNode.totalSize();
+        LazyDurableListNode t = thisNode;
+        if (ndx <= leftSize) {
+            t = new LazyDurableListNode(
+                    level,
+                    totalSize,
+                    this.created,
+                    this.deleted,
+                    leftNode.add(ndx, value, created, deleted),
+                    this.value,
+                    rightNode);
+        } else {
+            t = new LazyDurableListNode(
+                    level,
+                    totalSize,
+                    this.created,
+                    this.deleted,
+                    leftNode,
+                    this.value,
+                    rightNode.add(ndx - leftSize - 1, value, created, deleted));
+        }
+        return t.getData().skew().getData().split();
     }
 
     /**
