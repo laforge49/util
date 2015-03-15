@@ -6,8 +6,11 @@ import org.agilewiki.utils.maplist.ListAccessor;
 public class ListInsertTest extends TestCase {
     public void test() throws Exception {
         LazyDurableListNode l1 = LazyDurableListNode.LIST_NIL.add("a", 2);
+        assertEquals(1, l1.totalSize());
         l1 = l1.add("b", 3);
+        assertEquals(2, l1.totalSize());
         l1 = l1.add("c", 4);
+        assertEquals(3, l1.totalSize());
         l1 = l1.add("d", 5);
         l1 = l1.add("e", 6);
         l1 = l1.add("f", 7);
