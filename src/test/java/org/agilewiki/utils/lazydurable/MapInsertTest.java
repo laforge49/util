@@ -18,7 +18,7 @@ public class MapInsertTest extends TestCase {
         ListAccessor a1 = m1.listAccessor("1", 3);
         assertEquals("a", a1.get(0));
 
-        assertEquals("a", m1.copyList("1").getExistingValue(0, 4));
+        assertEquals("a", m1.copyList("1").get(0,4));
 
         MapAccessor ma = m1.mapAccessor();
         assertEquals("1", ma.firstKey());
