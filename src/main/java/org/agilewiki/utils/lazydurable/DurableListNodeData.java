@@ -422,6 +422,88 @@ public class DurableListNodeData {
     }
 
     /**
+     * AA Tree skew operation.
+     *
+     * @return Revised root node.
+     */
+    public LazyDurableListNode skew() {
+        if (isNil())
+            return thisNode;
+        if (leftNode.isNil())
+            return thisNode;
+        DurableListNodeData leftData = leftNode.getData();
+        if (leftData.level == level) {
+            LazyDurableListNode t = new LazyDurableListNode(
+                    level,
+                    totalSize,
+                    created,
+                    deleted,
+                    leftData.rightNode,
+                    value,
+                    rightNode);
+            LazyDurableListNode l = new LazyDurableListNode(
+                    leftData.level,
+                    leftData.totalSize,
+                    leftData.created,
+                    leftData.deleted,
+                    leftData.leftNode,
+                    leftData.value,
+                    t);
+            return l;
+        } else
+            return thisNode;
+    }
+
+    /**
+     * Mark a value as deleted.
+     *
+     * @param ndx  The index of the value.
+     * @param time The time of the deletion.
+     * @return The revised node.
+     */
+    public LazyDurableListNode remove(int ndx, long time) {
+        if (isNil())
+            return thisNode;
+        int leftSize = leftNode.totalSize();
+        if (ndx == leftSize) {
+            if (exists(time))
+                return new LazyDurableListNode(
+                        level,
+                        totalSize,
+                        created,
+                        time,
+                        leftNode,
+                        value,
+                        rightNode);
+            return thisNode;
+        }
+        if (ndx < leftSize) {
+            LazyDurableListNode n = leftNode.remove(ndx, time);
+            if (leftNode == n)
+                return thisNode;
+            return new LazyDurableListNode(
+                    level,
+                    totalSize,
+                    created,
+                    deleted,
+                    n,
+                    value,
+                    rightNode);
+        }
+        LazyDurableListNode n = rightNode.remove(ndx - leftSize - 1, time);
+        if (rightNode == n)
+            return thisNode;
+        return new LazyDurableListNode(
+                level,
+                totalSize,
+                created,
+                deleted,
+                leftNode,
+                value,
+                n);
+    }
+
+    /**
      * Copy everything except what was deleted before a given time.
      * (This is a shallow copy, as the values in the list are not copied.)
      *
