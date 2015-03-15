@@ -420,4 +420,37 @@ public class DurableListNodeData {
             list.add(value);
         rightNode.getData().flatList(list, time);
     }
+
+    /**
+     * Copy everything except what was deleted before a given time.
+     * (This is a shallow copy, as the values in the list are not copied.)
+     *
+     * @param n    The new list.
+     * @param time The given time.
+     * @return A shortened copy of the list without some historical values.
+     */
+    public LazyDurableListNode copyList(LazyDurableListNode n, long time) {
+        if (isNil())
+            return n;
+        n = leftNode.getData().copyList(n, time);
+        if (deleted >= time)
+            n = n.add(n.totalSize(), value, created, deleted);
+        return rightNode.getData().copyList(n, time);
+    }
+
+    /**
+     * Empty the list by marking all the existing values as deleted.
+     *
+     * @param time The time of the deletion.
+     * @return The currently empty versioned list.
+     */
+    public LazyDurableListNode clearList(long time) {
+        if (isNil())
+            return thisNode;
+        LazyDurableListNode ln = leftNode.clearList(time);
+        LazyDurableListNode rn = rightNode.clearList(time);
+        if (ln == leftNode && rn == rightNode && !exists(time))
+            return thisNode;
+        return new LazyDurableListNode(level, totalSize, created, time, ln, value, rn);
+    }
 }
