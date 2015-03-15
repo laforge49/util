@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * An immutable versioning list.
@@ -25,81 +26,47 @@ public class LazyDurableListNode {
      */
     public final static LazyDurableListNode LIST_NIL = new LazyDurableListNode();
 
-    protected final int level;
-    protected final LazyDurableListNode leftNode;
-    protected final LazyDurableListNode rightNode;
-    protected final Object value;
-    protected final long created;
-    protected final long deleted;
-    protected final int size;
-    protected final LazyDurableFactory valueFactory;
+    protected final AtomicReference<DurableListNodeData> dataReference = new AtomicReference<>();
     protected final int durableLength;
+    protected ByteBuffer byteBuffer;
 
     protected LazyDurableListNode() {
-        level = 0;
-        leftNode = this;
-        rightNode = this;
-        value = null;
-        created = 0L;
-        deleted = 0L;
-        size = 0;
-        valueFactory = null;
+        dataReference.set(new DurableListNodeData(this));
         durableLength = 2;
     }
 
-    protected LazyDurableListNode(int level,
-                                  LazyDurableListNode leftNode,
-                                  LazyDurableListNode rightNode,
-                                  Object value,
-                                  long created,
-                                  long deleted) {
-        this(
-                level,
-                leftNode,
-                rightNode,
-                value,
-                created,
-                deleted,
-                FactoryRegistry.getDurableFactory(value));
+    protected LazyDurableListNode(ByteBuffer byteBuffer) {
+        durableLength = byteBuffer.getInt();
+        this.byteBuffer = byteBuffer.slice();
+        byteBuffer.position(byteBuffer.position() + durableLength - 6);
     }
 
     protected LazyDurableListNode(int level,
-                                  LazyDurableListNode leftNode,
-                                  LazyDurableListNode rightNode,
-                                  Object value,
+                                  int totalSize,
                                   long created,
                                   long deleted,
-                                  LazyDurableFactory valueFactory) {
-        this(26 +
-                        leftNode.getDurableLength() +
-                        valueFactory.getDurableLength(value) +
-                        rightNode.getDurableLength(),
+                                  LazyDurableListNode leftNode,
+                                  Object value,
+                                  LazyDurableListNode rightNode) {
+        DurableListNodeData data = new DurableListNodeData(
+                this,
                 level,
-                leftNode,
-                rightNode,
-                value,
+                totalSize,
                 created,
                 deleted,
-                valueFactory);
+                leftNode,
+                value,
+                rightNode);
+        durableLength = data.getDurableLength();
+        dataReference.set(data);
     }
 
-    protected LazyDurableListNode(int durableLength,
-                                  int level,
-                                  LazyDurableListNode leftNode,
-                                  LazyDurableListNode rightNode,
-                                  Object value,
-                                  long created,
-                                  long deleted,
-                                  LazyDurableFactory valueFactory) {
-        this.durableLength = durableLength;
-        this.level = level;
-        this.leftNode = leftNode;
-        this.rightNode = rightNode;
-        this.value = value;
-        this.created = created;
-        this.deleted = deleted;
-        size = leftNode.size + rightNode.size + 1;
-        this.valueFactory = valueFactory;
+    protected DurableListNodeData getData() {
+        DurableListNodeData data = dataReference.get();
+        if (data != null)
+            return data;
+        dataReference.compareAndSet(null, new DurableListNodeData(this, byteBuffer.slice()));
+        return dataReference.get();
     }
 
     /**
@@ -108,11 +75,7 @@ public class LazyDurableListNode {
      * @return The count of all the values in the list.
      */
     public int totalSize() {
-        return size;
-    }
-
-    protected boolean exists(long time) {
-        return time >= created && time < deleted;
+        return isNil() ? 0 : getData().totalSize;
     }
 
     protected boolean isNil() {
@@ -128,10 +91,7 @@ public class LazyDurableListNode {
     public int size(long time) {
         if (isNil())
             return 0;
-        int s = leftNode.size(time) + rightNode.size(time);
-        if (exists(time))
-            s += 1;
-        return s;
+        return getData().size(time);
     }
 
     /**
@@ -141,11 +101,11 @@ public class LazyDurableListNode {
      * @param time The time of the query.
      * @return A value, or null.
      */
-    public Object get(int ndx, long time) {
-        LazyDurableListNode n = getListNode(ndx);
-        if (n == null || !n.exists(time))
+    public Object getExistingValue(int ndx, long time) {
+        LazyDurableListNode n = getData().getListNode(ndx);
+        if (n == null)
             return null;
-        return n.value;
+        return n.getData().getExistingValue(time);
     }
 
     /**
@@ -159,15 +119,7 @@ public class LazyDurableListNode {
     public int getIndex(Object value, long time) {
         if (isNil())
             return -1;
-        int ndx = leftNode.getIndex(value, time);
-        if (ndx > -1)
-            return ndx;
-        if (this.value == value && exists(time))
-            return leftNode.size;
-        ndx = rightNode.getIndex(value, time);
-        if (ndx == -1)
-            return -1;
-        return leftNode.size + 1 + ndx;
+        return getData().getIndex(value, time);
     }
 
     /**
@@ -181,15 +133,7 @@ public class LazyDurableListNode {
     public int getIndexRight(Object value, long time) {
         if (isNil())
             return -1;
-        int ndx = rightNode.getIndexRight(value, time);
-        if (ndx > -1)
-            return leftNode.size + 1 + ndx;
-        if (this.value == value && exists(time))
-            return leftNode.size;
-        ndx = leftNode.getIndexRight(value, time);
-        if (ndx == -1)
-            return -1;
-        return ndx;
+        return getData().getIndexRight(value, time);
     }
 
     /**
@@ -203,15 +147,7 @@ public class LazyDurableListNode {
     public int findIndex(Object value, long time) {
         if (isNil())
             return -1;
-        int ndx = leftNode.findIndex(value, time);
-        if (ndx > -1)
-            return ndx;
-        if (exists(time) && this.value.equals(value))
-            return leftNode.size;
-        ndx = rightNode.findIndex(value, time);
-        if (ndx == -1)
-            return -1;
-        return leftNode.size + 1 + ndx;
+        return getData().findIndex(value, time);
     }
 
     /**
@@ -225,26 +161,7 @@ public class LazyDurableListNode {
     public int findIndexRight(Object value, long time) {
         if (isNil())
             return -1;
-        int ndx = rightNode.findIndexRight(value, time);
-        if (ndx > -1)
-            return leftNode.size + 1 + ndx;
-        if (exists(time) && this.value.equals(value))
-            return leftNode.size;
-        ndx = leftNode.findIndexRight(value, time);
-        if (ndx == -1)
-            return -1;
-        return ndx;
-    }
-
-    protected LazyDurableListNode getListNode(int ndx) {
-        if (ndx < 0 || ndx >= size)
-            return null; //out of range
-        int leftSize = leftNode.size;
-        if (ndx < leftSize)
-            return leftNode.getListNode(ndx);
-        if (ndx > leftSize)
-            return rightNode.getListNode(ndx - leftSize - 1);
-        return this;
+        return getData().findIndexRight(value, time);
     }
 
     /**
@@ -255,20 +172,7 @@ public class LazyDurableListNode {
      * @return An index of an existing value that is higher, or -1.
      */
     public int higherIndex(int ndx, long time) {
-        if (ndx >= size - 1 || isNil())
-            return -1; //out of range
-        int leftSize = leftNode.size;
-        if (ndx < leftSize - 1) {
-            int h = leftNode.higherIndex(ndx, time);
-            if (h > -1)
-                return h;
-        }
-        if (ndx < leftSize) {
-            if (exists(time))
-                return leftSize;
-        }
-        int h = rightNode.higherIndex(ndx - leftSize - 1, time);
-        return h == -1 ? -1 : h + leftSize + 1;
+        return getData().higherIndex(ndx, time);
     }
 
     /**
@@ -279,21 +183,7 @@ public class LazyDurableListNode {
      * @return An index of an existing value that is higher or equal, or -1.
      */
     public int ceilingIndex(int ndx, long time) {
-        if (ndx >= size || isNil()) {
-            return -1; //out of range
-        }
-        int leftSize = leftNode.size;
-        if (ndx < leftSize) {
-            int h = leftNode.ceilingIndex(ndx, time);
-            if (h > -1)
-                return h;
-        }
-        if (ndx <= leftSize) {
-            if (exists(time))
-                return leftSize;
-        }
-        int h = rightNode.ceilingIndex(ndx - leftSize - 1, time);
-        return h <= -1 ? -1 : h + leftSize + 1;
+        return getData().ceilingIndex(ndx, time);
     }
 
     /**
@@ -316,17 +206,7 @@ public class LazyDurableListNode {
     public int lowerIndex(int ndx, long time) {
         if (ndx <= 0 || isNil())
             return -1; //out of range
-        int leftSize = leftNode.size;
-        if (ndx > leftSize + 1) {
-            int l = rightNode.lowerIndex(ndx - leftSize - 1, time);
-            if (l > -1)
-                return l + leftSize + 1;
-        }
-        if (ndx > leftSize) {
-            if (exists(time))
-                return leftSize;
-        }
-        return leftNode.lowerIndex(ndx, time);
+        return getData().lowerIndex(ndx, time);
     }
 
     /**
@@ -339,17 +219,7 @@ public class LazyDurableListNode {
     public int floorIndex(int ndx, long time) {
         if (ndx < 0 || isNil())
             return -1; //out of range
-        int leftSize = leftNode.size;
-        if (ndx > leftSize) {
-            int l = rightNode.floorIndex(ndx - leftSize - 1, time);
-            if (l > -1)
-                return l + leftSize + 1;
-        }
-        if (ndx >= leftSize) {
-            if (exists(time))
-                return leftSize;
-        }
-        return leftNode.floorIndex(ndx, time);
+        return getData().floorIndex(ndx, time);
     }
 
     /**
@@ -359,7 +229,7 @@ public class LazyDurableListNode {
      * @return The index of the last existing value in the list, or -1.
      */
     public int lastIndex(long time) {
-        return floorIndex(size, time);
+        return floorIndex(totalSize(), time);
     }
 
     /**
@@ -371,16 +241,7 @@ public class LazyDurableListNode {
     public boolean isEmpty(long time) {
         if (isNil())
             return true;
-        return !(exists(time) && leftNode.isEmpty(time) && rightNode.isEmpty(time));
-    }
-
-    protected void flatList(List list, long time) {
-        if (isNil())
-            return;
-        leftNode.flatList(list, time);
-        if (exists(time))
-            list.add(value);
-        rightNode.flatList(list, time);
+        return getData().isEmpty(time);
     }
 
     /**
@@ -391,7 +252,7 @@ public class LazyDurableListNode {
      */
     public List flatList(long time) {
         List list = new ArrayList<>();
-        flatList(list, time);
+        getData().flatList(list, time);
         return list;
     }
 
@@ -416,7 +277,7 @@ public class LazyDurableListNode {
                 if (next == -1)
                     throw new NoSuchElementException();
                 last = next;
-                return get(last, time);
+                return getExistingValue(last, time);
             }
         };
     }
@@ -466,7 +327,7 @@ public class LazyDurableListNode {
 
             @Override
             public Object get(int ndx) {
-                return LazyDurableListNode.this.get(ndx, time);
+                return LazyDurableListNode.this.getExistingValue(ndx, time);
             }
 
             @Override
@@ -536,56 +397,6 @@ public class LazyDurableListNode {
         };
     }
 
-    protected LazyDurableListNode skew() {
-        if (isNil())
-            return this;
-        if (leftNode.isNil())
-            return this;
-        if (leftNode.level == level) {
-            LazyDurableListNode t = new LazyDurableListNode(
-                    level,
-                    leftNode.rightNode,
-                    rightNode,
-                    value,
-                    created,
-                    deleted);
-            LazyDurableListNode l = new LazyDurableListNode(
-                    leftNode.level,
-                    leftNode.leftNode,
-                    t,
-                    leftNode.value,
-                    leftNode.created,
-                    leftNode.deleted);
-            return l;
-        } else
-            return this;
-    }
-
-    protected LazyDurableListNode split() {
-        if (isNil())
-            return this;
-        if (rightNode.isNil() || rightNode.rightNode.isNil())
-            return this;
-        if (level == rightNode.rightNode.level) {
-            LazyDurableListNode t = new LazyDurableListNode(
-                    level,
-                    leftNode,
-                    rightNode.leftNode,
-                    value,
-                    created,
-                    deleted);
-            LazyDurableListNode r = new LazyDurableListNode(
-                    rightNode.level + 1,
-                    t,
-                    rightNode.rightNode,
-                    rightNode.value,
-                    rightNode.created,
-                    rightNode.deleted);
-            return r;
-        }
-        return this;
-    }
-
     /**
      * Add a non-null value to the end of the list.
      *
@@ -615,30 +426,9 @@ public class LazyDurableListNode {
         if (isNil()) {
             if (ndx != 0 && ndx != -1)
                 throw new IllegalArgumentException("index out of range");
-            return new LazyDurableListNode(1, LIST_NIL, LIST_NIL, value, created, deleted);
+            return new LazyDurableListNode(1, 1, created, deleted, LIST_NIL, value, LIST_NIL);
         }
-        if (ndx == -1)
-            ndx = size;
-        int leftSize = leftNode.size;
-        LazyDurableListNode t = this;
-        if (ndx <= leftSize) {
-            t = new LazyDurableListNode(
-                    level,
-                    leftNode.add(ndx, value, created, deleted),
-                    rightNode,
-                    this.value,
-                    this.created,
-                    this.deleted);
-        } else {
-            t = new LazyDurableListNode(
-                    level,
-                    leftNode,
-                    rightNode.add(ndx - leftSize - 1, value, created, deleted),
-                    this.value,
-                    this.created,
-                    this.deleted);
-        }
-        return t.skew().split();
+        return getData().add(ndx, value, created, deleted);
     }
 
     /**
@@ -651,40 +441,7 @@ public class LazyDurableListNode {
     public LazyDurableListNode remove(int ndx, long time) {
         if (isNil())
             return this;
-        int leftSize = leftNode.size;
-        if (ndx == leftSize) {
-            if (exists(time))
-                return new LazyDurableListNode(
-                        level,
-                        leftNode,
-                        rightNode,
-                        value,
-                        created,
-                        time);
-            return this;
-        }
-        if (ndx < leftSize) {
-            LazyDurableListNode n = leftNode.remove(ndx, time);
-            if (leftNode == n)
-                return this;
-            return new LazyDurableListNode(
-                    level,
-                    n,
-                    rightNode,
-                    value,
-                    created,
-                    deleted);
-        }
-        LazyDurableListNode n = rightNode.remove(ndx - leftSize - 1, time);
-        if (rightNode == n)
-            return this;
-        return new LazyDurableListNode(
-                level,
-                leftNode,
-                n,
-                value,
-                created,
-                deleted);
+        return getData().remove(ndx, time);
     }
 
     /**
@@ -704,16 +461,7 @@ public class LazyDurableListNode {
      * @return A shortened copy of the list without some historical values.
      */
     public LazyDurableListNode copyList(long time) {
-        return copyList(LIST_NIL, time);
-    }
-
-    protected LazyDurableListNode copyList(LazyDurableListNode n, long time) {
-        if (isNil())
-            return n;
-        n = leftNode.copyList(n, time);
-        if (deleted >= time)
-            n = n.add(n.size, value, created, deleted);
-        return rightNode.copyList(n, time);
+        return getData().copyList(LIST_NIL, time);
     }
 
     /**
@@ -723,13 +471,7 @@ public class LazyDurableListNode {
      * @return The currently empty versioned list.
      */
     public LazyDurableListNode clearList(long time) {
-        if (isNil())
-            return this;
-        LazyDurableListNode ln = leftNode.clearList(time);
-        LazyDurableListNode rn = rightNode.clearList(time);
-        if (ln == leftNode && rn == rightNode && !exists(time))
-            return this;
-        return new LazyDurableListNode(level, ln, rn, value, created, time);
+        return getData().clearList(time);
     }
 
     /**
@@ -745,7 +487,7 @@ public class LazyDurableListNode {
     /**
      * Write the durable to a byte buffer.
      *
-     * @param byteBuffer    The byte buffer.
+     * @param byteBuffer The byte buffer.
      */
     public void writeDurable(ByteBuffer byteBuffer) {
         if (isNil()) {
@@ -759,15 +501,10 @@ public class LazyDurableListNode {
     /**
      * Serialize this object into a ByteBuffer.
      *
-     * @param byteBuffer    Where the serialized data is to be placed.
+     * @param byteBuffer Where the serialized data is to be placed.
      */
     public void serialize(ByteBuffer byteBuffer) {
-        byteBuffer.putInt(durableLength);
-        byteBuffer.putInt(level);
-        byteBuffer.putLong(created);
-        byteBuffer.putLong(deleted);
-        leftNode.writeDurable(byteBuffer);
-        valueFactory.writeDurable(value, byteBuffer);
-        rightNode.writeDurable(byteBuffer);
+        byteBuffer.putInt(getDurableLength());
+        getData().serialize(byteBuffer);
     }
 }

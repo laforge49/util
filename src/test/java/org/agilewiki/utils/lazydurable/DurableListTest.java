@@ -26,15 +26,15 @@ public class DurableListTest extends TestCase {
         l2 = l2.add("3", 3);
         LazyDurableFactory lazyDurableFactory3 = FactoryRegistry.getDurableFactory(l2);
         assertTrue(lazyDurableFactory3 instanceof LazyDurableListNodeFactory);
-        assertEquals(110, lazyDurableFactory3.getDurableLength(l2));
+        assertEquals(122, lazyDurableFactory3.getDurableLength(l2));
         ByteBuffer byteBuffer2 = ByteBuffer.allocate(lazyDurableFactory3.getDurableLength(l2));
         lazyDurableFactory3.writeDurable(l2, byteBuffer2);
-        assertEquals(110, byteBuffer2.position());
+        assertEquals(122, byteBuffer2.position());
         byteBuffer2.flip();
         LazyDurableFactory lazyDurableFactory4 = FactoryRegistry.readId(byteBuffer2);
         assertTrue(lazyDurableFactory4 instanceof LazyDurableListNodeFactory);
         Object object4 = lazyDurableFactory4.deserialize(byteBuffer2);
-        assertEquals(110, byteBuffer2.position());
+        assertEquals(122, byteBuffer2.position());
         assertEquals("123", String.join("", ((LazyDurableListNode) object4).flatList(3)));
     }
 }
