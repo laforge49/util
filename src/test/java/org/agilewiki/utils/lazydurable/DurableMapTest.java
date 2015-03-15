@@ -26,15 +26,15 @@ public class DurableMapTest extends TestCase {
         m2 = m2.add("a", "3", 3);
         LazyDurableFactory lazyDurableFactory3 = FactoryRegistry.getDurableFactory(m2);
         assertTrue(lazyDurableFactory3 instanceof LazyDurableMapNodeFactory);
-        assertEquals(128, lazyDurableFactory3.getDurableLength(m2));
+        assertEquals(132, lazyDurableFactory3.getDurableLength(m2));
         ByteBuffer byteBuffer2 = ByteBuffer.allocate(lazyDurableFactory3.getDurableLength(m2));
         lazyDurableFactory3.writeDurable(m2, byteBuffer2);
-        assertEquals(128, byteBuffer2.position());
+        assertEquals(132, byteBuffer2.position());
         byteBuffer2.flip();
         LazyDurableFactory lazyDurableFactory4 = FactoryRegistry.readId(byteBuffer2);
         assertTrue(lazyDurableFactory4 instanceof LazyDurableMapNodeFactory);
         Object object4 = lazyDurableFactory4.deserialize(byteBuffer2);
-        assertEquals(128, byteBuffer2.position());
+        assertEquals(132, byteBuffer2.position());
         assertEquals("123", String.join("", ((LazyDurableMapNode) object4).getList("a").flatList(3)));
     }
 }

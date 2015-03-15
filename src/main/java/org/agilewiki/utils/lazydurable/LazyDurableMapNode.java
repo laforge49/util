@@ -55,17 +55,32 @@ public class LazyDurableMapNode {
                                  LazyDurableMapNode rightNode,
                                  LazyDurableListNode listNode,
                                  Comparable key, LazyDurableFactory keyFactory) {
+        this(10 +
+                        keyFactory.getDurableLength(key) +
+                        leftNode.getDurableLength() +
+                        listNode.getDurableLength() +
+                        rightNode.getDurableLength(),
+                level,
+                leftNode,
+                rightNode,
+                listNode,
+                key,
+                FactoryRegistry.getDurableFactory(key));
+    }
+
+    protected LazyDurableMapNode(int durableLength,
+                                 int level,
+                                 LazyDurableMapNode leftNode,
+                                 LazyDurableMapNode rightNode,
+                                 LazyDurableListNode listNode,
+                                 Comparable key, LazyDurableFactory keyFactory) {
+        this.durableLength = durableLength;
         this.level = level;
         this.leftNode = leftNode;
         this.rightNode = rightNode;
         this.listNode = listNode;
         this.key = key;
         this.keyFactory = keyFactory;
-        durableLength = 6 +
-                keyFactory.getDurableLength(key) +
-                leftNode.getDurableLength() +
-                listNode.getDurableLength() +
-                rightNode.getDurableLength();
     }
 
     protected boolean isNil() {
@@ -725,6 +740,7 @@ public class LazyDurableMapNode {
      * @param byteBuffer    Where the serialized data is to be placed.
      */
     public void serialize(ByteBuffer byteBuffer) {
+        byteBuffer.putInt(durableLength);
         byteBuffer.putInt(level);
         keyFactory.writeDurable(key, byteBuffer);
         leftNode.writeDurable(byteBuffer);
