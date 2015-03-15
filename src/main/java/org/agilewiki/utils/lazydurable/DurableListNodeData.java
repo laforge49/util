@@ -433,21 +433,20 @@ public class DurableListNodeData {
         if (leftData.level == level) {
             LazyDurableListNode t = new LazyDurableListNode(
                     level,
-                    totalSize,
+                    totalSize - leftData.totalSize + leftData.leftNode.totalSize(),
                     created,
                     deleted,
                     leftData.rightNode,
                     value,
                     rightNode);
-            LazyDurableListNode l = new LazyDurableListNode(
+            return new LazyDurableListNode(
                     leftData.level,
-                    leftData.totalSize,
+                    totalSize,
                     leftData.created,
                     leftData.deleted,
                     leftData.leftNode,
                     leftData.value,
                     t);
-            return l;
         } else
             return thisNode;
     }
@@ -466,7 +465,7 @@ public class DurableListNodeData {
         if (level == rightData.rightNode.getData().level) {
             LazyDurableListNode t = new LazyDurableListNode(
                     level,
-                    totalSize,
+                    totalSize - rightData.totalSize + rightData.leftNode.totalSize(),
                     created,
                     deleted,
                     leftNode,
@@ -474,7 +473,7 @@ public class DurableListNodeData {
                     rightData.leftNode);
             LazyDurableListNode r = new LazyDurableListNode(
                     rightData.level + 1,
-                    rightData.totalSize,
+                    totalSize,
                     rightData.created,
                     rightData.deleted,
                     t,
@@ -493,7 +492,7 @@ public class DurableListNodeData {
         if (ndx <= leftSize) {
             t = new LazyDurableListNode(
                     level,
-                    totalSize,
+                    totalSize + 1,
                     this.created,
                     this.deleted,
                     leftNode.add(ndx, value, created, deleted),
@@ -502,7 +501,7 @@ public class DurableListNodeData {
         } else {
             t = new LazyDurableListNode(
                     level,
-                    totalSize,
+                    totalSize + 1,
                     this.created,
                     this.deleted,
                     leftNode,
