@@ -7,6 +7,12 @@ import java.util.List;
  * The durable data elements of a list node.
  */
 public class DurableListNodeData {
+
+    /**
+     * The node which holds this data.
+     */
+    public final LazyDurableListNode thisNode;
+
     /**
      * Composite node depth--see AA Tree algorithm.
      */
@@ -41,11 +47,6 @@ public class DurableListNodeData {
      * Right subtree node.
      */
     public final LazyDurableListNode rightNode;
-
-    /**
-     * The node which holds this data.
-     */
-    public final LazyDurableListNode thisNode;
 
     /**
      * The factory for the value.
