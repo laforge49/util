@@ -485,7 +485,16 @@ public class DurableListNodeData {
         return thisNode;
     }
 
-    protected LazyDurableListNode add(int ndx, Object value, long created, long deleted) {
+    /**
+     * Add a non-null value to the list.
+     *
+     * @param ndx   Where to add the value, or -1 to append to the end.
+     * @param value The value to be added.
+     * @param created    Creation time.
+     * @param deleted    Deletion time, or MAX_VALUE.
+     * @return The revised root node.
+     */
+    public LazyDurableListNode add(int ndx, Object value, long created, long deleted) {
         if (ndx == -1)
             ndx = totalSize;
         int leftSize = leftNode.totalSize();
