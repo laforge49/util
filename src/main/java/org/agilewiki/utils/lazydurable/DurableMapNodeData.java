@@ -205,21 +205,21 @@ public class DurableMapNodeData {
                     leftNode.add(key, ndx, value, created, deleted),
                     listNode,
                     rightNode,
-                    key);
+                    this.key);
         } else if (c == 0) {
             return new LazyDurableMapNode(
                     level,
                     leftNode,
                     listNode.add(ndx, value, created, deleted),
                     rightNode,
-                    key);
+                    this.key);
         } else {
             t = new LazyDurableMapNode(
                     level,
                     leftNode,
                     listNode,
                     rightNode.add(key, ndx, value, created, deleted),
-                    key);
+                    this.key);
         }
         return t.getData().skew().getData().split();
     }

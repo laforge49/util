@@ -173,21 +173,21 @@ public class ImmutableMapNode {
                     leftNode.add(key, ndx, value, created, deleted),
                     rightNode,
                     listNode,
-                    key);
+                    this.key);
         } else if (c == 0) {
             return new ImmutableMapNode(
                     level,
                     leftNode,
                     rightNode,
                     listNode.add(ndx, value, created, deleted),
-                    key);
+                    this.key);
         } else {
             t = new ImmutableMapNode(
                     level,
                     leftNode,
                     rightNode.add(key, ndx, value, created, deleted),
                     listNode,
-                    key);
+                    this.key);
         }
         return t.skew().split();
     }

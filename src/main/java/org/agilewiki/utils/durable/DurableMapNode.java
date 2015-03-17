@@ -201,21 +201,21 @@ public class DurableMapNode {
                     leftNode.add(key, ndx, value, created, deleted),
                     rightNode,
                     listNode,
-                    key);
+                    this.key);
         } else if (c == 0) {
             return new DurableMapNode(
                     level,
                     leftNode,
                     rightNode,
                     listNode.add(ndx, value, created, deleted),
-                    key);
+                    this.key);
         } else {
             t = new DurableMapNode(
                     level,
                     leftNode,
                     rightNode.add(key, ndx, value, created, deleted),
                     listNode,
-                    key);
+                    this.key);
         }
         return t.skew().split();
     }
