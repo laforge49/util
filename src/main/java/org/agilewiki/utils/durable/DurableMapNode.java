@@ -183,7 +183,7 @@ public class DurableMapNode {
      * @return The revised root node.
      */
     public DurableMapNode add(Comparable key, int ndx, Object value, long time) {
-        return add(key, ndx, value, time, Integer.MAX_VALUE);
+        return add(key, ndx, value, time, Long.MAX_VALUE);
     }
 
     protected DurableMapNode add(Comparable key, int ndx, Object value, long created, long deleted) {

@@ -14,7 +14,7 @@ public class ListNode {
     /**
      * A time after all insertions and deletions.
      */
-    public final static long MAX_TIME = Integer.MAX_VALUE - 1;
+    public final static long MAX_TIME = Long.MAX_VALUE - 1;
 
     /**
      * The root node of an empty tree.
@@ -543,7 +543,7 @@ public class ListNode {
      * @return The revised root node.
      */
     public ListNode add(int ndx, Object value, long time) {
-        return add(ndx, value, time, Integer.MAX_VALUE);
+        return add(ndx, value, time, Long.MAX_VALUE);
     }
 
     protected ListNode add(int ndx, Object value, long created, long deleted) {

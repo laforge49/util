@@ -155,7 +155,7 @@ public class ImmutableMapNode {
      * @return The revised root node.
      */
     public ImmutableMapNode add(Comparable key, int ndx, Object value, long time) {
-        return add(key, ndx, value, time, Integer.MAX_VALUE);
+        return add(key, ndx, value, time, Long.MAX_VALUE);
     }
 
     protected ImmutableMapNode add(Comparable key, int ndx, Object value, long created, long deleted) {
