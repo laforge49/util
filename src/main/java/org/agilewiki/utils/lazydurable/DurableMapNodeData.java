@@ -432,6 +432,124 @@ public class DurableMapNodeData {
     }
 
     /**
+     * Returns the smallest key of the non-empty lists for the given time.
+     *
+     * @param time The time of the query.
+     * @return The smallest key, or null.
+     */
+    public Comparable firstKey(long time) {
+        if (isNil())
+            return null;
+        Comparable k = leftNode.firstKey(time);
+        if (k != null)
+            return k;
+        if (!listNode.isEmpty(time))
+            return key;
+        return rightNode.firstKey(time);
+    }
+
+    /**
+     * Returns the largest key of the non-empty lists for the given time.
+     *
+     * @param time The time of the query.
+     * @return The largest key, or null.
+     */
+    public Comparable lastKey(long time) {
+        if (isNil())
+            return null;
+        Comparable k = rightNode.lastKey(time);
+        if (k != null)
+            return k;
+        if (!listNode.isEmpty(time))
+            return key;
+        return leftNode.lastKey(time);
+    }
+
+    /**
+     * Returns the next greater key.
+     *
+     * @param key  The given key.
+     * @param time The time of the query.
+     * @return The next greater key with content at the time of the query, or null.
+     */
+    public Comparable higherKey(Comparable key, long time) {
+        if (isNil())
+            return null;
+        int c = key.compareTo(this.key);
+        if (c <= 0) {
+            Comparable k = leftNode.higherKey(key, time);
+            if (k != null)
+                return k;
+        }
+        if (c < 0 && !listNode.isEmpty(time))
+            return this.key;
+        return rightNode.higherKey(key, time);
+    }
+
+    /**
+     * Returns the key with content that is greater than or equal to the given key.
+     *
+     * @param key  The given key.
+     * @param time The time of the query.
+     * @return The key greater than or equal to the given key, or null.
+     */
+    public Comparable ceilingKey(Comparable key, long time) {
+        if (isNil())
+            return null;
+        int c = key.compareTo(this.key);
+        if (c < 0) {
+            Comparable k = leftNode.ceilingKey(key, time);
+            if (k != null)
+                return k;
+        }
+        if (c <= 0 && !listNode.isEmpty(time))
+            return this.key;
+        return rightNode.ceilingKey(key, time);
+    }
+
+    /**
+     * Returns the next smaller key.
+     *
+     * @param key  The given key.
+     * @param time The time of the query.
+     * @return The next smaller key with content at the time of the query, or null.
+     */
+    public Comparable lowerKey(Comparable key, long time) {
+        if (isNil())
+            return null;
+        int c = key.compareTo(this.key);
+        if (c >= 0) {
+            Comparable k = rightNode.lowerKey(key, time);
+            if (k != null)
+                return k;
+        }
+        if (c > 0 && !listNode.isEmpty(time))
+            return this.key;
+        return leftNode.lowerKey(key, time);
+    }
+
+    /**
+     * Returns the key with content that is smaller than or equal to the given key.
+     *
+     * @param key  The given key.
+     * @param time The time of the query.
+     * @return The key smaller than or equal to the given key, or null.
+     */
+    public Comparable floorKey(Comparable key, long time) {
+        if (isNil())
+            return null;
+        int c = key.compareTo(this.key);
+        if (c > 0) {
+            Comparable k = rightNode.floorKey(key, time);
+            if (k != null)
+                return k;
+        }
+        if (c >= 0 && !listNode.isEmpty(time))
+            return this.key;
+        return leftNode.floorKey(key, time);
+    }
+
+    /**
      * Returns the length of the serialized data, including the id and durable length.
      *
      * @return The length of the serialized data.

@@ -43,17 +43,6 @@ public class LazyDurableMapNodeFactory implements LazyDurableFactory {
 
     @Override
     public LazyDurableMapNode deserialize(ByteBuffer byteBuffer) {
-        int durableLength = byteBuffer.getInt();
-        int level = byteBuffer.getInt();
-        LazyDurableFactory keyFactory = FactoryRegistry.readId(byteBuffer);
-        Comparable key = (Comparable) keyFactory.deserialize(byteBuffer);
-        LazyDurableFactory f = FactoryRegistry.readId(byteBuffer);
-        LazyDurableMapNode leftNode = (LazyDurableMapNode) f.deserialize(byteBuffer);
-        f = FactoryRegistry.readId(byteBuffer);
-        LazyDurableListNode listNode = (LazyDurableListNode) f.deserialize(byteBuffer);
-        f = FactoryRegistry.readId(byteBuffer);
-        LazyDurableMapNode rightNode = (LazyDurableMapNode) f.deserialize(byteBuffer);
-        return new LazyDurableMapNode(
-                durableLength, level, leftNode, rightNode, listNode, key, keyFactory);
+        return new LazyDurableMapNode(byteBuffer);
     }
 }
