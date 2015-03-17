@@ -54,7 +54,7 @@ public class DurableMapNodeData {
         this.thisNode = thisNode;
         this.level = 0;
         this.leftNode = thisNode;
-        this.listNode = null;
+        this.listNode = LazyDurableListNode.LIST_NIL;
         this.rightNode = thisNode;
         key = null;
 
