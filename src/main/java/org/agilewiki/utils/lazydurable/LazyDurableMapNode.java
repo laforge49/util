@@ -31,6 +31,7 @@ public class LazyDurableMapNode {
     protected LazyDurableMapNode(ByteBuffer byteBuffer) {
         durableLength = byteBuffer.getInt();
         this.byteBuffer = byteBuffer.slice();
+        this.byteBuffer.limit(durableLength - 6);
         byteBuffer.position(byteBuffer.position() + durableLength - 6);
     }
 
@@ -495,6 +496,14 @@ public class LazyDurableMapNode {
      */
     public void serialize(ByteBuffer byteBuffer) {
         byteBuffer.putInt(getDurableLength());
-        getData().serialize(byteBuffer);
+        if (this.byteBuffer == null) {
+            getData().serialize(byteBuffer);
+            return;
+        }
+        byteBuffer.put(this.byteBuffer.slice());
+        ByteBuffer bb = byteBuffer.slice();
+        bb.limit(durableLength - 6);
+        this.byteBuffer = bb;
+        dataReference.set(null); //limit memory footprint, plugs memory leak.
     }
 }
