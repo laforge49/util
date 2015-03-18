@@ -238,17 +238,17 @@ public class DurableMapNode {
             DurableMapNode n = leftNode.remove(key, ndx, time);
             if (n == leftNode)
                 return this;
-            return new DurableMapNode(level, n, rightNode, listNode, key);
+            return new DurableMapNode(level, n, rightNode, listNode, this.key);
         } else if (c == 0) {
             DurableListNode n = listNode.remove(ndx, time);
             if (n == listNode)
                 return this;
-            return new DurableMapNode(level, leftNode, rightNode, n, key);
+            return new DurableMapNode(level, leftNode, rightNode, n, this.key);
         } else {
             DurableMapNode n = rightNode.remove(key, ndx, time);
             if (n == rightNode)
                 return this;
-            return new DurableMapNode(level, leftNode, n, listNode, key);
+            return new DurableMapNode(level, leftNode, n, listNode, this.key);
         }
     }
 
@@ -269,7 +269,7 @@ public class DurableMapNode {
             DurableMapNode n = leftNode.clearList(key, time);
             if (n == leftNode)
                 return this;
-            return new DurableMapNode(level, n, rightNode, listNode, key);
+            return new DurableMapNode(level, n, rightNode, listNode, this.key);
         } else if (c == 0) {
             DurableListNode n = listNode.clearList(time);
             if (n == listNode)
@@ -279,7 +279,7 @@ public class DurableMapNode {
             DurableMapNode n = rightNode.clearList(key, time);
             if (n == rightNode)
                 return this;
-            return new DurableMapNode(level, leftNode, n, listNode, key);
+            return new DurableMapNode(level, leftNode, n, listNode, this.key);
         }
     }
 
@@ -288,19 +288,19 @@ public class DurableMapNode {
             throw new IllegalArgumentException("value may not be null");
         if (isNil()) {
             DurableListNode listNode = DurableListNode.LIST_NIL.add(value, time);
-            return new DurableMapNode(1, MAP_NIL, MAP_NIL, listNode, key);
+            return new DurableMapNode(1, MAP_NIL, MAP_NIL, listNode, this.key);
         }
         int c = key.compareTo(this.key);
         if (c < 0) {
             DurableMapNode n = leftNode.set(key, value, time);
-            return new DurableMapNode(level, n, rightNode, listNode, key);
+            return new DurableMapNode(level, n, rightNode, listNode, this.key);
         } else if (c == 0) {
             DurableListNode n = listNode.clearList(time);
             n = n.add(value, time);
-            return new DurableMapNode(level, leftNode, rightNode, n, key);
+            return new DurableMapNode(level, leftNode, rightNode, n, this.key);
         } else {
             DurableMapNode n = rightNode.set(key, value, time);
-            return new DurableMapNode(level, leftNode, n, listNode, key);
+            return new DurableMapNode(level, leftNode, n, listNode, this.key);
         }
     }
 

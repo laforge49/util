@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 public class SpeedTest extends TestCase {
     public void test() throws Exception {
         LazyDurableMapNode m1 = LazyDurableMapNode.MAP_NIL;
-        int c = 2;
+        int c = 10;
         long t0 = System.currentTimeMillis();
         for(int i = 0; i < c; ++i) {
             m1 = m1.add("k" + i, "v" + i, i);

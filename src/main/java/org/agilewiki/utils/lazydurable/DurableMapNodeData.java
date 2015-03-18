@@ -242,17 +242,17 @@ public class DurableMapNodeData {
             LazyDurableMapNode n = leftNode.remove(key, ndx, time);
             if (n == leftNode)
                 return thisNode;
-            return new LazyDurableMapNode(level, n, listNode, rightNode, key);
+            return new LazyDurableMapNode(level, n, listNode, rightNode, this.key);
         } else if (c == 0) {
             LazyDurableListNode n = listNode.remove(ndx, time);
             if (n == listNode)
                 return thisNode;
-            return new LazyDurableMapNode(level, leftNode, n, rightNode, key);
+            return new LazyDurableMapNode(level, leftNode, n, rightNode, this.key);
         } else {
             LazyDurableMapNode n = rightNode.remove(key, ndx, time);
             if (n == rightNode)
                 return thisNode;
-            return new LazyDurableMapNode(level, leftNode, listNode, n, key);
+            return new LazyDurableMapNode(level, leftNode, listNode, n, this.key);
         }
     }
 
@@ -273,17 +273,17 @@ public class DurableMapNodeData {
             LazyDurableMapNode n = leftNode.clearList(key, time);
             if (n == leftNode)
                 return thisNode;
-            return new LazyDurableMapNode(level, n, listNode, rightNode, key);
+            return new LazyDurableMapNode(level, n, listNode, rightNode, this.key);
         } else if (c == 0) {
             LazyDurableListNode n = listNode.clearList(time);
             if (n == listNode)
                 return thisNode;
-            return new LazyDurableMapNode(level, leftNode, n, rightNode, key);
+            return new LazyDurableMapNode(level, leftNode, n, rightNode, this.key);
         } else {
             LazyDurableMapNode n = rightNode.clearList(key, time);
             if (n == rightNode)
                 return thisNode;
-            return new LazyDurableMapNode(level, leftNode, listNode, n, key);
+            return new LazyDurableMapNode(level, leftNode, listNode, n, this.key);
         }
     }
 
@@ -299,14 +299,14 @@ public class DurableMapNodeData {
         int c = key.compareTo(this.key);
         if (c < 0) {
             LazyDurableMapNode n = leftNode.set(key, value, time);
-            return new LazyDurableMapNode(level, n, listNode, rightNode, key);
+            return new LazyDurableMapNode(level, n, listNode, rightNode, this.key);
         } else if (c == 0) {
             LazyDurableListNode n = listNode.clearList(time);
             n = n.add(value, time);
-            return new LazyDurableMapNode(level, leftNode, n, rightNode, key);
+            return new LazyDurableMapNode(level, leftNode, n, rightNode, this.key);
         } else {
             LazyDurableMapNode n = rightNode.set(key, value, time);
-            return new LazyDurableMapNode(level, leftNode, listNode, n, key);
+            return new LazyDurableMapNode(level, leftNode, listNode, n, this.key);
         }
     }
 

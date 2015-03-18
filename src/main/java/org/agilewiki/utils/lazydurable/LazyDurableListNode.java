@@ -505,14 +505,19 @@ public class LazyDurableListNode {
      * @param byteBuffer Where the serialized data is to be placed.
      */
     public void serialize(ByteBuffer byteBuffer) {
-        byteBuffer.putInt(getDurableLength());
         if (this.byteBuffer == null) {
+            byteBuffer.putInt(getDurableLength());
             getData().serialize(byteBuffer);
             return;
         }
-        byteBuffer.put(this.byteBuffer.slice());
+        if (this.byteBuffer.limit() != getDurableLength()) {
+            System.out.println("list shrunk by "+(this.byteBuffer.limit() - getDurableLength()));
+        } else {
+            System.out.print(".");
+        }
         ByteBuffer bb = byteBuffer.slice();
         bb.limit(durableLength - 6);
+        byteBuffer.put(this.byteBuffer.slice());
         this.byteBuffer = bb;
         dataReference.set(null); //limit memory footprint, plugs memory leak.
     }

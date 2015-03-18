@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 public class SpeedTest extends TestCase {
     public void test() throws Exception {
         DurableMapNode m1 = DurableMapNode.MAP_NIL;
-        int c = 1000000;
+        int c = 140;
         long t0 = System.currentTimeMillis();
         for(int i = 0; i < c; ++i) {
             m1 = m1.add("k" + i, "v" + i, i);
@@ -27,8 +27,10 @@ public class SpeedTest extends TestCase {
         byteBuffer.flip();
         long t4 = System.currentTimeMillis();
         DurableMapNode m2 = (DurableMapNode) FactoryRegistry.readId(byteBuffer).deserialize(byteBuffer);
+        System.out.println("durable length = "+m2.getDurableLength());
         String fk = (String) m2.firstKey(DurableListNode.MAX_TIME);
-        m2.set("k0","upd", 2*c);
+        m2 = m2.set("k0","upd", 2*c);
+        System.out.println("durable length = " + m2.getDurableLength());
         ByteBuffer byteBuffer1 = ByteBuffer.allocate(m2.getDurableLength());
         m2.writeDurable(byteBuffer1);
         long t5 = System.currentTimeMillis();

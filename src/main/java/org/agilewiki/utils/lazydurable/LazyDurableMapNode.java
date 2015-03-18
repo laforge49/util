@@ -500,6 +500,11 @@ public class LazyDurableMapNode {
             getData().serialize(byteBuffer);
             return;
         }
+        if (this.byteBuffer.limit() != getDurableLength()) {
+            System.out.println("map shrunk by "+(this.byteBuffer.limit() - getDurableLength()));
+        } else {
+            System.out.print(".");
+        }
         ByteBuffer bb = byteBuffer.slice();
         bb.limit(durableLength - 2);
         byteBuffer.put(this.byteBuffer.slice());
