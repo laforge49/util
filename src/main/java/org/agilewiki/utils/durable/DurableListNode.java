@@ -353,7 +353,7 @@ public class DurableListNode {
     public boolean isEmpty(long time) {
         if (isNil())
             return true;
-        return !(exists(time) && leftNode.isEmpty(time) && rightNode.isEmpty(time));
+        return !exists(time) && leftNode.isEmpty(time) && rightNode.isEmpty(time);
     }
 
     protected void flatList(List list, long time) {
