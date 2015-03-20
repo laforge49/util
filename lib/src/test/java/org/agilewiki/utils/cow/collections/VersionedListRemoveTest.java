@@ -9,13 +9,13 @@ public class VersionedListRemoveTest extends TestCase {
     public void test() throws Exception {
         Registry registry = new Registry();
 
-        VersionedListNode l1 = registry.listNil;
+        VersionedListNode l1 = registry.nilVersionedList;
 
         l1 = l1.remove(-1, 1);
         l1 = l1.remove(0, 1);
         l1 = l1.remove(1, 1);
 
-        VersionedListNode l2 = registry.listNil.add("a", 2);
+        VersionedListNode l2 = registry.nilVersionedList.add("a", 2);
         l2 = l2.add("b", 3);
         l2 = l2.add("c", 4);
         l2 = l2.add("d", 5);

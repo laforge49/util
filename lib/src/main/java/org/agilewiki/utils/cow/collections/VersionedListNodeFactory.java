@@ -10,14 +10,14 @@ import java.nio.ByteBuffer;
  */
 public class VersionedListNodeFactory extends BaseFactory {
 
-    public final char listNilId;
-    public final VersionedListNode listNil;
+    public final char nilVersionedListId;
+    public final VersionedListNode nilVersionedList;
 
-    public VersionedListNodeFactory(FactoryRegistry factoryRegistry, char id, char listNilId) {
+    public VersionedListNodeFactory(FactoryRegistry factoryRegistry, char id, char nilVersionedListId) {
         super(factoryRegistry, id);
-        this.listNilId = listNilId;
-        new NilVersionedListNodeFactory(this, listNilId);
-        listNil = new VersionedListNode(this);
+        this.nilVersionedListId = nilVersionedListId;
+        new NilVersionedListNodeFactory(this, nilVersionedListId);
+        nilVersionedList = new VersionedListNode(this);
     }
 
     @Override

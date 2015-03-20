@@ -2,6 +2,8 @@ package org.agilewiki.utils.cow;
 
 import org.agilewiki.utils.cow.collections.VersionedListNode;
 import org.agilewiki.utils.cow.collections.VersionedListNodeFactory;
+import org.agilewiki.utils.cow.collections.VersionedMapNode;
+import org.agilewiki.utils.cow.collections.VersionedMapNodeFactory;
 import org.agilewiki.utils.cow.scalars.*;
 
 import java.nio.ByteBuffer;
@@ -11,7 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * Implements the factory registry.
  */
 public class Registry implements FactoryRegistry {
-    public final VersionedListNode listNil;
+    public final VersionedListNode nilVersionedList;
+    public final VersionedMapNode nilVersionedMap;
 
     protected final ConcurrentHashMap<Character, ImmutableFactory> idMap =
             new ConcurrentHashMap<>(16, 0.75f, 1);
@@ -29,7 +32,9 @@ public class Registry implements FactoryRegistry {
         new FloatFactory(this, 'F');
         new IntegerFactory(this, 'I');
         new LongFactory(this, 'L');
-        listNil = new VersionedListNodeFactory(this, 'l', '1').listNil;
+        nilVersionedList = new VersionedListNodeFactory(this, 'l', '1').nilVersionedList;
+        nilVersionedMap = new VersionedMapNodeFactory(this, 'm', '2', nilVersionedList).nilVersionedMap
+        ;
     }
 
     @Override

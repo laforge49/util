@@ -74,7 +74,7 @@ public class VersionedListNode {
     }
 
     protected boolean isNil() {
-        return this == factory.listNil;
+        return this == factory.nilVersionedList;
     }
 
     /**
@@ -421,7 +421,7 @@ public class VersionedListNode {
         if (isNil()) {
             if (ndx != 0 && ndx != -1)
                 throw new IllegalArgumentException("index out of range");
-            return new VersionedListNode(factory, 1, 1, created, deleted, factory.listNil, value, factory.listNil);
+            return new VersionedListNode(factory, 1, 1, created, deleted, factory.nilVersionedList, value, factory.nilVersionedList);
         }
         return getData().add(ndx, value, created, deleted);
     }
@@ -456,7 +456,7 @@ public class VersionedListNode {
      * @return A shortened copy of the list without some historical values.
      */
     public VersionedListNode copyList(long time) {
-        return getData().copyList(factory.listNil, time);
+        return getData().copyList(factory.nilVersionedList, time);
     }
 
     /**
@@ -486,10 +486,10 @@ public class VersionedListNode {
      */
     public void writeDurable(ByteBuffer byteBuffer) {
         if (isNil()) {
-            byteBuffer.putChar(factory.listNilId);
+            byteBuffer.putChar(factory.nilVersionedListId);
             return;
         }
-        byteBuffer.putChar(factory.listNilId);
+        byteBuffer.putChar(factory.nilVersionedListId);
         serialize(byteBuffer);
     }
 

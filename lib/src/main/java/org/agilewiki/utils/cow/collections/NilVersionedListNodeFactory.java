@@ -38,6 +38,6 @@ public class NilVersionedListNodeFactory extends BaseFactory {
 
     @Override
     public VersionedListNode deserialize(ByteBuffer byteBuffer) {
-        return factory.listNil;
+        return factory.nilVersionedList;
     }
 }

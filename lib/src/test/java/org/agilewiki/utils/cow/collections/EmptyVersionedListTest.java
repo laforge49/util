@@ -7,9 +7,9 @@ public class EmptyVersionedListTest extends TestCase {
     public void test() throws Exception {
         Registry registry = new Registry();
 
-        assertEquals(0, registry.listNil.totalSize());
+        assertEquals(0, registry.nilVersionedList.totalSize());
 
-        ListAccessor la = registry.listNil.listAccessor();
+        ListAccessor la = registry.nilVersionedList.listAccessor();
 
         assertEquals(Registry.MAX_TIME, la.time());
 

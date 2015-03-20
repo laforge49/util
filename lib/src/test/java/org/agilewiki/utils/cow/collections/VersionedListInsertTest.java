@@ -7,7 +7,7 @@ public class VersionedListInsertTest extends TestCase {
     public void test() throws Exception {
         Registry registry = new Registry();
 
-        VersionedListNode l1 = registry.listNil.add("a", 2);
+        VersionedListNode l1 = registry.nilVersionedList.add("a", 2);
         assertEquals(1, l1.totalSize());
         l1 = l1.add("b", 3);
         assertEquals(2, l1.totalSize());
@@ -30,7 +30,7 @@ public class VersionedListInsertTest extends TestCase {
         assertEquals("abcdefg", String.join("", a1.flatList()));
         assertEquals("abcd", String.join("", l1.flatList(5)));
 
-        VersionedListNode l2 = registry.listNil.add(0, "G", 2);
+        VersionedListNode l2 = registry.nilVersionedList.add(0, "G", 2);
         l2 = l2.add(0, "F", 3);
         l2 = l2.add(0, "E", 4);
         l2 = l2.add(0, "D", 5);
