@@ -79,10 +79,10 @@ public interface ImmutableFactory {
     /**
      * Serialize an immutable object into a ByteBuffer.
      *
-     * @param durable    The immutable object to be serialized.
+     * @param immutable    The immutable object to be serialized.
      * @param byteBuffer Where the serialized data is to be placed.
      */
-    void serialize(Object durable, ByteBuffer byteBuffer);
+    void serialize(Object immutable, ByteBuffer byteBuffer);
 
     /**
      * Deserialize an immutable object from the content of a ByteBuffer.

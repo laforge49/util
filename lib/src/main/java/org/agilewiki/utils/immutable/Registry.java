@@ -33,8 +33,8 @@ public class Registry implements FactoryRegistry {
         new IntegerFactory(this, 'I');
         new LongFactory(this, 'L');
         nilVersionedList = new VersionedListNodeFactory(this, 'l', '1').nilVersionedList;
-        nilVersionedMap = new VersionedMapNodeFactory(this, 'm', '2', nilVersionedList).nilVersionedMap
-        ;
+        nilVersionedMap = new VersionedMapNodeFactory(this, 'm', '2', nilVersionedList).nilVersionedMap;
+        new CS256Factory(this, 'c');
     }
 
     @Override
