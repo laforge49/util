@@ -1,5 +1,7 @@
 package org.agilewiki.utils.cow;
 
+import org.agilewiki.utils.cow.scalars.*;
+
 import java.nio.ByteBuffer;
 import java.util.concurrent.ConcurrentHashMap;
 

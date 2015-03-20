@@ -19,7 +19,7 @@ public interface FactoryRegistry {
     /**
      * Returns the factory for the given id.
      *
-     * @param id    The id of an immutable factory.
+     * @param id The id of an immutable factory.
      * @return The immutable factory, or null.
      */
     ImmutableFactory getImmutableFactory(char id);

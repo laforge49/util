@@ -1,11 +1,14 @@
-package org.agilewiki.utils.cow;
+package org.agilewiki.utils.cow.scalars;
+
+import org.agilewiki.utils.cow.BaseFactory;
+import org.agilewiki.utils.cow.FactoryRegistry;
 
 import java.nio.ByteBuffer;
 
 /**
- * Defines how an Float is serialized / deserialized.
+ * Defines how a Long is serialized / deserialized.
  */
-public class FloatFactory extends BaseFactory {
+public class LongFactory extends BaseFactory {
 
     /**
      * Create and register the factory.
@@ -13,29 +16,29 @@ public class FloatFactory extends BaseFactory {
      * @param factoryRegistry The registry where the factory is registered.
      * @param id              The char used to identify the factory.
      */
-    public FloatFactory(FactoryRegistry factoryRegistry, char id) {
+    public LongFactory(FactoryRegistry factoryRegistry, char id) {
         super(factoryRegistry, id);
     }
 
     @Override
     public Class getImmutableClass() {
-        return Float.class;
+        return Long.class;
     }
 
     @Override
     public int getDurableLength(Object durable) {
         if (durable == null)
             return 2;
-        return 6;
+        return 10;
     }
 
     @Override
     public void serialize(Object durable, ByteBuffer byteBuffer) {
-        byteBuffer.putFloat((Float) durable);
+        byteBuffer.putLong((Long) durable);
     }
 
     @Override
-    public Float deserialize(ByteBuffer byteBuffer) {
-        return byteBuffer.getFloat();
+    public Long deserialize(ByteBuffer byteBuffer) {
+        return byteBuffer.getLong();
     }
 }

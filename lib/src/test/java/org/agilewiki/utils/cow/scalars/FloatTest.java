@@ -1,6 +1,8 @@
-package org.agilewiki.utils.cow;
+package org.agilewiki.utils.cow.scalars;
 
 import junit.framework.TestCase;
+import org.agilewiki.utils.cow.ImmutableFactory;
+import org.agilewiki.utils.cow.Registry;
 
 import java.nio.ByteBuffer;
 

@@ -1,4 +1,7 @@
-package org.agilewiki.utils.cow;
+package org.agilewiki.utils.cow.scalars;
+
+import org.agilewiki.utils.cow.BaseFactory;
+import org.agilewiki.utils.cow.FactoryRegistry;
 
 import java.nio.ByteBuffer;
 
@@ -10,8 +13,8 @@ public class NullFactory extends BaseFactory {
     /**
      * Create and register this factory.
      *
-     * @param factoryRegistry    The registry where this factory is registered.
-     * @param id                 The char used to identify this factory.
+     * @param factoryRegistry The registry where this factory is registered.
+     * @param id              The char used to identify this factory.
      */
     public NullFactory(FactoryRegistry factoryRegistry, char id) {
         super(factoryRegistry, id);

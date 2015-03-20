@@ -64,7 +64,7 @@ public interface ImmutableFactory {
     /**
      * Write the immutable to a byte buffer.
      *
-     * @param immutable    The immutable object to be serialized.
+     * @param immutable  The immutable object to be serialized.
      * @param byteBuffer The byte buffer.
      */
     default void writeDurable(Object immutable, ByteBuffer byteBuffer) {

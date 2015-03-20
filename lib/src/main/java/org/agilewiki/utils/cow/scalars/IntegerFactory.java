@@ -1,4 +1,7 @@
-package org.agilewiki.utils.cow;
+package org.agilewiki.utils.cow.scalars;
+
+import org.agilewiki.utils.cow.BaseFactory;
+import org.agilewiki.utils.cow.FactoryRegistry;
 
 import java.nio.ByteBuffer;
 

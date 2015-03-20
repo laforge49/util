@@ -18,8 +18,8 @@ public abstract class BaseFactory implements ImmutableFactory {
     /**
      * Create and register the factory.
      *
-     * @param factoryRegistry    The registry where the factory is registered.
-     * @param id                 The char used to identify the factory.
+     * @param factoryRegistry The registry where the factory is registered.
+     * @param id              The char used to identify the factory.
      */
     public BaseFactory(FactoryRegistry factoryRegistry, char id) {
         this.factoryRegistry = factoryRegistry;
