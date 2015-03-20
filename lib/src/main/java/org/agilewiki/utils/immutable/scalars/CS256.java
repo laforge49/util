@@ -13,7 +13,7 @@ public class CS256 {
         bitSet = new BitSet(256);
         bitSet.flip(255);
         for (int i=0; i < bytes.length; i++) {
-            bitSet.flip((((int) bytes[i]) - (int) Byte.MIN_VALUE + i) % 256);
+            bitSet.flip((((int) bytes[i]) - (int) Byte.MIN_VALUE + i * 7) % 256);
         }
     }
 
