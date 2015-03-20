@@ -56,24 +56,24 @@ public interface ImmutableFactory {
      * Returns the size of a byte array needed to serialize the durable object,
      * including the space needed for the durable id.
      *
-     * @param durable The immutable object to be serialized.
+     * @param immutable The immutable object to be serialized.
      * @return The size in bytes of the serialized data.
      */
-    int getDurableLength(Object durable);
+    int getDurableLength(Object immutable);
 
     /**
-     * Write the durable to a byte buffer.
+     * Write the immutable to a byte buffer.
      *
-     * @param durable    The immutable object to be serialized.
+     * @param immutable    The immutable object to be serialized.
      * @param byteBuffer The byte buffer.
      */
-    default void writeDurable(Object durable, ByteBuffer byteBuffer) {
-        if (durable == null) {
+    default void writeDurable(Object immutable, ByteBuffer byteBuffer) {
+        if (immutable == null) {
             byteBuffer.putChar(FactoryRegistry.NULL_ID);
             return;
         }
-        byteBuffer.putChar(getId(durable));
-        serialize(durable, byteBuffer);
+        byteBuffer.putChar(getId(immutable));
+        serialize(immutable, byteBuffer);
     }
 
     /**

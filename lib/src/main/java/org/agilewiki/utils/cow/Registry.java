@@ -19,6 +19,11 @@ public class Registry implements FactoryRegistry {
     public Registry() {
         new NullFactory(this, NULL_ID);
         new StringFactory(this, 'S');
+        new DoubleFactory(this, 'D');
+        new BooleanFactory(this, 'B', 't', 'f');
+        new FloatFactory(this, 'F');
+        new IntegerFactory(this, 'I');
+        new LongFactory(this, 'L');
     }
 
     @Override
