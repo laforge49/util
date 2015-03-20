@@ -1,5 +1,7 @@
 package org.agilewiki.utils.cow;
 
+import org.agilewiki.utils.cow.collections.ImmutableListNode;
+import org.agilewiki.utils.cow.collections.ImmutableListNodeFactory;
 import org.agilewiki.utils.cow.scalars.*;
 
 import java.nio.ByteBuffer;
@@ -9,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Implements the factory registry.
  */
 public class Registry implements FactoryRegistry {
+    public final ImmutableListNode listNil;
 
     protected final ConcurrentHashMap<Character, ImmutableFactory> idMap =
             new ConcurrentHashMap<>(16, 0.75f, 1);
@@ -19,13 +22,14 @@ public class Registry implements FactoryRegistry {
      * Creates the registry and registers the default factories.
      */
     public Registry() {
-        new NullFactory(this, NULL_ID);
+        new NullFactory(this, NULL_ID); // 'N'
         new StringFactory(this, 'S');
         new DoubleFactory(this, 'D');
         new BooleanFactory(this, 'B', 't', 'f');
         new FloatFactory(this, 'F');
         new IntegerFactory(this, 'I');
         new LongFactory(this, 'L');
+        listNil = new ImmutableListNodeFactory(this, 'l', '1').listNil;
     }
 
     @Override
