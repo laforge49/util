@@ -1,18 +1,17 @@
 package org.agilewiki.utils.cow.collections;
 
 import org.agilewiki.utils.cow.BaseFactory;
-import org.agilewiki.utils.cow.FactoryRegistry;
 
 import java.nio.ByteBuffer;
 
 /**
  * Defines how a nil list node is serialized / deserialized.
  */
-public class NilListNodeFactory extends BaseFactory {
+public class NilVersionedListNodeFactory extends BaseFactory {
 
-    public final ImmutableListNodeFactory factory;
+    public final VersionedListNodeFactory factory;
 
-    public NilListNodeFactory(ImmutableListNodeFactory factory, char id) {
+    public NilVersionedListNodeFactory(VersionedListNodeFactory factory, char id) {
         super(factory.factoryRegistry, id);
         this.factory = factory;
     }
@@ -24,7 +23,7 @@ public class NilListNodeFactory extends BaseFactory {
 
     @Override
     public void match(Object immutable) {
-        if (!((ImmutableListNode) immutable).isNil())
+        if (!((VersionedListNode) immutable).isNil())
             throw new IllegalArgumentException("The immutable object is not a nil list node");
     }
 
@@ -38,7 +37,7 @@ public class NilListNodeFactory extends BaseFactory {
     }
 
     @Override
-    public ImmutableListNode deserialize(ByteBuffer byteBuffer) {
+    public VersionedListNode deserialize(ByteBuffer byteBuffer) {
         return factory.listNil;
     }
 }

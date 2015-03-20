@@ -9,12 +9,12 @@ import java.util.List;
 /**
  * The durable data elements of a list node.
  */
-public class ImmutableListNodeData {
+public class VersionedListNodeData {
 
     /**
      * The node which holds this data.
      */
-    public final ImmutableListNode thisNode;
+    public final VersionedListNode thisNode;
 
     /**
      * Composite node depth--see AA Tree algorithm.
@@ -39,7 +39,7 @@ public class ImmutableListNodeData {
     /**
      * Left subtree node.
      */
-    public final ImmutableListNode leftNode;
+    public final VersionedListNode leftNode;
 
     /**
      * The value of the node.
@@ -49,7 +49,7 @@ public class ImmutableListNodeData {
     /**
      * Right subtree node.
      */
-    public final ImmutableListNode rightNode;
+    public final VersionedListNode rightNode;
 
     /**
      * The factory for the value.
@@ -61,7 +61,7 @@ public class ImmutableListNodeData {
      *
      * @param thisNode The node which holds this data.
      */
-    public ImmutableListNodeData(ImmutableListNode thisNode) {
+    public VersionedListNodeData(VersionedListNode thisNode) {
         this.thisNode = thisNode;
         this.level = 0;
         totalSize = 0;
@@ -86,14 +86,14 @@ public class ImmutableListNodeData {
      * @param value     The value of the node.
      * @param rightNode Right subtree node.
      */
-    public ImmutableListNodeData(ImmutableListNode thisNode,
+    public VersionedListNodeData(VersionedListNode thisNode,
                                  int level,
                                  int totalSize,
                                  long created,
                                  long deleted,
-                                 ImmutableListNode leftNode,
+                                 VersionedListNode leftNode,
                                  Object value,
-                                 ImmutableListNode rightNode) {
+                                 VersionedListNode rightNode) {
         this.thisNode = thisNode;
         this.level = level;
         this.totalSize = totalSize;
@@ -111,7 +111,7 @@ public class ImmutableListNodeData {
      * @param thisNode   The node which holds this data.
      * @param byteBuffer Holds the serialized data.
      */
-    public ImmutableListNodeData(ImmutableListNode thisNode, ByteBuffer byteBuffer) {
+    public VersionedListNodeData(VersionedListNode thisNode, ByteBuffer byteBuffer) {
         this.thisNode = thisNode;
         level = byteBuffer.getInt();
         totalSize = byteBuffer.getInt();
@@ -119,11 +119,11 @@ public class ImmutableListNodeData {
         deleted = byteBuffer.getLong();
         FactoryRegistry registry = thisNode.factory.factoryRegistry;
         ImmutableFactory f = registry.readId(byteBuffer);
-        leftNode = (ImmutableListNode) f.deserialize(byteBuffer);
+        leftNode = (VersionedListNode) f.deserialize(byteBuffer);
         valueFactory = registry.readId(byteBuffer);
         value = valueFactory.deserialize(byteBuffer);
         f = registry.readId(byteBuffer);
-        rightNode = (ImmutableListNode) f.deserialize(byteBuffer);
+        rightNode = (VersionedListNode) f.deserialize(byteBuffer);
     }
 
     /**
@@ -195,7 +195,7 @@ public class ImmutableListNodeData {
      * @param ndx Relative position of the selected node within the sublist.
      * @return The selected node, or null.
      */
-    public ImmutableListNode getListNode(int ndx) {
+    public VersionedListNode getListNode(int ndx) {
         if (ndx < 0 || ndx >= totalSize)
             return null; //out of range
         int leftSize = leftNode.totalSize();
@@ -431,12 +431,12 @@ public class ImmutableListNodeData {
      *
      * @return Revised root node.
      */
-    public ImmutableListNode skew() {
+    public VersionedListNode skew() {
         if (isNil() || leftNode.isNil())
             return thisNode;
-        ImmutableListNodeData leftData = leftNode.getData();
+        VersionedListNodeData leftData = leftNode.getData();
         if (leftData.level == level) {
-            ImmutableListNode t = new ImmutableListNode(
+            VersionedListNode t = new VersionedListNode(
                     thisNode.factory,
                     level,
                     totalSize - leftData.totalSize + leftData.leftNode.totalSize(),
@@ -445,7 +445,7 @@ public class ImmutableListNodeData {
                     leftData.rightNode,
                     value,
                     rightNode);
-            return new ImmutableListNode(
+            return new VersionedListNode(
                     thisNode.factory,
                     leftData.level,
                     totalSize,
@@ -463,14 +463,14 @@ public class ImmutableListNodeData {
      *
      * @return The revised root node.
      */
-    public ImmutableListNode split() {
+    public VersionedListNode split() {
         if (isNil() || rightNode.isNil())
             return thisNode;
-        ImmutableListNodeData rightData = rightNode.getData();
+        VersionedListNodeData rightData = rightNode.getData();
         if (rightData.rightNode.isNil())
             return thisNode;
         if (level == rightData.rightNode.getData().level) {
-            ImmutableListNode t = new ImmutableListNode(
+            VersionedListNode t = new VersionedListNode(
                     thisNode.factory,
                     level,
                     totalSize - rightData.totalSize + rightData.leftNode.totalSize(),
@@ -479,7 +479,7 @@ public class ImmutableListNodeData {
                     leftNode,
                     value,
                     rightData.leftNode);
-            ImmutableListNode r = new ImmutableListNode(
+            VersionedListNode r = new VersionedListNode(
                     thisNode.factory,
                     rightData.level + 1,
                     totalSize,
@@ -502,13 +502,13 @@ public class ImmutableListNodeData {
      * @param deleted Deletion time, or MAX_VALUE.
      * @return The revised root node.
      */
-    public ImmutableListNode add(int ndx, Object value, long created, long deleted) {
+    public VersionedListNode add(int ndx, Object value, long created, long deleted) {
         if (ndx == -1)
             ndx = totalSize;
         int leftSize = leftNode.totalSize();
-        ImmutableListNode t = thisNode;
+        VersionedListNode t = thisNode;
         if (ndx <= leftSize) {
-            t = new ImmutableListNode(
+            t = new VersionedListNode(
                     thisNode.factory,
                     level,
                     totalSize + 1,
@@ -518,7 +518,7 @@ public class ImmutableListNodeData {
                     this.value,
                     rightNode);
         } else {
-            t = new ImmutableListNode(
+            t = new VersionedListNode(
                     thisNode.factory,
                     level,
                     totalSize + 1,
@@ -538,13 +538,13 @@ public class ImmutableListNodeData {
      * @param time The time of the deletion.
      * @return The revised node.
      */
-    public ImmutableListNode remove(int ndx, long time) {
+    public VersionedListNode remove(int ndx, long time) {
         if (isNil())
             return thisNode;
         int leftSize = leftNode.totalSize();
         if (ndx == leftSize) {
             if (exists(time))
-                return new ImmutableListNode(
+                return new VersionedListNode(
                         thisNode.factory,
                         level,
                         totalSize,
@@ -556,10 +556,10 @@ public class ImmutableListNodeData {
             return thisNode;
         }
         if (ndx < leftSize) {
-            ImmutableListNode n = leftNode.remove(ndx, time);
+            VersionedListNode n = leftNode.remove(ndx, time);
             if (leftNode == n)
                 return thisNode;
-            return new ImmutableListNode(
+            return new VersionedListNode(
                     thisNode.factory,
                     level,
                     totalSize,
@@ -569,10 +569,10 @@ public class ImmutableListNodeData {
                     value,
                     rightNode);
         }
-        ImmutableListNode n = rightNode.remove(ndx - leftSize - 1, time);
+        VersionedListNode n = rightNode.remove(ndx - leftSize - 1, time);
         if (rightNode == n)
             return thisNode;
-        return new ImmutableListNode(
+        return new VersionedListNode(
                 thisNode.factory,
                 level,
                 totalSize,
@@ -591,7 +591,7 @@ public class ImmutableListNodeData {
      * @param time The given time.
      * @return A shortened copy of the list without some historical values.
      */
-    public ImmutableListNode copyList(ImmutableListNode n, long time) {
+    public VersionedListNode copyList(VersionedListNode n, long time) {
         if (isNil())
             return n;
         n = leftNode.getData().copyList(n, time);
@@ -606,13 +606,13 @@ public class ImmutableListNodeData {
      * @param time The time of the deletion.
      * @return The currently empty versioned list.
      */
-    public ImmutableListNode clearList(long time) {
+    public VersionedListNode clearList(long time) {
         if (isNil())
             return thisNode;
-        ImmutableListNode ln = leftNode.clearList(time);
-        ImmutableListNode rn = rightNode.clearList(time);
+        VersionedListNode ln = leftNode.clearList(time);
+        VersionedListNode rn = rightNode.clearList(time);
         if (ln == leftNode && rn == rightNode && !exists(time))
             return thisNode;
-        return new ImmutableListNode(thisNode.factory, level, totalSize, created, time, ln, value, rn);
+        return new VersionedListNode(thisNode.factory, level, totalSize, created, time, ln, value, rn);
     }
 }

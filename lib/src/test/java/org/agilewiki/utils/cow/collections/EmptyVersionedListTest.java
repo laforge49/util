@@ -3,7 +3,7 @@ package org.agilewiki.utils.cow.collections;
 import junit.framework.TestCase;
 import org.agilewiki.utils.cow.Registry;
 
-public class EmptyListTest extends TestCase {
+public class EmptyVersionedListTest extends TestCase {
     public void test() throws Exception {
         Registry registry = new Registry();
 

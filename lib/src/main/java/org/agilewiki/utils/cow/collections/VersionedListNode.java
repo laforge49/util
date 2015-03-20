@@ -12,21 +12,21 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * An immutable versioning list.
  */
-public class ImmutableListNode {
+public class VersionedListNode {
 
-    public final ImmutableListNodeFactory factory;
+    public final VersionedListNodeFactory factory;
 
-    protected final AtomicReference<ImmutableListNodeData> dataReference = new AtomicReference<>();
+    protected final AtomicReference<VersionedListNodeData> dataReference = new AtomicReference<>();
     protected final int durableLength;
     protected ByteBuffer byteBuffer;
 
-    protected ImmutableListNode(ImmutableListNodeFactory factory) {
+    protected VersionedListNode(VersionedListNodeFactory factory) {
         this.factory = factory;
-        dataReference.set(new ImmutableListNodeData(this));
+        dataReference.set(new VersionedListNodeData(this));
         durableLength = 2;
     }
 
-    protected ImmutableListNode(ImmutableListNodeFactory factory, ByteBuffer byteBuffer) {
+    protected VersionedListNode(VersionedListNodeFactory factory, ByteBuffer byteBuffer) {
         this.factory = factory;
         durableLength = byteBuffer.getInt();
         this.byteBuffer = byteBuffer.slice();
@@ -34,16 +34,16 @@ public class ImmutableListNode {
         byteBuffer.position(byteBuffer.position() + durableLength - 6);
     }
 
-    protected ImmutableListNode(ImmutableListNodeFactory factory,
+    protected VersionedListNode(VersionedListNodeFactory factory,
                                 int level,
                                 int totalSize,
                                 long created,
                                 long deleted,
-                                ImmutableListNode leftNode,
+                                VersionedListNode leftNode,
                                 Object value,
-                                ImmutableListNode rightNode) {
+                                VersionedListNode rightNode) {
         this.factory = factory;
-        ImmutableListNodeData data = new ImmutableListNodeData(
+        VersionedListNodeData data = new VersionedListNodeData(
                 this,
                 level,
                 totalSize,
@@ -56,11 +56,11 @@ public class ImmutableListNode {
         dataReference.set(data);
     }
 
-    protected ImmutableListNodeData getData() {
-        ImmutableListNodeData data = dataReference.get();
+    protected VersionedListNodeData getData() {
+        VersionedListNodeData data = dataReference.get();
         if (data != null)
             return data;
-        dataReference.compareAndSet(null, new ImmutableListNodeData(this, byteBuffer.slice()));
+        dataReference.compareAndSet(null, new VersionedListNodeData(this, byteBuffer.slice()));
         return dataReference.get();
     }
 
@@ -97,7 +97,7 @@ public class ImmutableListNode {
      * @return A value, or null.
      */
     public Object getExistingValue(int ndx, long time) {
-        ImmutableListNode n = getData().getListNode(ndx);
+        VersionedListNode n = getData().getListNode(ndx);
         if (n == null)
             return null;
         return n.getData().getExistingValue(time);
@@ -317,77 +317,77 @@ public class ImmutableListNode {
 
             @Override
             public int size() {
-                return ImmutableListNode.this.size(time);
+                return VersionedListNode.this.size(time);
             }
 
             @Override
             public Object get(int ndx) {
-                return ImmutableListNode.this.getExistingValue(ndx, time);
+                return VersionedListNode.this.getExistingValue(ndx, time);
             }
 
             @Override
             public int getIndex(Object value) {
-                return ImmutableListNode.this.getIndex(value, time);
+                return VersionedListNode.this.getIndex(value, time);
             }
 
             @Override
             public int getIndexRight(Object value) {
-                return ImmutableListNode.this.getIndexRight(value, time);
+                return VersionedListNode.this.getIndexRight(value, time);
             }
 
             @Override
             public int findIndex(Object value) {
-                return ImmutableListNode.this.findIndex(value, time);
+                return VersionedListNode.this.findIndex(value, time);
             }
 
             @Override
             public int findIndexRight(Object value) {
-                return ImmutableListNode.this.findIndexRight(value, time);
+                return VersionedListNode.this.findIndexRight(value, time);
             }
 
             @Override
             public int higherIndex(int ndx) {
-                return ImmutableListNode.this.higherIndex(ndx, time);
+                return VersionedListNode.this.higherIndex(ndx, time);
             }
 
             @Override
             public int ceilingIndex(int ndx) {
-                return ImmutableListNode.this.ceilingIndex(ndx, time);
+                return VersionedListNode.this.ceilingIndex(ndx, time);
             }
 
             @Override
             public int firstIndex() {
-                return ImmutableListNode.this.firstIndex(time);
+                return VersionedListNode.this.firstIndex(time);
             }
 
             @Override
             public int lowerIndex(int ndx) {
-                return ImmutableListNode.this.lowerIndex(ndx, time);
+                return VersionedListNode.this.lowerIndex(ndx, time);
             }
 
             @Override
             public int floorIndex(int ndx) {
-                return ImmutableListNode.this.floorIndex(ndx, time);
+                return VersionedListNode.this.floorIndex(ndx, time);
             }
 
             @Override
             public int lastIndex() {
-                return ImmutableListNode.this.lastIndex(time);
+                return VersionedListNode.this.lastIndex(time);
             }
 
             @Override
             public boolean isEmpty() {
-                return ImmutableListNode.this.isEmpty(time);
+                return VersionedListNode.this.isEmpty(time);
             }
 
             @Override
             public List flatList() {
-                return ImmutableListNode.this.flatList(time);
+                return VersionedListNode.this.flatList(time);
             }
 
             @Override
             public Iterator iterator() {
-                return ImmutableListNode.this.iterator(time);
+                return VersionedListNode.this.iterator(time);
             }
         };
     }
@@ -399,7 +399,7 @@ public class ImmutableListNode {
      * @param time  The time the value is added.
      * @return The revised root node.
      */
-    public ImmutableListNode add(Object value, long time) {
+    public VersionedListNode add(Object value, long time) {
         return add(-1, value, time);
     }
 
@@ -411,17 +411,17 @@ public class ImmutableListNode {
      * @param time  The time the value is added.
      * @return The revised root node.
      */
-    public ImmutableListNode add(int ndx, Object value, long time) {
+    public VersionedListNode add(int ndx, Object value, long time) {
         return add(ndx, value, time, Long.MAX_VALUE);
     }
 
-    protected ImmutableListNode add(int ndx, Object value, long created, long deleted) {
+    protected VersionedListNode add(int ndx, Object value, long created, long deleted) {
         if (value == null)
             throw new IllegalArgumentException("value may not be null");
         if (isNil()) {
             if (ndx != 0 && ndx != -1)
                 throw new IllegalArgumentException("index out of range");
-            return new ImmutableListNode(factory, 1, 1, created, deleted, factory.listNil, value, factory.listNil);
+            return new VersionedListNode(factory, 1, 1, created, deleted, factory.listNil, value, factory.listNil);
         }
         return getData().add(ndx, value, created, deleted);
     }
@@ -433,7 +433,7 @@ public class ImmutableListNode {
      * @param time The time of the deletion.
      * @return The revised node.
      */
-    public ImmutableListNode remove(int ndx, long time) {
+    public VersionedListNode remove(int ndx, long time) {
         if (isNil())
             return this;
         return getData().remove(ndx, time);
@@ -444,7 +444,7 @@ public class ImmutableListNode {
      *
      * @return A complete, but shallow copy of the list.
      */
-    public ImmutableListNode copyList() {
+    public VersionedListNode copyList() {
         return copyList(0L);
     }
 
@@ -455,7 +455,7 @@ public class ImmutableListNode {
      * @param time The given time.
      * @return A shortened copy of the list without some historical values.
      */
-    public ImmutableListNode copyList(long time) {
+    public VersionedListNode copyList(long time) {
         return getData().copyList(factory.listNil, time);
     }
 
@@ -465,7 +465,7 @@ public class ImmutableListNode {
      * @param time The time of the deletion.
      * @return The currently empty versioned list.
      */
-    public ImmutableListNode clearList(long time) {
+    public VersionedListNode clearList(long time) {
         return getData().clearList(time);
     }
 

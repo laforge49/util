@@ -5,17 +5,17 @@ import org.agilewiki.utils.cow.Registry;
 
 import java.util.Iterator;
 
-public class ListRemoveTest extends TestCase {
+public class VersionedListRemoveTest extends TestCase {
     public void test() throws Exception {
         Registry registry = new Registry();
 
-        ImmutableListNode l1 = registry.listNil;
+        VersionedListNode l1 = registry.listNil;
 
         l1 = l1.remove(-1, 1);
         l1 = l1.remove(0, 1);
         l1 = l1.remove(1, 1);
 
-        ImmutableListNode l2 = registry.listNil.add("a", 2);
+        VersionedListNode l2 = registry.listNil.add("a", 2);
         l2 = l2.add("b", 3);
         l2 = l2.add("c", 4);
         l2 = l2.add("d", 5);
@@ -46,7 +46,7 @@ public class ListRemoveTest extends TestCase {
         assertEquals(6, l2.firstIndex(17));
         assertEquals(-1, l2.lastIndex(22));
 
-        ImmutableListNode copy = l2.copyList(16);
+        VersionedListNode copy = l2.copyList(16);
         assertEquals("e", String.join("", copy.flatList(6)));
         assertEquals("efg", String.join("", copy.flatList(15)));
         assertEquals(3, l2.size(15));
