@@ -6,7 +6,7 @@ import org.agilewiki.utils.immutable.Registry;
 
 import java.nio.ByteBuffer;
 
-public class SpeedTest extends TestCase {
+public class VersionedMapSpeedTest extends TestCase {
     public void test() throws Exception {
         Registry registry = new Registry();
         VersionedMapNode m1 = registry.nilVersionedMap;
