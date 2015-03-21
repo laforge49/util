@@ -27,11 +27,15 @@ public class CS256Factory extends BaseFactory {
 
     @Override
     public void serialize(Object immutable, ByteBuffer byteBuffer) {
-        byteBuffer.put(((CS256) immutable).toByteArray());
+        byteBuffer.asLongBuffer().put(((CS256) immutable).toLongArray());
+        byteBuffer.position(byteBuffer.position() + 32);
     }
 
     @Override
     public Object deserialize(ByteBuffer byteBuffer) {
-        return new CS256(byteBuffer);
+        long[] longs = new long[4];
+        byteBuffer.asLongBuffer().get(longs);
+        byteBuffer.position(byteBuffer.position() + 32);
+        return new CS256(longs);
     }
 }

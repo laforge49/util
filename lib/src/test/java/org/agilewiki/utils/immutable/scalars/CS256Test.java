@@ -11,11 +11,17 @@ public class CS256Test extends TestCase {
     public void test() throws Exception {
         FactoryRegistry registry = new Registry();
 
-        CS256 cs256a = new CS256("abc".getBytes());
-        CS256 cs256b = new CS256("123".getBytes());
+        ByteBuffer bba = ByteBuffer.allocate(6);
+        bba.put("abc".getBytes());
+        bba.flip();
+        CS256 cs256a = new CS256(bba);
+        ByteBuffer bbb = ByteBuffer.allocate(6);
+        bbb.put("123".getBytes());
+        bbb.flip();
+        CS256 cs256b = new CS256(bbb);
         assertTrue(cs256a.equals(cs256a));
         assertFalse(cs256a.equals(cs256b));
-        assertEquals(32, cs256a.toByteArray().length);
+        assertEquals(4, cs256a.toLongArray().length);
 
         ImmutableFactory factory1 = registry.getImmutableFactory(cs256a);
         assertTrue(factory1 instanceof CS256Factory);

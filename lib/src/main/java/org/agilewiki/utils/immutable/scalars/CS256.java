@@ -9,25 +9,43 @@ import java.util.BitSet;
 public class CS256 {
     private final BitSet bitSet;
 
-    public CS256(byte[] bytes) {
+    /**
+     * Create a checksum of the contents of the bytebuffer.
+     *
+     * @param byteBuffer    ByteBuffer is read but its position is not altered.
+     */
+    public CS256(ByteBuffer byteBuffer) {
         bitSet = new BitSet(256);
         bitSet.flip(255);
-        for (int i=0; i < bytes.length; i++) {
-            bitSet.flip((((int) bytes[i]) - (int) Byte.MIN_VALUE + i * 7) % 256);
+        int length = byteBuffer.remaining();
+        int offset = byteBuffer.position();
+        for (int i = 0; i < length; i++) {
+            bitSet.flip((((int) byteBuffer.get(offset + i)) - (int) Byte.MIN_VALUE + i * 7) % 256);
         }
     }
 
-    public CS256(ByteBuffer byteBuffer) {
-        ByteBuffer byteBuffer1 = (ByteBuffer) byteBuffer.slice().limit(32);
-        bitSet = BitSet.valueOf(byteBuffer1);
-        byteBuffer.position(byteBuffer.position() + 32);
+    /**
+     * Load the contents of the checksum with an array of 4 longs.
+     *
+     * @param longs
+     */
+    public CS256(long[] longs) {
+        if (longs.length != 4)
+            throw new IllegalArgumentException("length of longs must be 4");
+        bitSet = BitSet.valueOf(longs);
     }
 
+    @Override
     public boolean equals(Object obj) {
         return bitSet.equals(((CS256) obj).bitSet);
     }
 
-    public byte[] toByteArray() {
-        return bitSet.toByteArray();
+    /**
+     * Returns the contents of the checksum.
+     *
+     * @return An array, long[4].
+     */
+    public long[] toLongArray() {
+        return bitSet.toLongArray();
     }
 }
