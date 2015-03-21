@@ -35,10 +35,14 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <utils.version>0.6.0</utils.version>
+        <jactor2.version>1.0.0</jactor2.version>
+        <slf4j.version>1.7.7</slf4j.version>
         <junit.version>4.11</junit.version>
     </properties>
 
     <modules>
         <module>lib</module>
+        <module>cow</module>
     </modules>
 </project>
