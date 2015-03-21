@@ -158,6 +158,8 @@ public class ListNode {
     public int higherIndex(int ndx) {
         if (isNil())
             return -1;
+        if (ndx < 0)
+            return 0;
         return (totalSize() > ndx + 1) ? ndx + 1 : -1;
     }
 
@@ -170,6 +172,8 @@ public class ListNode {
     public int ceilingIndex(int ndx) {
         if (isNil())
             return -1;
+        if (ndx < 0)
+            return 0;
         return (totalSize() > ndx) ? ndx : -1;
     }
 
@@ -191,6 +195,9 @@ public class ListNode {
     public int lowerIndex(int ndx) {
         if (ndx <= 0 || isNil())
             return -1; //out of range
+        int t = totalSize();
+        if (ndx >= t)
+            return t -1;
         return ndx - 1;
     }
 
@@ -203,6 +210,9 @@ public class ListNode {
     public int floorIndex(int ndx) {
         if (ndx < 0 || isNil())
             return -1; //out of range
+        int t = totalSize();
+        if (ndx >= t)
+            return t -1;
         return ndx;
     }
 
