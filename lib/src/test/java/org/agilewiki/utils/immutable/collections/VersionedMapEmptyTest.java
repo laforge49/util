@@ -3,7 +3,7 @@ package org.agilewiki.utils.immutable.collections;
 import junit.framework.TestCase;
 import org.agilewiki.utils.immutable.Registry;
 
-public class EmptyVersionedMapTest extends TestCase {
+public class VersionedMapEmptyTest extends TestCase {
     public void test() throws Exception {
         Registry registry = new Registry();
 

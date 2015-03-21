@@ -3,13 +3,13 @@ package org.agilewiki.utils.immutable.collections;
 import junit.framework.TestCase;
 import org.agilewiki.utils.immutable.Registry;
 
-public class EmptyListTest extends TestCase {
+public class VersionedListEmptyTest extends TestCase {
     public void test() throws Exception {
         Registry registry = new Registry();
 
-        assertEquals(0, registry.nilList.totalSize());
+        assertEquals(0, registry.nilVersionedList.totalSize());
 
-        ListAccessor la = registry.nilList.listAccessor();
+        ListAccessor la = registry.nilVersionedList.listAccessor();
 
         assertEquals(Registry.MAX_TIME, la.time());
 
