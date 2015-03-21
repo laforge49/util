@@ -1,9 +1,6 @@
 package org.agilewiki.utils.immutable;
 
-import org.agilewiki.utils.immutable.collections.VersionedListNode;
-import org.agilewiki.utils.immutable.collections.VersionedListNodeFactory;
-import org.agilewiki.utils.immutable.collections.VersionedMapNode;
-import org.agilewiki.utils.immutable.collections.VersionedMapNodeFactory;
+import org.agilewiki.utils.immutable.collections.*;
 import org.agilewiki.utils.immutable.scalars.*;
 
 import java.nio.ByteBuffer;
@@ -15,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Registry implements FactoryRegistry {
     public final VersionedListNode nilVersionedList;
     public final VersionedMapNode nilVersionedMap;
+    public final ListNode nilList;
 
     protected final ConcurrentHashMap<Character, ImmutableFactory> idMap =
             new ConcurrentHashMap<>(16, 0.75f, 1);
@@ -35,6 +33,7 @@ public class Registry implements FactoryRegistry {
         nilVersionedList = new VersionedListNodeFactory(this, 'l', '1').nilVersionedList;
         nilVersionedMap = new VersionedMapNodeFactory(this, 'm', '2', nilVersionedList).nilVersionedMap;
         new CS256Factory(this, 'c');
+        nilList = new ListNodeFactory(this, 'n', '3').nilList;
     }
 
     @Override

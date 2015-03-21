@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Accesses a versioned list for a given time.
+ * Accesses a list.
  */
 public interface ListAccessor extends Iterable {
 
@@ -18,7 +18,7 @@ public interface ListAccessor extends Iterable {
     /**
      * Returns the time being accessed.
      *
-     * @return The time being accessed.
+     * @return The time being accessed, or MAX_TIME.
      */
     long time();
 

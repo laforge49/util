@@ -6,7 +6,7 @@ import org.agilewiki.utils.immutable.FactoryRegistry;
 import java.nio.ByteBuffer;
 
 /**
- * Defines how true is serialized / deserialized.
+ * Defines how a versioned list is serialized / deserialized.
  */
 public class VersionedListNodeFactory extends BaseFactory {
 

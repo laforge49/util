@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 /**
- * The durable data elements of a list node.
+ * The durable data elements of a versioned list node.
  */
 public class VersionedListNodeData {
 

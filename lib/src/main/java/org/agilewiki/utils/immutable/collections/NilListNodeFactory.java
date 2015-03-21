@@ -5,13 +5,13 @@ import org.agilewiki.utils.immutable.BaseFactory;
 import java.nio.ByteBuffer;
 
 /**
- * Defines how a nil versioned list node is serialized / deserialized.
+ * Defines how a nil list node is serialized / deserialized.
  */
-public class NilVersionedListNodeFactory extends BaseFactory {
+public class NilListNodeFactory extends BaseFactory {
 
-    public final VersionedListNodeFactory factory;
+    public final ListNodeFactory factory;
 
-    public NilVersionedListNodeFactory(VersionedListNodeFactory factory, char id) {
+    public NilListNodeFactory(ListNodeFactory factory, char id) {
         super(factory.factoryRegistry, id);
         this.factory = factory;
     }
@@ -23,7 +23,7 @@ public class NilVersionedListNodeFactory extends BaseFactory {
 
     @Override
     public void match(Object immutable) {
-        if (!((VersionedListNode) immutable).isNil())
+        if (!((ListNode) immutable).isNil())
             throw new IllegalArgumentException("The immutable object is not a nil list node");
     }
 
@@ -37,7 +37,7 @@ public class NilVersionedListNodeFactory extends BaseFactory {
     }
 
     @Override
-    public VersionedListNode deserialize(ByteBuffer byteBuffer) {
-        return factory.nilVersionedList;
+    public ListNode deserialize(ByteBuffer byteBuffer) {
+        return factory.nilList;
     }
 }

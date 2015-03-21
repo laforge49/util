@@ -10,7 +10,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * An immutable versioning list.
+ * An immutable versioned list.
  */
 public class VersionedListNode {
 

@@ -6,14 +6,14 @@ import java.util.NavigableMap;
 import java.util.NavigableSet;
 
 /**
- * Accesses a versioned map list for a given time.
+ * Accesses a map list.
  */
 public interface MapAccessor extends Iterable<ListAccessor> {
 
     /**
      * Returns the time being accessed.
      *
-     * @return The time being accessed.
+     * @return The time being accessed, or MAX_TIME.
      */
     long time();
 
