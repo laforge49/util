@@ -6,6 +6,8 @@ import org.agilewiki.utils.immutable.ImmutableFactory;
 import java.nio.ByteBuffer;
 import java.util.List;
 
+import static java.lang.Math.min;
+
 /**
  * The durable data elements of a list node.
  */
@@ -363,5 +365,95 @@ public class ListNodeData {
                     rightNode.add(ndx - leftSize - 1, value));
         }
         return t.getData().skew().getData().split();
+    }
+
+    private ListNode successor() {
+        return rightNode.getData().leftMost();
+    }
+
+    private ListNode leftMost() {
+        if (level > 1)
+            return leftNode.getData().leftMost();
+        return thisNode;
+    }
+
+    private ListNode predecessor() {
+        return leftNode.getData().rightMost();
+    }
+
+    private ListNode rightMost() {
+        if (level > 1)
+            return rightNode.getData().rightMost();
+        return thisNode;
+    }
+
+    private ListNode decreaseLevel() {
+        ListNodeData rd = rightNode.getData();
+        int shouldBe = min(leftNode.getData().level, rd.level) + 1;
+        if (shouldBe < level) {
+            ListNode r;
+            if (shouldBe < rd.level)
+                r = new ListNode(
+                        thisNode.factory,
+                        shouldBe,
+                        rd.totalSize,
+                        rd.leftNode,
+                        rd.value,
+                        rd.rightNode);
+            else
+                r = rightNode;
+            return new ListNode(
+                    thisNode.factory,
+                    shouldBe,
+                    totalSize,
+                    leftNode,
+                    value,
+                    r);
+        }
+        return thisNode;
+    }
+
+    public ListNode remove(int ndx) {
+        if (isNil())
+            return thisNode;
+        int leftSize = leftNode.size();
+        ListNode t = thisNode;
+        if (ndx > leftSize) {
+            ListNode r = rightNode.remove(ndx - leftSize -1);
+            if (r != rightNode)
+                t = new ListNode(thisNode.factory, level, totalSize, leftNode, value, r);
+        } else if (ndx < leftSize) {
+            ListNode l = leftNode.remove(ndx);
+            if (l != leftNode)
+                t = new ListNode(thisNode.factory, level, totalSize, l, value, rightNode);
+        } else {
+            ListNode nil = thisNode.factory.nilList;
+            if (level == 1)
+                return nil;
+            if (leftNode.isNil()) {
+                ListNode l = successor();
+                t = new ListNode(thisNode.factory, level, totalSize - 1, nil, l.getData().value, rightNode.remove(0));
+            } else {
+                ListNode l = predecessor();
+                t = new ListNode(thisNode.factory, level, totalSize - 1, leftNode.remove(leftSize - 1), l.getData().value, rightNode);
+            }
+        }
+        t = t.getData().decreaseLevel().getData().skew();
+        ListNodeData td = t.getData();
+        ListNode r = td.rightNode.getData().skew();
+        if (!r.isNil()) {
+            ListNodeData rd = r.getData();
+            ListNode rr = rd.rightNode.getData().skew();
+            if (rd.rightNode != rr)
+                r = new ListNode(thisNode.factory, rd.level, rd.totalSize, rd.leftNode, rd.value, rr);
+        }
+        if (r != td.rightNode)
+            t = new ListNode(thisNode.factory, td.level, td.totalSize, td.leftNode, td.value, r);
+        t = t.getData().split();
+        r = t.getData().rightNode.getData().split();
+        if (r != t.getData().rightNode)
+            td = t.getData();
+            t = new ListNode(thisNode.factory, td.level, td.totalSize, td.leftNode, td.value, r);
+        return t;
     }
 }

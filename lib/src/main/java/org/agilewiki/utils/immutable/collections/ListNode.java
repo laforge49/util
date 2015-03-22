@@ -443,4 +443,10 @@ public class ListNode {
         this.byteBuffer = bb;
         dataReference.set(null); //limit memory footprint, plugs memory leak.
     }
+
+    public ListNode remove(int ndx) {
+        if (isNil())
+            return this;
+        return getData().remove(ndx);
+    }
 }
