@@ -447,6 +447,14 @@ public class ListNode {
     public ListNode remove(int ndx) {
         if (isNil())
             return this;
+        if (ndx < 0)
+            return this;
         return getData().remove(ndx);
+    }
+
+    public String toString() {
+        if (isNil())
+            return "";
+        return getData().toString();
     }
 }
