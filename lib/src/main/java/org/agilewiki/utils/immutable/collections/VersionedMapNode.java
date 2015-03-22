@@ -384,7 +384,6 @@ public class VersionedMapNode {
 
     /**
      * Returns a map accessor for the latest time.
-     * But after calling add, a previously created accessor becomes invalid.
      *
      * @return A map accessor for the latest time.
      */
