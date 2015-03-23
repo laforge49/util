@@ -422,7 +422,7 @@ public class ListNode {
             byteBuffer.putChar(factory.nilListId);
             return;
         }
-        byteBuffer.putChar(factory.nilListId);
+        byteBuffer.putChar(factory.id);
         serialize(byteBuffer);
     }
 
