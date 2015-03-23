@@ -164,7 +164,7 @@ public class MapNode {
      *
      * @return A set of the keys.
      */
-    public NavigableSet<Comparable> flatKeys() {
+    public NavigableSet flatKeys() {
         NavigableSet keys = new TreeSet<>();
         getData().flatKeys(keys);
         return keys;
