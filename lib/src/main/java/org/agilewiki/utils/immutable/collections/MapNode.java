@@ -390,7 +390,7 @@ public class MapNode {
             byteBuffer.putChar(factory.nilMapId);
             return;
         }
-        byteBuffer.putChar(factory.nilMapId);
+        byteBuffer.putChar(factory.id);
         serialize(byteBuffer);
     }
 
