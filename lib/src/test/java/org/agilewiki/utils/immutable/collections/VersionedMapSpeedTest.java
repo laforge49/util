@@ -10,7 +10,7 @@ public class VersionedMapSpeedTest extends TestCase {
     public void test() throws Exception {
         Registry registry = new Registry();
         VersionedMapNode m1 = registry.nilVersionedMap;
-        int c = 10;
+        int c = 1000000;
         long t0 = System.currentTimeMillis();
         for(int i = 0; i < c; ++i) {
             m1 = m1.add("k" + i, "v" + i, i);
