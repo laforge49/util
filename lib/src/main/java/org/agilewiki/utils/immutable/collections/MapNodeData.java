@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 
+import static java.lang.Math.min;
+
 /**
  * The durable data elements of a map node.
  */
@@ -197,9 +199,9 @@ public class MapNodeData {
     /**
      * Add a non-null value to the list.
      *
-     * @param key     The key of the list.
-     * @param ndx     Where to add the value.
-     * @param value   The value to be added.
+     * @param key   The key of the list.
+     * @param ndx   Where to add the value.
+     * @param value The value to be added.
      * @return The revised root node.
      */
     public MapNode add(Comparable key, int ndx, Object value) {
@@ -233,15 +235,107 @@ public class MapNodeData {
         return t.getData().skew().getData().split();
     }
 
+    private MapNode successor() {
+        return rightNode.getData().leftMost();
+    }
+
+    private MapNode leftMost() {
+        if (!leftNode.isNil())
+            return leftNode.getData().leftMost();
+        return thisNode;
+    }
+
+    private MapNode predecessor() {
+        return leftNode.getData().rightMost();
+    }
+
+    private MapNode rightMost() {
+        if (!rightNode.isNil())
+            return rightNode.getData().rightMost();
+        return thisNode;
+    }
+
+    private MapNode decreaseLevel() {
+        MapNodeData rd = rightNode.getData();
+        int shouldBe = min(leftNode.getData().level, rd.level) + 1;
+        if (shouldBe < level) {
+            MapNode r;
+            if (shouldBe < rd.level)
+                r = new MapNode(
+                        thisNode.factory,
+                        shouldBe,
+                        rd.leftNode,
+                        rd.listNode,
+                        rd.rightNode,
+                        rd.key);
+            else
+                r = rightNode;
+            return new MapNode(
+                    thisNode.factory,
+                    shouldBe,
+                    leftNode,
+                    listNode,
+                    r,
+                    key);
+        }
+        return thisNode;
+    }
+
     public MapNode remove(Comparable key) {
-        throw new UnsupportedOperationException(); //todo
+        if (isNil())
+            return thisNode;
+        int c = key.compareTo(this.key);
+        MapNode t = thisNode;
+        if (c > 0) {
+            MapNode r = rightNode.remove(key);
+            if (r != rightNode)
+                t = new MapNode(thisNode.factory, level, leftNode, listNode, r, this.key);
+        } else if (c < 0) {
+            MapNode l = leftNode.remove(key);
+            if (l != leftNode)
+                t = new MapNode(thisNode.factory, level, l, listNode, rightNode, this.key);
+        } else {
+            MapNode nil = thisNode.factory.nilMap;
+            if (leftNode.isNil() && rightNode.isNil()) {
+                return nil;
+            }
+            if (leftNode.isNil()) {
+                MapNode l = successor();
+                MapNodeData ld = l.getData();
+                t = new MapNode(thisNode.factory, level, nil, ld.listNode, rightNode.remove(ld.key), ld.key);
+            } else {
+                MapNode l = predecessor();
+                MapNodeData ld = l.getData();
+                t = new MapNode(thisNode.factory, level, leftNode.remove(ld.key), ld.listNode, rightNode, ld.key);
+            }
+        }
+        t = t.getData().decreaseLevel().getData().skew();
+        MapNodeData td = t.getData();
+        MapNode r = td.rightNode.getData().skew();
+        if (!r.isNil()) {
+            MapNodeData rd = r.getData();
+            MapNode rr = rd.rightNode.getData().skew();
+            if (rd.rightNode != rr) {
+                r = new MapNode(thisNode.factory, rd.level, rd.leftNode, rd.listNode, rr, rd.key);
+            }
+        }
+        if (r != td.rightNode) {
+            t = new MapNode(thisNode.factory, td.level, td.leftNode, td.listNode, r, td.key);
+        }
+        t = t.getData().split();
+        r = t.getData().rightNode.getData().split();
+        td = t.getData();
+        if (r != td.rightNode) {
+            t = new MapNode(thisNode.factory, td.level, td.leftNode, td.listNode, r, td.key);
+        }
+        return t;
     }
 
     /**
      * Delete a value from the list.
      *
-     * @param key  The key of the list.
-     * @param ndx  The index of the value.
+     * @param key The key of the list.
+     * @param ndx The index of the value.
      * @return The revised node.
      */
     public MapNode remove(Comparable key, int ndx) {
@@ -255,17 +349,19 @@ public class MapNodeData {
             if (n == leftNode)
                 return thisNode;
             return new MapNode(thisNode.factory, level, n, listNode, rightNode, this.key);
-        } else if (c == 0) {
-            ListNode n = listNode.remove(ndx);
-            if (n == listNode)
-                return thisNode;
-            return new MapNode(thisNode.factory, level, leftNode, n, rightNode, this.key);
-        } else {
+        }
+        if (c > 0) {
             MapNode n = rightNode.remove(key, ndx);
             if (n == rightNode)
                 return thisNode;
             return new MapNode(thisNode.factory, level, leftNode, listNode, n, this.key);
         }
+        ListNode n = listNode.remove(ndx);
+        if (n == listNode)
+            return thisNode;
+        if (n.isNil())
+            return remove(key);
+        return new MapNode(thisNode.factory, level, leftNode, n, rightNode, this.key);
     }
 
     /**
@@ -306,7 +402,7 @@ public class MapNodeData {
     /**
      * Builds a map of all the keys and values.
      *
-     * @param map  The map being built.
+     * @param map The map being built.
      */
     public void flatMap(NavigableMap<Comparable, List> map) {
         if (isNil())
@@ -404,7 +500,7 @@ public class MapNodeData {
     /**
      * Returns the next greater key.
      *
-     * @param key  The given key.
+     * @param key The given key.
      * @return The next greater key, or null.
      */
     public Comparable higherKey(Comparable key) {
@@ -424,7 +520,7 @@ public class MapNodeData {
     /**
      * Returns the key that is greater than or equal to the given key.
      *
-     * @param key  The given key.
+     * @param key The given key.
      * @return The key greater than or equal to the given key, or null.
      */
     public Comparable ceilingKey(Comparable key) {
@@ -444,7 +540,7 @@ public class MapNodeData {
     /**
      * Returns the next smaller key.
      *
-     * @param key  The given key.
+     * @param key The given key.
      * @return The next smaller key, or null.
      */
     public Comparable lowerKey(Comparable key) {
@@ -464,7 +560,7 @@ public class MapNodeData {
     /**
      * Returns the key that is smaller than or equal to the given key.
      *
-     * @param key  The given key.
+     * @param key The given key.
      * @return The key smaller than or equal to the given key, or null.
      */
     public Comparable floorKey(Comparable key) {
