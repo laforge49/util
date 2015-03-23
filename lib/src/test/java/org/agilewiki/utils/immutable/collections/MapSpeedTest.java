@@ -10,7 +10,7 @@ public class MapSpeedTest extends TestCase {
     public void test() throws Exception {
         Registry registry = new Registry();
         MapNode m1 = registry.nilMap;
-        int c = 1000000;
+        int c = 10;
         long t0 = System.currentTimeMillis();
         for(int i = 0; i < c; ++i) {
             m1 = m1.add("k" + i, "v" + i);
@@ -26,6 +26,7 @@ public class MapSpeedTest extends TestCase {
         m1.writeDurable(byteBuffer);
         long t3 = System.currentTimeMillis();
         System.out.println("Serialization time = "+(t3 - t2)+" milliseconds");
+        System.out.println("durable length = " + m1.getDurableLength());
         byteBuffer.flip();
         long t4 = System.currentTimeMillis();
         MapNode m2 = (MapNode) registry.readId(byteBuffer).deserialize(byteBuffer);
@@ -35,5 +36,6 @@ public class MapSpeedTest extends TestCase {
         m2.writeDurable(byteBuffer1);
         long t5 = System.currentTimeMillis();
         System.out.println("Deserialize/reserialize time = "+(t5 - t4)+" milliseconds");
+        System.out.println("durable length = " + m2.getDurableLength());
     }
 }

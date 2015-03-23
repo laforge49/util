@@ -482,7 +482,7 @@ public class VersionedMapNode {
             byteBuffer.putChar(factory.nilVersionedMapId);
             return;
         }
-        byteBuffer.putChar(factory.nilVersionedMapId);
+        byteBuffer.putChar(factory.id);
         serialize(byteBuffer);
     }
 
