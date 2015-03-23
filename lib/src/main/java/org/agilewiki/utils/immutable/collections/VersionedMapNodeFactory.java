@@ -26,8 +26,8 @@ public class VersionedMapNodeFactory extends BaseFactory {
     }
 
     @Override
-    public ImmutableFactory getImmutableFactory(Object durable) {
-        if (((VersionedMapNode) durable).isNil())
+    public ImmutableFactory getImmutableFactory(Object immutable) {
+        if (((VersionedMapNode) immutable).isNil())
             return factoryRegistry.getImmutableFactory(nilVersionedMapId);
         return this;
     }

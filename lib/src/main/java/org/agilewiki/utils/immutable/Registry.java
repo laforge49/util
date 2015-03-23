@@ -36,7 +36,7 @@ public class Registry implements FactoryRegistry {
         nilVersionedMap = new VersionedMapNodeFactory(this, 'm', '2', nilVersionedList).nilVersionedMap;
         new CS256Factory(this, 'c');
         nilList = new ListNodeFactory(this, 'n', '3').nilList;
-        nilMap = new MapNodeFactory(this, 'm', '2', nilList).nilMap;
+        nilMap = new MapNodeFactory(this, 'o', '4', nilList).nilMap;
     }
 
     @Override

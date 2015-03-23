@@ -2,6 +2,7 @@ package org.agilewiki.utils.immutable.collections;
 
 import org.agilewiki.utils.immutable.BaseFactory;
 import org.agilewiki.utils.immutable.FactoryRegistry;
+import org.agilewiki.utils.immutable.ImmutableFactory;
 
 import java.nio.ByteBuffer;
 
@@ -18,6 +19,13 @@ public class VersionedListNodeFactory extends BaseFactory {
         this.nilVersionedListId = nilVersionedListId;
         new NilVersionedListNodeFactory(this, nilVersionedListId);
         nilVersionedList = new VersionedListNode(this);
+    }
+
+    @Override
+    public ImmutableFactory getImmutableFactory(Object immutable) {
+        if (((VersionedListNode) immutable).isNil())
+            return factoryRegistry.getImmutableFactory(nilVersionedListId);
+        return this;
     }
 
     @Override

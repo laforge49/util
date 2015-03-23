@@ -489,7 +489,7 @@ public class VersionedListNode {
             byteBuffer.putChar(factory.nilVersionedListId);
             return;
         }
-        byteBuffer.putChar(factory.nilVersionedListId);
+        byteBuffer.putChar(factory.id);
         serialize(byteBuffer);
     }
 
