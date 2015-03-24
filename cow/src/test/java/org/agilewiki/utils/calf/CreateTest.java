@@ -16,11 +16,12 @@ public class CreateTest extends TestCase {
             int maxRootBlockSize = 1000;
             try (Db calf = new Db(registry, calfPath, maxRootBlockSize)) {
                 calf.deleteIfExists();
-                calf.create(true, "Hello world!").call();
-                calf.update("hi!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!").call();
+                calf.open(true, "Hello world!").call();
                 calf.update("hi!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!").call();
                 calf.close();
                 System.out.println(calf.size());
+                calf.open();
+                System.out.println(calf.immutable);
             }
         } finally {
             Plant.close();
