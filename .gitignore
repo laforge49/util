@@ -1,6 +1,7 @@
 .svn
 .manager
 .idea
+*.db
 *.log
 *.aw5db
 target
