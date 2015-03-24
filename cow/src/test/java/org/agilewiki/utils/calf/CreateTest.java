@@ -13,10 +13,12 @@ public class CreateTest extends TestCase {
         try {
             Registry registry = new Registry();
             Path calfPath = Paths.get("calf.db");
-            int maxRootBlockSize = 10000000;
+            int maxRootBlockSize = 1000;
             try (Db calf = new Db(registry, calfPath, maxRootBlockSize)) {
                 calf.deleteIfExists();
-                calf.create(true, registry.nilMap.factory.id);
+                calf.create(true, "Hello world!").call();
+                calf.update("hi!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!").call();
+                calf.update("hi!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!").call();
                 calf.close();
                 System.out.println(calf.size());
             }

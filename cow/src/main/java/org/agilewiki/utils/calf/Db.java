@@ -1,11 +1,12 @@
 package org.agilewiki.utils.calf;
 
 import org.agilewiki.jactor2.core.blades.IsolationBladeBase;
+import org.agilewiki.jactor2.core.messages.AsyncResponseProcessor;
+import org.agilewiki.jactor2.core.messages.impl.AsyncRequestImpl;
 import org.agilewiki.jactor2.core.reactors.IsolationReactor;
 import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
 import org.agilewiki.utils.immutable.scalars.CS256;
-import org.agilewiki.utils.immutable.scalars.CS256Factory;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -22,6 +23,8 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     private final Path dbPath;
     private SeekableByteChannel sbc;
     private final int maxRootBlockSize;
+    private long nextRootPosition;
+    public Object immutable;
 
     public Db(FactoryRegistry registry, Path dbPath, int maxRootBlockSize) throws Exception {
         this.registry = registry;
@@ -60,38 +63,61 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         return Files.size(dbPath);
     }
 
-    public void create(boolean createNew, char nilImmutableId)
-            throws IOException {
-        if (createNew)
-            sbc = Files.newByteChannel(dbPath, READ, WRITE, SYNC, CREATE_NEW);
-        else
-            sbc = Files.newByteChannel(dbPath, READ, WRITE, SYNC, CREATE);
-        ByteBuffer byteBuffer0 = initialBlock(nilImmutableId);
-        sbc.position(0L);
-        while(byteBuffer0.remaining() > 0) {
-            sbc.write(byteBuffer0);
-        }
+    public AReq<Void> create(boolean createNew, Object immutable) {
+        return new AReq<Void>("create") {
+            @Override
+            protected void processAsyncOperation(final AsyncRequestImpl _asyncRequestImpl,
+                                                 final AsyncResponseProcessor<Void> _asyncResponseProcessor)
+                    throws Exception {
+                if (createNew)
+                    sbc = Files.newByteChannel(dbPath, READ, WRITE, SYNC, CREATE_NEW);
+                else
+                    sbc = Files.newByteChannel(dbPath, READ, WRITE, SYNC, CREATE);
+                _update(immutable);
+                _update(immutable);
+                _asyncResponseProcessor.processAsyncResponse(null);
+            }
+        };
     }
 
-    protected ByteBuffer initialBlock(char nilImmutableId) {
-        int contentSize = 8 + 2;
-        int initialBlockSize = 4 + 4 + 32 + contentSize;
-        if (initialBlockSize > maxRootBlockSize) {
-            throw new IllegalStateException("maxRootBlockSize is smaller than the initial block size");
+    public AReq<Void> update(Object immutable) {
+        return new AReq<Void>("update") {
+            @Override
+            protected void processAsyncOperation(AsyncRequestImpl _asyncRequestImpl, AsyncResponseProcessor<Void> _asyncResponseProcessor) throws Exception {
+                _update(immutable);
+                _asyncResponseProcessor.processAsyncResponse(null);
+            }
+        };
+    }
+
+    protected void _update(Object immutable)
+            throws IOException {
+        ImmutableFactory factory = registry.getImmutableFactory(immutable);
+        int contentSize = 8 + factory.getDurableLength(immutable);
+        int blockSize = 4 + 4 + 32 + contentSize;
+        if (blockSize > maxRootBlockSize) {
+            throw new IllegalStateException("maxRootBlockSize is smaller than the block size " +
+                    blockSize);
         }
         ByteBuffer contentBuffer = ByteBuffer.allocate(contentSize);
         contentBuffer.putLong(System.currentTimeMillis());
-        contentBuffer.putChar(nilImmutableId);
+        factory.serialize(immutable, contentBuffer);
         contentBuffer.flip();
         CS256 cs256 = new CS256(contentBuffer);
-        ByteBuffer byteBuffer = ByteBuffer.allocate(initialBlockSize);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(blockSize);
         byteBuffer.putInt(maxRootBlockSize);
         ImmutableFactory cs256Factory = registry.getImmutableFactory(cs256);
         cs256Factory.serialize(cs256, byteBuffer);
         byteBuffer.put(contentBuffer);
-        byteBuffer.putInt(initialBlockSize);
+        byteBuffer.putInt(blockSize);
         byteBuffer.flip();
-        return byteBuffer;
+        sbc.position(nextRootPosition);
+        while(byteBuffer.remaining() > 0) {
+            sbc.write(byteBuffer);
+        }
+        nextRootPosition = (nextRootPosition + maxRootBlockSize) % (2 * maxRootBlockSize);
+        this.immutable = immutable;
+        return;
     }
 
     @Override
