@@ -17,7 +17,7 @@ public class CreateTest extends TestCase {
             int maxRootBlockSize = 1000;
             try (Db calf = new Db(registry, calfPath, maxRootBlockSize)) {
                 Files.deleteIfExists(calfPath);
-                calf.open(true, "Hello world!").call();
+                calf.open(true, "!").call();
                 Transaction t2 = new Transaction() {
                     @Override
                     public Object transform(Object immutable) {
@@ -27,7 +27,7 @@ public class CreateTest extends TestCase {
                 calf.update(t2).call();
                 calf.close();
                 System.out.println(Files.size(calfPath));
-                calf.open();
+                calf.open().call();
                 System.out.println(calf.immutable);
             }
         } finally {

@@ -50,6 +50,9 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             protected void processAsyncOperation(final AsyncRequestImpl _asyncRequestImpl,
                                                  final AsyncResponseProcessor<Void> _asyncResponseProcessor)
                     throws Exception {
+                if (sbc != null) {
+                    throw new IllegalStateException("already open");
+                }
                 if (createNew)
                     sbc = Files.newByteChannel(dbPath, READ, WRITE, SYNC, CREATE_NEW);
                 else
@@ -75,22 +78,22 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             throws IOException {
         ImmutableFactory factory = registry.getImmutableFactory(immutable);
         int contentSize = 8 + factory.getDurableLength(immutable);
-        int blockSize = 4 + 4 + 32 + contentSize;
+        int blockSize = 4 + 4 + 34 + contentSize;
         if (blockSize > maxRootBlockSize) {
             throw new IllegalStateException("maxRootBlockSize is smaller than the block size " +
                     blockSize);
         }
         ByteBuffer contentBuffer = ByteBuffer.allocate(contentSize);
         contentBuffer.putLong(System.currentTimeMillis());
-        factory.serialize(immutable, contentBuffer);
+        factory.writeDurable(immutable, contentBuffer);
         contentBuffer.flip();
         CS256 cs256 = new CS256(contentBuffer);
         ByteBuffer byteBuffer = ByteBuffer.allocate(blockSize);
         byteBuffer.putInt(maxRootBlockSize);
-        ImmutableFactory cs256Factory = registry.getImmutableFactory(cs256);
-        cs256Factory.serialize(cs256, byteBuffer);
-        byteBuffer.put(contentBuffer);
         byteBuffer.putInt(blockSize);
+        ImmutableFactory cs256Factory = registry.getImmutableFactory(cs256);
+        cs256Factory.writeDurable(cs256, byteBuffer);
+        byteBuffer.put(contentBuffer);
         byteBuffer.flip();
         sbc.position(nextRootPosition);
         while (byteBuffer.remaining() > 0) {
@@ -103,8 +106,10 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
 
     @Override
     public void close() throws Exception {
-        if (sbc != null)
+        if (sbc != null) {
             sbc.close();
+            sbc = null;
+        }
     }
 
     public AReq<Void> open() {
@@ -112,9 +117,13 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             @Override
             protected void processAsyncOperation(AsyncRequestImpl _asyncRequestImpl,
                                                  AsyncResponseProcessor<Void> _asyncResponseProcessor) throws Exception {
+                if (sbc != null) {
+                    throw new IllegalStateException("already open");
+                }
                 if (!usable()) {
                     throw new IllegalStateException("file is unusable");
                 }
+                sbc = Files.newByteChannel(dbPath, READ, WRITE, SYNC);
                 RootBlock rb0 = readRootBlock(0L);
                 RootBlock rb1 = readRootBlock(maxRootBlockSize);
                 if (rb0 == null && rb1 == null) {
@@ -139,6 +148,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                 }
                 ImmutableFactory factory = registry.readId(rb.immutableBytes);
                 immutable = factory.deserialize(rb.immutableBytes);
+                _asyncResponseProcessor.processAsyncResponse(null);
             }
         };
     }
@@ -153,7 +163,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     protected RootBlock readRootBlock(long position)
             throws IOException {
         try {
-            ByteBuffer header = ByteBuffer.allocate(4 + 4 + 32);
+            ByteBuffer header = ByteBuffer.allocate(4 + 4 + 34);
             sbc.position(position);
             while (header.remaining() > 0) {
                 sbc.read(header);
@@ -164,7 +174,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                 return null;
             }
             int blockSize = header.getInt();
-            if (blockSize < 4 + 4 + 32 + 8 + 2) {
+            if (blockSize < 4 + 4 + 34 + 8 + 2) {
                 return null;
             }
             if (blockSize > maxRootBlockSize) {
@@ -175,7 +185,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                 return null;
             }
             CS256 cs1 = (CS256) csf.deserialize(header);
-            ByteBuffer body = ByteBuffer.allocate(blockSize - 4 - 4 - 32);
+            ByteBuffer body = ByteBuffer.allocate(blockSize - 4 - 4 - 34);
             while (body.remaining() > 0) {
                 sbc.read(body);
             }
