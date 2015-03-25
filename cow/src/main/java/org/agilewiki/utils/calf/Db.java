@@ -28,12 +28,27 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     private long nextRootPosition;
     public Object immutable;
 
+    /**
+     * Create a Db actor.
+     *
+     * @param registry            The immutable factory registry.
+     * @param dbPath              The path of the db file.
+     * @param maxRootBlockSize    The maximum root block size.
+     */
     public Db(FactoryRegistry registry, Path dbPath, int maxRootBlockSize) throws Exception {
         this.registry = registry;
         this.dbPath = dbPath;
         this.maxRootBlockSize = maxRootBlockSize;
     }
 
+    /**
+     * Create a Db actor.
+     *
+     * @param _reactor            The reactor of the actor.
+     * @param registry            The immutable factory registry.
+     * @param dbPath              The path of the db file.
+     * @param maxRootBlockSize    The maximum root block size.
+     */
     public Db(IsolationReactor _reactor,
               FactoryRegistry registry,
               Path dbPath,
@@ -44,6 +59,12 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         this.maxRootBlockSize = maxRootBlockSize;
     }
 
+    /**
+     * Open the db, creating a new db file.
+     *
+     * @param createNew    True when a db file must not already exist.
+     * @param immutable    The initial value held by the db.
+     */
     public void open(boolean createNew, Object immutable)
             throws IOException {
         if (sbc != null) {
@@ -58,6 +79,12 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         _update(immutable);
     }
 
+    /**
+     * Update the database.
+     *
+     * @param transaction    The transaction which will transform the db contents.
+     * @return The request to perform the update.
+     */
     public AReq<Void> update(Transaction transaction) {
         return new AReq<Void>("update") {
             @Override
@@ -106,6 +133,9 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         }
     }
 
+    /**
+     * Open an existing database.
+     */
     public void open()
             throws IOException {
         if (sbc != null) {
