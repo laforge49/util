@@ -14,6 +14,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.rmi.server.ExportException;
 
 import static java.nio.file.StandardOpenOption.*;
 
@@ -71,12 +72,17 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             getReactor().error("open on already open db");
             throw new IllegalStateException("already open");
         }
-        if (createNew)
-            sbc = Files.newByteChannel(dbPath, READ, WRITE, SYNC, CREATE_NEW);
-        else
-            sbc = Files.newByteChannel(dbPath, READ, WRITE, SYNC, CREATE);
-        _update(immutable);
-        _update(immutable);
+        try {
+            if (createNew)
+                sbc = Files.newByteChannel(dbPath, READ, WRITE, SYNC, CREATE_NEW);
+            else
+                sbc = Files.newByteChannel(dbPath, READ, WRITE, SYNC, CREATE);
+            _update(immutable);
+            _update(immutable);
+        } catch (Exception ex) {
+            getReactor().error("unable to open db to create a new file", ex);
+            throw ex;
+        }
     }
 
     /**
@@ -88,9 +94,16 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     public AReq<Void> update(Transaction transaction) {
         return new AReq<Void>("update") {
             @Override
-            protected void processAsyncOperation(AsyncRequestImpl _asyncRequestImpl, AsyncResponseProcessor<Void> _asyncResponseProcessor) throws Exception {
-                _update(transaction.transform(immutable));
-                _asyncResponseProcessor.processAsyncResponse(null);
+            protected void processAsyncOperation(AsyncRequestImpl _asyncRequestImpl,
+                                                 AsyncResponseProcessor<Void> _asyncResponseProcessor)
+                    throws Exception {
+                try {
+                    _update(transaction.transform(immutable));
+                    _asyncResponseProcessor.processAsyncResponse(null);
+                } catch (Exception ex) {
+                    getReactor().error("unable to update db", ex);
+                    throw ex;
+                }
             }
         };
     }
@@ -158,28 +171,33 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             getReactor().error("file is not a regular file: " + dbPath);
             throw new IllegalStateException("file is not a regular file: " + dbPath);
         }
-        sbc = Files.newByteChannel(dbPath, READ, WRITE, SYNC);
-        RootBlock rb0 = readRootBlock(0L);
-        RootBlock rb1 = readRootBlock(maxRootBlockSize);
-        if (rb0 == null && rb1 == null) {
-            throw new IllegalStateException("no valid root blocks found");
+        try {
+            sbc = Files.newByteChannel(dbPath, READ, WRITE, SYNC);
+            RootBlock rb0 = readRootBlock(0L);
+            RootBlock rb1 = readRootBlock(maxRootBlockSize);
+            if (rb0 == null && rb1 == null) {
+                throw new IllegalStateException("no valid root blocks found");
+            }
+            RootBlock rb;
+            if (rb0 == null) {
+                rb = rb1;
+                nextRootPosition = 0L;
+            } else if (rb1 == null) {
+                rb = rb0;
+                nextRootPosition = maxRootBlockSize;
+            } else if (rb0.timestamp > rb1.timestamp) {
+                rb = rb0;
+                nextRootPosition = maxRootBlockSize;
+            } else {
+                rb = rb1;
+                nextRootPosition = 0L;
+            }
+            ImmutableFactory factory = registry.readId(rb.immutableBytes);
+            immutable = factory.deserialize(rb.immutableBytes);
+        } catch (Exception ex) {
+            getReactor().error("Unable to open existing db file", ex);
+            throw ex;
         }
-        RootBlock rb;
-        if (rb0 == null) {
-            rb = rb1;
-            nextRootPosition = 0L;
-        } else if (rb1 == null) {
-            rb = rb0;
-            nextRootPosition = maxRootBlockSize;
-        } else if (rb0.timestamp > rb1.timestamp) {
-            rb = rb0;
-            nextRootPosition = maxRootBlockSize;
-        } else {
-            rb = rb1;
-            nextRootPosition = 0L;
-        }
-        ImmutableFactory factory = registry.readId(rb.immutableBytes);
-        immutable = factory.deserialize(rb.immutableBytes);
     }
 
     protected RootBlock readRootBlock(long position)
