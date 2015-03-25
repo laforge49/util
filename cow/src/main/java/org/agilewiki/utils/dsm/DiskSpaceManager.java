@@ -96,15 +96,25 @@ public class DiskSpaceManager {
     }
 
     /**
-     * Make the blocks available which had been released and
-     * write the bit array to a ByteBuffer.
-     *
-     * @param byteBuffer    Holds the bit array.
+     * Make the blocks available which had been released.
+     * <p>
+     * Calling commit will sometimes reduce the durable length.
+     * So commit should be called before durableLength if an accurate
+     * result is needed for a subsequent write.
+     * </p>
      */
-    public void commit(ByteBuffer byteBuffer) {
+    public void commit() {
         for (int i : freed) {
             bitSet.clear(i);
         }
+    }
+
+    /**
+     * Write the bit array to a ByteBuffer.
+     *
+     * @param byteBuffer    Holds the bit array.
+     */
+    public void write(ByteBuffer byteBuffer) {
         byte[] bytes = bitSet.toByteArray();
         byteBuffer.putInt(bytes.length);
         byteBuffer.put(bytes);
