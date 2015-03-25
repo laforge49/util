@@ -61,11 +61,11 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         };
     }
 
-    public AReq<Void> update(Object immutable) {
+    public AReq<Void> update(Transaction transaction) {
         return new AReq<Void>("update") {
             @Override
             protected void processAsyncOperation(AsyncRequestImpl _asyncRequestImpl, AsyncResponseProcessor<Void> _asyncResponseProcessor) throws Exception {
-                _update(immutable);
+                _update(transaction.transform(immutable));
                 _asyncResponseProcessor.processAsyncResponse(null);
             }
         };

@@ -18,7 +18,13 @@ public class CreateTest extends TestCase {
             try (Db calf = new Db(registry, calfPath, maxRootBlockSize)) {
                 Files.deleteIfExists(calfPath);
                 calf.open(true, "Hello world!").call();
-                calf.update("hi!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!").call();
+                Transaction t2 = new Transaction() {
+                    @Override
+                    public Object transform(Object immutable) {
+                        return "hi!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+                    }
+                };
+                calf.update(t2).call();
                 calf.close();
                 System.out.println(Files.size(calfPath));
                 calf.open();
