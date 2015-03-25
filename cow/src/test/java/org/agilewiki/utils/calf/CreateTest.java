@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 import org.agilewiki.jactor2.core.impl.Plant;
 import org.agilewiki.utils.immutable.Registry;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -15,11 +16,11 @@ public class CreateTest extends TestCase {
             Path calfPath = Paths.get("calf.db");
             int maxRootBlockSize = 1000;
             try (Db calf = new Db(registry, calfPath, maxRootBlockSize)) {
-                calf.deleteIfExists();
+                Files.deleteIfExists(calfPath);
                 calf.open(true, "Hello world!").call();
                 calf.update("hi!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!").call();
                 calf.close();
-                System.out.println(calf.size());
+                System.out.println(Files.size(calfPath));
                 calf.open();
                 System.out.println(calf.immutable);
             }

@@ -22,7 +22,7 @@ import static java.nio.file.StandardOpenOption.*;
  */
 public class Db extends IsolationBladeBase implements AutoCloseable {
     private final FactoryRegistry registry;
-    private final Path dbPath;
+    public final Path dbPath;
     private SeekableByteChannel sbc;
     private final int maxRootBlockSize;
     private long nextRootPosition;
@@ -42,20 +42,6 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         this.registry = registry;
         this.dbPath = dbPath;
         this.maxRootBlockSize = maxRootBlockSize;
-    }
-
-    public boolean notExists() {
-        return Files.notExists(dbPath);
-    }
-
-    public boolean deleteIfExists()
-            throws IOException {
-        return Files.deleteIfExists(dbPath);
-    }
-
-    public long size()
-            throws IOException {
-        return Files.size(dbPath);
     }
 
     public AReq<Void> open(boolean createNew, Object immutable) {
