@@ -44,24 +44,17 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         this.maxRootBlockSize = maxRootBlockSize;
     }
 
-    public AReq<Void> open(boolean createNew, Object immutable) {
-        return new AReq<Void>("openCreate") {
-            @Override
-            protected void processAsyncOperation(final AsyncRequestImpl _asyncRequestImpl,
-                                                 final AsyncResponseProcessor<Void> _asyncResponseProcessor)
-                    throws Exception {
-                if (sbc != null) {
-                    throw new IllegalStateException("already open");
-                }
-                if (createNew)
-                    sbc = Files.newByteChannel(dbPath, READ, WRITE, SYNC, CREATE_NEW);
-                else
-                    sbc = Files.newByteChannel(dbPath, READ, WRITE, SYNC, CREATE);
-                _update(immutable);
-                _update(immutable);
-                _asyncResponseProcessor.processAsyncResponse(null);
-            }
-        };
+    public void open(boolean createNew, Object immutable)
+            throws IOException {
+        if (sbc != null) {
+            throw new IllegalStateException("already open");
+        }
+        if (createNew)
+            sbc = Files.newByteChannel(dbPath, READ, WRITE, SYNC, CREATE_NEW);
+        else
+            sbc = Files.newByteChannel(dbPath, READ, WRITE, SYNC, CREATE);
+        _update(immutable);
+        _update(immutable);
     }
 
     public AReq<Void> update(Transaction transaction) {
@@ -112,45 +105,36 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         }
     }
 
-    public AReq<Void> open() {
-        return new AReq<Void>("OpenRead") {
-            @Override
-            protected void processAsyncOperation(AsyncRequestImpl _asyncRequestImpl,
-                                                 AsyncResponseProcessor<Void> _asyncResponseProcessor) throws Exception {
-                if (sbc != null) {
-                    throw new IllegalStateException("already open");
-                }
-                if (!usable()) {
-                    throw new IllegalStateException("file is unusable");
-                }
-                sbc = Files.newByteChannel(dbPath, READ, WRITE, SYNC);
-                RootBlock rb0 = readRootBlock(0L);
-                RootBlock rb1 = readRootBlock(maxRootBlockSize);
-                if (rb0 == null && rb1 == null) {
-                    throw new IllegalStateException("no valid root blocks found");
-                }
-                RootBlock rb;
-                if (rb0 == null) {
-                    rb = rb1;
-                    nextRootPosition = 0L;
-                }
-                else if (rb1 == null) {
-                    rb = rb0;
-                    nextRootPosition = maxRootBlockSize;
-                }
-                else if (rb0.timestamp > rb1.timestamp) {
-                    rb = rb0;
-                    nextRootPosition = maxRootBlockSize;
-                }
-                else {
-                    rb = rb1;
-                    nextRootPosition = 0L;
-                }
-                ImmutableFactory factory = registry.readId(rb.immutableBytes);
-                immutable = factory.deserialize(rb.immutableBytes);
-                _asyncResponseProcessor.processAsyncResponse(null);
-            }
-        };
+    public void open()
+            throws IOException {
+        if (sbc != null) {
+            throw new IllegalStateException("already open");
+        }
+        if (!usable()) {
+            throw new IllegalStateException("file is unusable");
+        }
+        sbc = Files.newByteChannel(dbPath, READ, WRITE, SYNC);
+        RootBlock rb0 = readRootBlock(0L);
+        RootBlock rb1 = readRootBlock(maxRootBlockSize);
+        if (rb0 == null && rb1 == null) {
+            throw new IllegalStateException("no valid root blocks found");
+        }
+        RootBlock rb;
+        if (rb0 == null) {
+            rb = rb1;
+            nextRootPosition = 0L;
+        } else if (rb1 == null) {
+            rb = rb0;
+            nextRootPosition = maxRootBlockSize;
+        } else if (rb0.timestamp > rb1.timestamp) {
+            rb = rb0;
+            nextRootPosition = maxRootBlockSize;
+        } else {
+            rb = rb1;
+            nextRootPosition = 0L;
+        }
+        ImmutableFactory factory = registry.readId(rb.immutableBytes);
+        immutable = factory.deserialize(rb.immutableBytes);
     }
 
     public boolean usable() {
