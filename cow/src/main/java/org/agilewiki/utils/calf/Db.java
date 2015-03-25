@@ -47,6 +47,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     public void open(boolean createNew, Object immutable)
             throws IOException {
         if (sbc != null) {
+            getReactor().error("open on already open db");
             throw new IllegalStateException("already open");
         }
         if (createNew)
@@ -108,10 +109,24 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     public void open()
             throws IOException {
         if (sbc != null) {
+            getReactor().error("open on already open db");
             throw new IllegalStateException("already open");
         }
-        if (!usable()) {
-            throw new IllegalStateException("file is unusable");
+        if (Files.notExists(dbPath)) {
+            getReactor().error("file does not exist: " + dbPath);
+            throw new IllegalStateException("file does not exist: " + dbPath);
+        }
+        if (!Files.isReadable(dbPath)) {
+            getReactor().error("file is not readable: " + dbPath);
+            throw new IllegalStateException("file is not readable: " + dbPath);
+        }
+        if (!Files.isWritable(dbPath)) {
+            getReactor().error("file is not writable: " + dbPath);
+            throw new IllegalStateException("file is not writable: " + dbPath);
+        }
+        if (!Files.isRegularFile(dbPath)) {
+            getReactor().error("file is not a regular file: " + dbPath);
+            throw new IllegalStateException("file is not a regular file: " + dbPath);
         }
         sbc = Files.newByteChannel(dbPath, READ, WRITE, SYNC);
         RootBlock rb0 = readRootBlock(0L);
@@ -137,13 +152,6 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         immutable = factory.deserialize(rb.immutableBytes);
     }
 
-    public boolean usable() {
-        return Files.exists(dbPath) &&
-                Files.isReadable(dbPath) &&
-                Files.isWritable(dbPath) &&
-                Files.isRegularFile(dbPath);
-    }
-
     protected RootBlock readRootBlock(long position)
             throws IOException {
         try {
@@ -155,17 +163,21 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             header.flip();
             int maxSize = header.getInt();
             if (maxRootBlockSize != maxSize) {
+                getReactor().warn("root block max size is incorrect");
                 return null;
             }
             int blockSize = header.getInt();
             if (blockSize < 4 + 4 + 34 + 8 + 2) {
+                getReactor().warn("root block size is too small");
                 return null;
             }
             if (blockSize > maxRootBlockSize) {
+                getReactor().warn("root block size exceeds max root block size");
                 return null;
             }
             ImmutableFactory csf = registry.readId(header);
             if (!(csf instanceof CS256Factory)) {
+                getReactor().warn("expecting CS256 in root block");
                 return null;
             }
             CS256 cs1 = (CS256) csf.deserialize(header);
@@ -176,6 +188,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             body.flip();
             CS256 cs2 = new CS256(body);
             if (!cs1.equals(cs2)) {
+                getReactor().warn("root block has bad checksum");
                 return null;
             }
             RootBlock rb = new RootBlock();
@@ -183,6 +196,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             rb.immutableBytes = body;
             return rb;
         } catch (Exception ex) {
+            getReactor().warn("unable to read root block", ex);
             return null;
         }
     }
