@@ -81,7 +81,7 @@ public class MapNode {
     /**
      * Returns a list accessor.
      *
-     * @param key  The key for the list.
+     * @param key The key for the list.
      * @return A list accessor.
      */
     public ListAccessor listAccessor(Comparable key) {
@@ -120,8 +120,8 @@ public class MapNode {
     /**
      * Remove a value from the list.
      *
-     * @param key  The key of the list.
-     * @param ndx  The index of the value.
+     * @param key The key of the list.
+     * @param ndx The index of the value.
      * @return The revised node.
      */
     public MapNode remove(Comparable key, int ndx) {
@@ -133,7 +133,7 @@ public class MapNode {
     /**
      * Delete the list.
      *
-     * @param key  The key of the list.
+     * @param key The key of the list.
      * @return The revised node.
      */
     public MapNode remove(Comparable key) {
@@ -228,7 +228,7 @@ public class MapNode {
     /**
      * Returns the next greater key.
      *
-     * @param key  The given key.
+     * @param key The given key.
      * @return The next greater key, or null.
      */
     public Comparable higherKey(Comparable key) {
@@ -240,7 +240,7 @@ public class MapNode {
     /**
      * Returns the key that is greater than or equal to the given key.
      *
-     * @param key  The given key.
+     * @param key The given key.
      * @return The key greater than or equal to the given key, or null.
      */
     public Comparable ceilingKey(Comparable key) {
@@ -252,7 +252,7 @@ public class MapNode {
     /**
      * Returns the next smaller key.
      *
-     * @param key  The given key.
+     * @param key The given key.
      * @return The next smaller key, or null.
      */
     public Comparable lowerKey(Comparable key) {
@@ -264,7 +264,7 @@ public class MapNode {
     /**
      * Returns the key that is smaller than or equal to the given key.
      *
-     * @param key  The given key.
+     * @param key The given key.
      * @return The key smaller than or equal to the given key, or null.
      */
     public Comparable floorKey(Comparable key) {

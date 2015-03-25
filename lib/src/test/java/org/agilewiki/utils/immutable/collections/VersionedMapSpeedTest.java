@@ -12,11 +12,11 @@ public class VersionedMapSpeedTest extends TestCase {
         VersionedMapNode m1 = registry.nilVersionedMap;
         int c = 10;
         long t0 = System.currentTimeMillis();
-        for(int i = 0; i < c; ++i) {
+        for (int i = 0; i < c; ++i) {
             m1 = m1.add("k" + i, "v" + i, i);
         }
         long t1 = System.currentTimeMillis();
-        System.out.println("Created "+c+" entries in "+(t1 - t0)+" milliseconds");
+        System.out.println("Created " + c + " entries in " + (t1 - t0) + " milliseconds");
 
         ByteBuffer byteBufferx = ByteBuffer.allocate(m1.getDurableLength());
         m1.writeDurable(byteBufferx);
@@ -25,7 +25,7 @@ public class VersionedMapSpeedTest extends TestCase {
         ByteBuffer byteBuffer = ByteBuffer.allocate(m1.getDurableLength());
         m1.writeDurable(byteBuffer);
         long t3 = System.currentTimeMillis();
-        System.out.println("Serialization time = "+(t3 - t2)+" milliseconds");
+        System.out.println("Serialization time = " + (t3 - t2) + " milliseconds");
         System.out.println("durable length = " + m1.getDurableLength());
         byteBuffer.flip();
 
@@ -36,7 +36,7 @@ public class VersionedMapSpeedTest extends TestCase {
         ByteBuffer byteBuffer1 = ByteBuffer.allocate(m2.getDurableLength());
         m2.writeDurable(byteBuffer1);
         long t5 = System.currentTimeMillis();
-        System.out.println("Deserialize/reserialize time = "+(t5 - t4)+" milliseconds");
+        System.out.println("Deserialize/reserialize time = " + (t5 - t4) + " milliseconds");
         System.out.println("durable length = " + m2.getDurableLength());
     }
 }

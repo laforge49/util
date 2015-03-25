@@ -12,7 +12,7 @@ public class CS256 {
     /**
      * Create a checksum of the contents of the bytebuffer.
      *
-     * @param byteBuffer    ByteBuffer is read but its position is not altered.
+     * @param byteBuffer ByteBuffer is read but its position is not altered.
      */
     public CS256(ByteBuffer byteBuffer) {
         bitSet = new BitSet(256);

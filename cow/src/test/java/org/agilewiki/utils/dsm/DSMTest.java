@@ -16,7 +16,7 @@ public class DSMTest extends TestCase {
         dsm = new DiskSpaceManager(bb0);
         assertEquals(4, bb0.position());
         assertEquals(0, dsm.usage());
-        for(int i = 0; i < 8; i++) {
+        for (int i = 0; i < 8; i++) {
             assertEquals(i, dsm.allocate());
         }
         dsm.commit();

@@ -30,7 +30,7 @@ public class DiskSpaceManager {
      * The ByteBuffer contains first a byte count pf the size of the bit array,
      * followed by the bytes of the bit array.
      *
-     * @param byteBuffer    The source of the bit array.
+     * @param byteBuffer The source of the bit array.
      */
     public DiskSpaceManager(ByteBuffer byteBuffer) {
         int byteCount = byteBuffer.getInt();
@@ -112,7 +112,7 @@ public class DiskSpaceManager {
     /**
      * Write the bit array to a ByteBuffer.
      *
-     * @param byteBuffer    Holds the bit array.
+     * @param byteBuffer Holds the bit array.
      */
     public void write(ByteBuffer byteBuffer) {
         byte[] bytes = bitSet.toByteArray();

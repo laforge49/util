@@ -3,9 +3,6 @@ package org.agilewiki.utils.immutable.collections;
 import junit.framework.TestCase;
 import org.agilewiki.utils.immutable.Registry;
 
-import java.util.NavigableSet;
-import java.util.Set;
-
 public class MapRemoveTest extends TestCase {
     public void test() throws Exception {
         Registry registry = new Registry();

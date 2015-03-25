@@ -338,8 +338,8 @@ public class ListNodeData {
     /**
      * Add a non-null value to the list.
      *
-     * @param ndx     Where to add the value, or -1 to append to the end.
-     * @param value   The value to be added.
+     * @param ndx   Where to add the value, or -1 to append to the end.
+     * @param value The value to be added.
      * @return The revised root node.
      */
     public ListNode add(int ndx, Object value) {
@@ -419,7 +419,7 @@ public class ListNodeData {
         int leftSize = leftNode.size();
         ListNode t = thisNode;
         if (ndx > leftSize) {
-            ListNode r = rightNode.remove(ndx - leftSize -1);
+            ListNode r = rightNode.remove(ndx - leftSize - 1);
             if (r != rightNode)
                 t = new ListNode(thisNode.factory, level, totalSize - 1, leftNode, value, r);
         } else if (ndx < leftSize) {
@@ -462,6 +462,6 @@ public class ListNodeData {
     }
 
     public String toString() {
-        return "("+leftNode.toString()+value+"-"+level+"-"+totalSize+rightNode.toString()+")";
+        return "(" + leftNode.toString() + value + "-" + level + "-" + totalSize + rightNode.toString() + ")";
     }
 }

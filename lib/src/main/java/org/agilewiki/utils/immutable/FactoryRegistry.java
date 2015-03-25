@@ -30,15 +30,6 @@ public interface FactoryRegistry {
     ImmutableFactory getImmutableFactory(char id);
 
     /**
-     * Read an id and map it to a durable factory instance.
-     *
-     * @param byteBuffer The byte buffer to be read.
-     * @return The durable factory instance.
-     * @throws IllegalStateException when the durable id is not recognized.
-     */
-    ImmutableFactory readId(ByteBuffer byteBuffer);
-
-    /**
      * Map an immutable object to an immutable factory instance.
      * Nulls are mapped to the registered NullFactory.
      *
@@ -47,4 +38,13 @@ public interface FactoryRegistry {
      * @throws IllegalArgumentException when the immutable class is not recognized.
      */
     ImmutableFactory getImmutableFactory(Object immutable);
+
+    /**
+     * Read an id and map it to a durable factory instance.
+     *
+     * @param byteBuffer The byte buffer to be read.
+     * @return The durable factory instance.
+     * @throws IllegalStateException when the durable id is not recognized.
+     */
+    ImmutableFactory readId(ByteBuffer byteBuffer);
 }

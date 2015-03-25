@@ -1,7 +1,7 @@
 package org.agilewiki.utils.immutable.collections;
 
-import org.agilewiki.utils.immutable.ImmutableFactory;
 import org.agilewiki.utils.immutable.FactoryRegistry;
+import org.agilewiki.utils.immutable.ImmutableFactory;
 
 import java.nio.ByteBuffer;
 import java.util.List;

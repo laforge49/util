@@ -87,7 +87,7 @@ public class ListNode {
     /**
      * Returns a value if it is in range.
      *
-     * @param ndx  The index of the selected value.
+     * @param ndx The index of the selected value.
      * @return A value, or null.
      */
     public Object get(int ndx) {
@@ -152,7 +152,7 @@ public class ListNode {
     /**
      * Returns the index higher than the given index.
      *
-     * @param ndx  A given index.
+     * @param ndx A given index.
      * @return An index that is higher, or -1.
      */
     public int higherIndex(int ndx) {
@@ -166,7 +166,7 @@ public class ListNode {
     /**
      * Returns the index equal to the given index.
      *
-     * @param ndx  A given index.
+     * @param ndx A given index.
      * @return An index that is equal, or -1.
      */
     public int ceilingIndex(int ndx) {
@@ -189,7 +189,7 @@ public class ListNode {
     /**
      * Returns the index lower than the given index.
      *
-     * @param ndx  A given index.
+     * @param ndx A given index.
      * @return An index of an existing value that is lower, or -1.
      */
     public int lowerIndex(int ndx) {
@@ -197,14 +197,14 @@ public class ListNode {
             return -1; //out of range
         int t = totalSize();
         if (ndx >= t)
-            return t -1;
+            return t - 1;
         return ndx - 1;
     }
 
     /**
      * Returns the index if in range.
      *
-     * @param ndx  A given index.
+     * @param ndx A given index.
      * @return The index, or -1.
      */
     public int floorIndex(int ndx) {
@@ -212,7 +212,7 @@ public class ListNode {
             return -1; //out of range
         int t = totalSize();
         if (ndx >= t)
-            return t -1;
+            return t - 1;
         return ndx;
     }
 
@@ -282,7 +282,7 @@ public class ListNode {
     /**
      * Returns a list accessor.
      *
-     * @param key  The key for the list.
+     * @param key The key for the list.
      * @return A list accessor for the given time.
      */
     public ListAccessor listAccessor(Comparable key) {
