@@ -1,6 +1,7 @@
 package org.agilewiki.utils.immutable.collections;
 
 import org.agilewiki.utils.immutable.FactoryRegistry;
+import org.agilewiki.utils.immutable.Releasable;
 
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -9,7 +10,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * An immutable map of versioned lists.
  */
-public class VersionedMapNode {
+public class VersionedMapNode implements Releasable {
 
     public final VersionedMapNodeFactory factory;
 
@@ -502,5 +503,10 @@ public class VersionedMapNode {
         byteBuffer.put(this.byteBuffer.slice());
         this.byteBuffer = bb;
         dataReference.set(null); //limit memory footprint, plugs memory leak.
+    }
+
+    @Override
+    public void release() {
+        getData().release();
     }
 }

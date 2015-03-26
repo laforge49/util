@@ -2,6 +2,7 @@ package org.agilewiki.utils.immutable.collections;
 
 import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
+import org.agilewiki.utils.immutable.Releasable;
 
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.List;
 /**
  * The durable data elements of a versioned list node.
  */
-public class VersionedListNodeData {
+public class VersionedListNodeData implements Releasable {
 
     /**
      * The node which holds this data.
@@ -614,5 +615,15 @@ public class VersionedListNodeData {
         if (ln == leftNode && rn == rightNode && !exists(time))
             return thisNode;
         return new VersionedListNode(thisNode.factory, level, totalSize, created, time, ln, value, rn);
+    }
+
+    @Override
+    public void release() {
+        if (leftNode instanceof Releasable)
+            ((Releasable) leftNode).release();
+        if (value instanceof Releasable)
+            ((Releasable) value).release();
+        if (rightNode instanceof Releasable)
+            ((Releasable) rightNode).release();
     }
 }

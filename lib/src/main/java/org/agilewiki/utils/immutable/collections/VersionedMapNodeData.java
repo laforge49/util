@@ -2,6 +2,7 @@ package org.agilewiki.utils.immutable.collections;
 
 import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
+import org.agilewiki.utils.immutable.Releasable;
 
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.NavigableSet;
 /**
  * The durable data elements of a map node.
  */
-public class VersionedMapNodeData {
+public class VersionedMapNodeData implements Releasable {
 
     /**
      * The node which holds this data.
@@ -595,5 +596,15 @@ public class VersionedMapNodeData {
         listNode.writeDurable(byteBuffer);
         rightNode.writeDurable(byteBuffer);
         keyFactory.writeDurable(key, byteBuffer);
+    }
+
+    @Override
+    public void release() {
+        if (leftNode instanceof Releasable)
+            ((Releasable) leftNode).release();
+        if (listNode instanceof Releasable)
+            ((Releasable) listNode).release();
+        if (rightNode instanceof Releasable)
+            ((Releasable) rightNode).release();
     }
 }

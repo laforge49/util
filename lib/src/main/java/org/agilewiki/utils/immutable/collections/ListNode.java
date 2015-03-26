@@ -1,6 +1,7 @@
 package org.agilewiki.utils.immutable.collections;
 
 import org.agilewiki.utils.immutable.FactoryRegistry;
+import org.agilewiki.utils.immutable.Releasable;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * An immutable list.
  */
-public class ListNode {
+public class ListNode implements Releasable {
 
     public final ListNodeFactory factory;
 
@@ -456,5 +457,10 @@ public class ListNode {
         if (isNil())
             return "";
         return getData().toString();
+    }
+
+    @Override
+    public void release() {
+        getData().release();
     }
 }

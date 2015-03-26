@@ -2,6 +2,7 @@ package org.agilewiki.utils.immutable.collections;
 
 import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
+import org.agilewiki.utils.immutable.Releasable;
 
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -11,7 +12,7 @@ import static java.lang.Math.min;
 /**
  * The durable data elements of a list node.
  */
-public class ListNodeData {
+public class ListNodeData implements Releasable {
 
     /**
      * The node which holds this data.
@@ -463,5 +464,15 @@ public class ListNodeData {
 
     public String toString() {
         return "(" + leftNode.toString() + value + "-" + level + "-" + totalSize + rightNode.toString() + ")";
+    }
+
+    @Override
+    public void release() {
+        if (leftNode instanceof Releasable)
+            ((Releasable) leftNode).release();
+        if (value instanceof Releasable)
+            ((Releasable) value).release();
+        if (rightNode instanceof Releasable)
+            ((Releasable) rightNode).release();
     }
 }
