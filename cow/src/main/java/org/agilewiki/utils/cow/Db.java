@@ -12,19 +12,19 @@ import org.agilewiki.utils.immutable.scalars.CS256Factory;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.SeekableByteChannel;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static java.nio.file.StandardOpenOption.*;
 
 /**
- * A database with one block stored alternatively in two locations.
+ * A database that supports multiple blocks.
  */
 public class Db extends IsolationBladeBase implements AutoCloseable {
     private final FactoryRegistry registry;
     public final Path dbPath;
-    private SeekableByteChannel sbc;
+    private FileChannel fc;
     private final int maxRootBlockSize;
     private long nextRootPosition;
     public Object immutable;
@@ -68,15 +68,15 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
      */
     public void open(boolean createNew, Object immutable)
             throws IOException {
-        if (sbc != null) {
+        if (fc != null) {
             getReactor().error("open on already open db");
             throw new IllegalStateException("already open");
         }
         try {
             if (createNew)
-                sbc = Files.newByteChannel(dbPath, READ, WRITE, SYNC, CREATE_NEW);
+                fc = FileChannel.open(dbPath, READ, WRITE, SYNC, CREATE_NEW);
             else
-                sbc = Files.newByteChannel(dbPath, READ, WRITE, SYNC, CREATE);
+                fc = FileChannel.open(dbPath, READ, WRITE, SYNC, CREATE);
             _update(immutable);
             _update(immutable);
         } catch (Exception ex) {
@@ -129,9 +129,9 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         cs256Factory.writeDurable(cs256, byteBuffer);
         byteBuffer.put(contentBuffer);
         byteBuffer.flip();
-        sbc.position(nextRootPosition);
+        long p = nextRootPosition;
         while (byteBuffer.remaining() > 0) {
-            sbc.write(byteBuffer);
+            p += fc.write(byteBuffer, p);
         }
         nextRootPosition = (nextRootPosition + maxRootBlockSize) % (2 * maxRootBlockSize);
         this.immutable = immutable;
@@ -140,9 +140,9 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
 
     @Override
     public void close() throws Exception {
-        if (sbc != null) {
-            sbc.close();
-            sbc = null;
+        if (fc != null) {
+            fc.close();
+            fc = null;
         }
     }
 
@@ -151,7 +151,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
      */
     public void open()
             throws IOException {
-        if (sbc != null) {
+        if (fc != null) {
             getReactor().error("open on already open db");
             throw new IllegalStateException("already open");
         }
@@ -172,7 +172,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             throw new IllegalStateException("file is not a regular file: " + dbPath);
         }
         try {
-            sbc = Files.newByteChannel(dbPath, READ, WRITE, SYNC);
+            fc = FileChannel.open(dbPath, READ, WRITE, SYNC);
             RootBlock rb0 = readRootBlock(0L);
             RootBlock rb1 = readRootBlock(maxRootBlockSize);
             if (rb0 == null && rb1 == null) {
@@ -204,9 +204,8 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             throws IOException {
         try {
             ByteBuffer header = ByteBuffer.allocate(4 + 4 + 34);
-            sbc.position(position);
             while (header.remaining() > 0) {
-                sbc.read(header);
+                position += fc.read(header, position);
             }
             header.flip();
             int maxSize = header.getInt();
@@ -231,7 +230,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             CS256 cs1 = (CS256) csf.deserialize(header);
             ByteBuffer body = ByteBuffer.allocate(blockSize - 4 - 4 - 34);
             while (body.remaining() > 0) {
-                sbc.read(body);
+                position += fc.read(body, position);
             }
             body.flip();
             CS256 cs2 = new CS256(body);
