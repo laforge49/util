@@ -3,9 +3,8 @@ package org.agilewiki.utils.cow;
 import org.agilewiki.jactor2.core.blades.IsolationBladeBase;
 import org.agilewiki.jactor2.core.messages.AsyncResponseProcessor;
 import org.agilewiki.jactor2.core.messages.impl.AsyncRequestImpl;
-import org.agilewiki.jactor2.core.reactors.IsolationReactor;
 import org.agilewiki.utils.Transaction;
-import org.agilewiki.utils.immutable.FactoryRegistry;
+import org.agilewiki.utils.immutable.CascadingRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
 import org.agilewiki.utils.immutable.scalars.CS256;
 import org.agilewiki.utils.immutable.scalars.CS256Factory;
@@ -22,7 +21,7 @@ import static java.nio.file.StandardOpenOption.*;
  * A database that supports multiple blocks.
  */
 public class Db extends IsolationBladeBase implements AutoCloseable {
-    private final FactoryRegistry registry;
+    public final DbFactoryRegistry dbFactoryRegistry;
     public final Path dbPath;
     private FileChannel fc;
     private final int maxRootBlockSize;
@@ -34,30 +33,14 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     /**
      * Create a Db actor.
      *
-     * @param registry         The immutable factory registry.
+     * @param parentRegistry   The parent cascading registry.
      * @param dbPath           The path of the db file.
      * @param maxRootBlockSize The maximum root block size.
      */
-    public Db(FactoryRegistry registry, Path dbPath, int maxRootBlockSize) throws Exception {
-        this.registry = registry;
-        this.dbPath = dbPath;
-        this.maxRootBlockSize = maxRootBlockSize;
-    }
-
-    /**
-     * Create a Db actor.
-     *
-     * @param _reactor         The reactor of the actor.
-     * @param registry         The immutable factory registry.
-     * @param dbPath           The path of the db file.
-     * @param maxRootBlockSize The maximum root block size.
-     */
-    public Db(IsolationReactor _reactor,
-              FactoryRegistry registry,
+    public Db(CascadingRegistry parentRegistry,
               Path dbPath,
-              int maxRootBlockSize) {
-        super(_reactor);
-        this.registry = registry;
+              int maxRootBlockSize) throws Exception {
+        dbFactoryRegistry = new DbFactoryRegistry(this, parentRegistry);
         this.dbPath = dbPath;
         this.maxRootBlockSize = maxRootBlockSize;
     }
@@ -127,7 +110,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     protected void _update(Object immutable)
             throws IOException {
         //todo save dsm
-        ImmutableFactory factory = registry.getImmutableFactory(immutable);
+        ImmutableFactory factory = dbFactoryRegistry.getImmutableFactory(immutable);
         int contentSize = 8 + factory.getDurableLength(immutable);
         int blockSize = 4 + 4 + 34 + contentSize;
         if (blockSize > maxRootBlockSize) {
@@ -142,7 +125,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         ByteBuffer byteBuffer = ByteBuffer.allocate(blockSize);
         byteBuffer.putInt(maxRootBlockSize);
         byteBuffer.putInt(blockSize);
-        ImmutableFactory cs256Factory = registry.getImmutableFactory(cs256);
+        ImmutableFactory cs256Factory = dbFactoryRegistry.getImmutableFactory(cs256);
         cs256Factory.writeDurable(cs256, byteBuffer);
         byteBuffer.put(contentBuffer);
         byteBuffer.flip();
@@ -210,7 +193,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                 nextRootPosition = 0L;
             }
             //todo load dsm
-            ImmutableFactory factory = registry.readId(rb.immutableBytes);
+            ImmutableFactory factory = dbFactoryRegistry.readId(rb.immutableBytes);
             immutable = factory.deserialize(rb.immutableBytes);
         } catch (Exception ex) {
             getReactor().error("Unable to open existing db file", ex);
@@ -240,7 +223,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                 getReactor().warn("root block size exceeds max root block size");
                 return null;
             }
-            ImmutableFactory csf = registry.readId(header);
+            ImmutableFactory csf = dbFactoryRegistry.readId(header);
             if (!(csf instanceof CS256Factory)) {
                 getReactor().warn("expecting CS256 in root block");
                 return null;
