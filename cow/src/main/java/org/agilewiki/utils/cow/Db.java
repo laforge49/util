@@ -3,10 +3,10 @@ package org.agilewiki.utils.cow;
 import org.agilewiki.jactor2.core.blades.IsolationBladeBase;
 import org.agilewiki.jactor2.core.messages.AsyncResponseProcessor;
 import org.agilewiki.jactor2.core.messages.impl.AsyncRequestImpl;
-import org.agilewiki.utils.Transaction;
 import org.agilewiki.utils.dsm.DiskSpaceManager;
 import org.agilewiki.utils.immutable.CascadingRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
+import org.agilewiki.utils.immutable.collections.MapNode;
 import org.agilewiki.utils.immutable.scalars.CS256;
 import org.agilewiki.utils.immutable.scalars.CS256Factory;
 
@@ -27,7 +27,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     private FileChannel fc;
     private final int maxBlockSize;
     private long nextRootPosition;
-    public Object immutable;
+    public MapNode mapNode;
     protected Thread privilegedThread;
     DiskSpaceManager dsm;
 
@@ -50,14 +50,14 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
      * Open the db, creating a new db file.
      *
      * @param createNew True when a db file must not already exist.
-     * @param immutable The initial value held by the db.
      */
-    public void open(boolean createNew, Object immutable)
+    public void open(boolean createNew)
             throws IOException {
         if (fc != null) {
             getReactor().error("open on already open db");
             throw new IllegalStateException("already open");
         }
+        mapNode = dbFactoryRegistry.nilMap;
         try {
             if (createNew)
                 fc = FileChannel.open(dbPath, READ, WRITE, SYNC, CREATE_NEW);
@@ -66,8 +66,8 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             dsm = new DiskSpaceManager();
             dsm.allocate();
             dsm.allocate();
-            _update(immutable);
-            _update(immutable);
+            _update(mapNode);
+            _update(mapNode);
         } catch (Exception ex) {
             fc = null;
             getReactor().error("unable to open db to create a new file", ex);
@@ -90,7 +90,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                 try {
                     privilegedThread = Thread.currentThread();
                     try {
-                        _update(transaction.transform(immutable));
+                        _update(transaction.transform(mapNode));
                     } finally {
                         privilegedThread = null;
                     }
@@ -112,11 +112,11 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             throw new IllegalStateException("privileged operation");
     }
 
-    protected void _update(Object immutable)
+    protected void _update(MapNode mapNode)
             throws IOException {
-        ImmutableFactory factory = dbFactoryRegistry.getImmutableFactory(immutable);
+        ImmutableFactory factory = dbFactoryRegistry.getImmutableFactory(mapNode);
         dsm.commit();
-        int contentSize = 8 + dsm.durableLength() + factory.getDurableLength(immutable);
+        int contentSize = 8 + dsm.durableLength() + factory.getDurableLength(mapNode);
         int blockSize = 4 + 4 + 34 + contentSize;
         if (blockSize > maxBlockSize) {
             throw new IllegalStateException("maxRootBlockSize is smaller than the block size " +
@@ -125,7 +125,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         ByteBuffer contentBuffer = ByteBuffer.allocate(contentSize);
         contentBuffer.putLong(System.currentTimeMillis());
         dsm.write(contentBuffer);
-        factory.writeDurable(immutable, contentBuffer);
+        factory.writeDurable(mapNode, contentBuffer);
         contentBuffer.flip();
         CS256 cs256 = new CS256(contentBuffer);
         ByteBuffer byteBuffer = ByteBuffer.allocate(blockSize);
@@ -140,7 +140,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             p += fc.write(byteBuffer, p);
         }
         nextRootPosition = (nextRootPosition + maxBlockSize) % (2 * maxBlockSize);
-        this.immutable = immutable;
+        this.mapNode = mapNode;
         return;
     }
 
@@ -200,7 +200,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             }
             dsm = new DiskSpaceManager(rb.serializedContent);
             ImmutableFactory factory = dbFactoryRegistry.readId(rb.serializedContent);
-            immutable = factory.deserialize(rb.serializedContent);
+            mapNode = (MapNode) factory.deserialize(rb.serializedContent);
         } catch (Exception ex) {
             fc = null;
             getReactor().error("Unable to open existing db file", ex);

@@ -2,7 +2,6 @@ package org.agilewiki.utils.calf;
 
 import junit.framework.TestCase;
 import org.agilewiki.jactor2.core.impl.Plant;
-import org.agilewiki.utils.Transaction;
 import org.agilewiki.utils.immutable.Registry;
 
 import java.nio.file.Files;
