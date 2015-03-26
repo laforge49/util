@@ -61,15 +61,4 @@ public class BlockReferenceFactory extends BaseFactory {
         CS256 cs256 = (CS256) factory.deserialize(byteBuffer);
         return new BlockReference(db, blockNbr, blockLength, cs256);
     }
-
-    /**
-     * Create a block reference for a new block.
-     *
-     * @param immutable    The object to be saved in the block.
-     * @return The block reference.
-     */
-    public BlockReference create(Object immutable)
-            throws IOException{
-        return new BlockReference(db, immutable);
-    }
 }
