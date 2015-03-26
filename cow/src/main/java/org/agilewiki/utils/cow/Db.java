@@ -114,6 +114,8 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
 
     protected void _update(MapNode mapNode)
             throws IOException {
+        if (mapNode == this.mapNode)
+            return;
         ImmutableFactory factory = dbFactoryRegistry.getImmutableFactory(mapNode);
         dsm.commit();
         int contentSize = 8 + dsm.durableLength() + factory.getDurableLength(mapNode);
