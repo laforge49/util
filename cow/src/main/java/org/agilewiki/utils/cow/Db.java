@@ -146,17 +146,19 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         return;
     }
 
-    public void read(ByteBuffer byteBuffer, long position)
+    public void readBlock(ByteBuffer byteBuffer, int blockNbr)
             throws IOException {
         checkPrivilege();
+        long position = blockNbr * (long) maxBlockSize;
         while (byteBuffer.remaining() > 0) {
             position += fc.read(byteBuffer, position);
         }
     }
 
-    public void write(ByteBuffer byteBuffer, long position)
+    public void write(ByteBuffer byteBuffer, int blockNbr)
             throws IOException {
         checkPrivilege();
+        long position = blockNbr * (long) maxBlockSize;
         while (byteBuffer.remaining() > 0) {
             position += fc.write(byteBuffer, position);
         }
