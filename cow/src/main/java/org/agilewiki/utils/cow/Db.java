@@ -4,6 +4,7 @@ import org.agilewiki.jactor2.core.blades.IsolationBladeBase;
 import org.agilewiki.jactor2.core.messages.AsyncResponseProcessor;
 import org.agilewiki.jactor2.core.messages.impl.AsyncRequestImpl;
 import org.agilewiki.utils.Transaction;
+import org.agilewiki.utils.dsm.DiskSpaceManager;
 import org.agilewiki.utils.immutable.CascadingRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
 import org.agilewiki.utils.immutable.scalars.CS256;
@@ -28,7 +29,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     private long nextRootPosition;
     public Object immutable;
     protected Thread privilegedThread;
-    //todo define dsm
+    DiskSpaceManager dsm;
 
     /**
      * Create a Db actor.
@@ -62,9 +63,11 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                 fc = FileChannel.open(dbPath, READ, WRITE, SYNC, CREATE_NEW);
             else
                 fc = FileChannel.open(dbPath, READ, WRITE, SYNC, CREATE);
+            dsm = new DiskSpaceManager();
             _update(immutable);
             _update(immutable);
         } catch (Exception ex) {
+            fc = null;
             getReactor().error("unable to open db to create a new file", ex);
             throw ex;
         }
@@ -99,19 +102,19 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     }
 
     /**
-     * Returns true if the current thread is executing a transaction.
-     *
-     * @return True if the thread has transactional privileges.
+     * Verifies that the thread is processing a transaction.
+     * Otherwise an IllegalStateException is thrown.
      */
-    public boolean isPrivileged() {
-        return Thread.currentThread() == privilegedThread;
+    public void checkPrivilege() {
+        if (Thread.currentThread() != privilegedThread)
+            throw new IllegalStateException("privileged operation");
     }
 
     protected void _update(Object immutable)
             throws IOException {
-        //todo save dsm
         ImmutableFactory factory = dbFactoryRegistry.getImmutableFactory(immutable);
-        int contentSize = 8 + factory.getDurableLength(immutable);
+        dsm.commit();
+        int contentSize = 8 + dsm.durableLength() + factory.getDurableLength(immutable);
         int blockSize = 4 + 4 + 34 + contentSize;
         if (blockSize > maxRootBlockSize) {
             throw new IllegalStateException("maxRootBlockSize is smaller than the block size " +
@@ -119,6 +122,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         }
         ByteBuffer contentBuffer = ByteBuffer.allocate(contentSize);
         contentBuffer.putLong(System.currentTimeMillis());
+        dsm.write(contentBuffer);
         factory.writeDurable(immutable, contentBuffer);
         contentBuffer.flip();
         CS256 cs256 = new CS256(contentBuffer);
@@ -192,10 +196,11 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                 rb = rb1;
                 nextRootPosition = 0L;
             }
-            //todo load dsm
-            ImmutableFactory factory = dbFactoryRegistry.readId(rb.immutableBytes);
-            immutable = factory.deserialize(rb.immutableBytes);
+            dsm = new DiskSpaceManager(rb.serializedContent);
+            ImmutableFactory factory = dbFactoryRegistry.readId(rb.serializedContent);
+            immutable = factory.deserialize(rb.serializedContent);
         } catch (Exception ex) {
+            fc = null;
             getReactor().error("Unable to open existing db file", ex);
             throw ex;
         }
@@ -215,7 +220,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                 return null;
             }
             int blockSize = header.getInt();
-            if (blockSize < 4 + 4 + 34 + 8 + 2) {
+            if (blockSize < 4 + 4 + 34 + 8 + 4 + 2) {
                 getReactor().warn("root block size is too small");
                 return null;
             }
@@ -241,7 +246,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             }
             RootBlock rb = new RootBlock();
             rb.timestamp = body.getLong();
-            rb.immutableBytes = body;
+            rb.serializedContent = body;
             return rb;
         } catch (Exception ex) {
             getReactor().warn("unable to read root block", ex);
@@ -251,6 +256,43 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
 
     protected class RootBlock {
         long timestamp;
-        ByteBuffer immutableBytes;
+        ByteBuffer serializedContent;
+    }
+
+    /**
+     * Allocates a block of disk space.
+     * But if not processing a transaction when called,
+     * an IllegalStateException is thrown.
+     *
+     * @return The number of the block that was allocated.
+     */
+    public int allocate() {
+        checkPrivilege();
+        return dsm.allocate();
+    }
+
+    /**
+     * Returns the number of allocated pages.
+     * But if not processing a transaction when called,
+     * an IllegalStateException is thrown.
+     *
+     * @return The number of pages in use.
+     */
+    public int usage() {
+        checkPrivilege();
+        return dsm.usage();
+    }
+
+    /**
+     * Release a block.
+     * It will become available on the next transaction.
+     * But if not processing a transaction when called,
+     * an IllegalStateException is thrown.
+     *
+     * @param i The block to be released.
+     */
+    public void release(int i) {
+        checkPrivilege();
+        dsm.release(i);
     }
 }
