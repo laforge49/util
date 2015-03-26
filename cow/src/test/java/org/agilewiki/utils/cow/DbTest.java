@@ -22,6 +22,7 @@ public class DbTest extends TestCase {
                 Transaction t2 = new Transaction() {
                     @Override
                     public Object transform(Object immutable) {
+                        System.out.println("block usage: " + db.usage());
                         return "hi!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
                     }
                 };
