@@ -296,6 +296,8 @@ public class MapNodeData implements Releasable {
             if (l != leftNode)
                 t = new MapNode(thisNode.factory, level, l, listNode, rightNode, this.key);
         } else {
+            if (listNode instanceof Releasable)
+                ((Releasable) listNode).release();
             MapNode nil = thisNode.factory.nilMap;
             if (leftNode.isNil() && rightNode.isNil()) {
                 return nil;
@@ -608,6 +610,8 @@ public class MapNodeData implements Releasable {
 
     @Override
     public void release() {
+        if (isNil())
+            return;
         if (leftNode instanceof Releasable)
             ((Releasable) leftNode).release();
         if (listNode instanceof Releasable)
