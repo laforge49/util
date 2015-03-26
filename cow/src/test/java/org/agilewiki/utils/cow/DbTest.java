@@ -14,10 +14,10 @@ public class DbTest extends TestCase {
         new Plant();
         try {
             Registry registry = new Registry();
-            Path calfPath = Paths.get("cow.db");
+            Path dbPath = Paths.get("cow.db");
             int maxRootBlockSize = 1000;
-            try (Db db = new Db(registry, calfPath, maxRootBlockSize)) {
-                Files.deleteIfExists(calfPath);
+            try (Db db = new Db(registry, dbPath, maxRootBlockSize)) {
+                Files.deleteIfExists(dbPath);
                 db.open(true, "!");
                 Transaction t2 = new Transaction() {
                     @Override
@@ -27,7 +27,7 @@ public class DbTest extends TestCase {
                 };
                 db.update(t2).call();
                 db.close();
-                System.out.println(Files.size(calfPath));
+                System.out.println(Files.size(dbPath));
                 db.open();
                 System.out.println(db.immutable);
             }

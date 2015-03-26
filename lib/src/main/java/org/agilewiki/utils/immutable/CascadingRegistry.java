@@ -53,7 +53,7 @@ public class CascadingRegistry implements FactoryRegistry {
         if (factory != null)
             return factory.getImmutableFactory(immutable);
         if (parent != null)
-            return getImmutableFactory(immutable);
+            return parent.getImmutableFactory(immutable);
         throw new IllegalArgumentException("Unknown class: " + c.getName());
     }
 
