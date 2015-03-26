@@ -107,6 +107,7 @@ public class DiskSpaceManager {
         for (int i : freed) {
             bitSet.clear(i);
         }
+        freed.clear();
     }
 
     /**

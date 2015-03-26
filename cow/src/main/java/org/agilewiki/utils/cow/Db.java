@@ -28,6 +28,8 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     private final int maxRootBlockSize;
     private long nextRootPosition;
     public Object immutable;
+    protected Thread privilegedThread;
+    //todo define dsm
 
     /**
      * Create a Db actor.
@@ -98,7 +100,12 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                                                  AsyncResponseProcessor<Void> _asyncResponseProcessor)
                     throws Exception {
                 try {
-                    _update(transaction.transform(immutable));
+                    privilegedThread = Thread.currentThread();
+                    try {
+                        _update(transaction.transform(immutable));
+                    } finally {
+                        privilegedThread = null;
+                    }
                     _asyncResponseProcessor.processAsyncResponse(null);
                 } catch (Exception ex) {
                     getReactor().error("unable to update db", ex);
@@ -108,8 +115,18 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         };
     }
 
+    /**
+     * Returns true if the current thread is executing a transaction.
+     *
+     * @return True if the thread has transactional privileges.
+     */
+    public boolean isPrivileged() {
+        return Thread.currentThread() == privilegedThread;
+    }
+
     protected void _update(Object immutable)
             throws IOException {
+        //todo save dsm
         ImmutableFactory factory = registry.getImmutableFactory(immutable);
         int contentSize = 8 + factory.getDurableLength(immutable);
         int blockSize = 4 + 4 + 34 + contentSize;
@@ -192,6 +209,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                 rb = rb1;
                 nextRootPosition = 0L;
             }
+            //todo load dsm
             ImmutableFactory factory = registry.readId(rb.immutableBytes);
             immutable = factory.deserialize(rb.immutableBytes);
         } catch (Exception ex) {
