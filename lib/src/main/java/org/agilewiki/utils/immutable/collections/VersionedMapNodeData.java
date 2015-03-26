@@ -4,6 +4,7 @@ import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
 import org.agilewiki.utils.immutable.Releasable;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.NavigableMap;
@@ -599,7 +600,8 @@ public class VersionedMapNodeData implements Releasable {
     }
 
     @Override
-    public void release() {
+    public void release()
+            throws IOException {
         if (leftNode instanceof Releasable)
             ((Releasable) leftNode).release();
         if (listNode instanceof Releasable)

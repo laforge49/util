@@ -25,7 +25,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     public final DbFactoryRegistry dbFactoryRegistry;
     public final Path dbPath;
     private FileChannel fc;
-    private final int maxBlockSize;
+    public final int maxBlockSize;
     private long nextRootPosition;
     public MapNode mapNode;
     protected Thread privilegedThread;
@@ -247,7 +247,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                 return null;
             }
             if (blockSize > maxBlockSize) {
-                getReactor().warn("root block size exceeds max root block size");
+                getReactor().warn("root block size exceeds max block size");
                 return null;
             }
             ImmutableFactory csf = dbFactoryRegistry.readId(header);

@@ -3,6 +3,7 @@ package org.agilewiki.utils.immutable.collections;
 import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.Releasable;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -506,7 +507,8 @@ public class VersionedMapNode implements Releasable {
     }
 
     @Override
-    public void release() {
+    public void release()
+            throws IOException {
         getData().release();
     }
 }

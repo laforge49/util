@@ -3,6 +3,7 @@ package org.agilewiki.utils.immutable.collections;
 import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.Releasable;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -445,7 +446,8 @@ public class ListNode implements Releasable {
         dataReference.set(null); //limit memory footprint, plugs memory leak.
     }
 
-    public ListNode remove(int ndx) {
+    public ListNode remove(int ndx)
+            throws IOException {
         if (isNil())
             return this;
         if (ndx < 0)
@@ -460,7 +462,8 @@ public class ListNode implements Releasable {
     }
 
     @Override
-    public void release() {
+    public void release()
+            throws IOException{
         getData().release();
     }
 }

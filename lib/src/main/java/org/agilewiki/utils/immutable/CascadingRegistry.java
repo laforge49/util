@@ -47,6 +47,16 @@ public class CascadingRegistry implements FactoryRegistry {
     }
 
     @Override
+    public ImmutableFactory getImmutableFactory(Class c) {
+        ImmutableFactory factory = classMap.get(c);
+        if (factory != null)
+            return factory;
+        if (parent != null)
+            return parent.getImmutableFactory(c);
+        throw new IllegalArgumentException("Unknown class: " + c.getName());
+    }
+
+    @Override
     public ImmutableFactory getImmutableFactory(Object immutable) {
         Class c = immutable == null ? NullFactory.class : immutable.getClass();
         ImmutableFactory factory = classMap.get(c);

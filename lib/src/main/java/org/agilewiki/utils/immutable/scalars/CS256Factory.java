@@ -9,6 +9,8 @@ import java.nio.ByteBuffer;
  * Defines how a CS256 is serialized / deserialized.
  */
 public class CS256Factory extends BaseFactory {
+    public final static int DURABLE_LENGTH = 34;
+
     public CS256Factory(FactoryRegistry factoryRegistry, char id) {
         super(factoryRegistry, id);
     }
@@ -22,7 +24,7 @@ public class CS256Factory extends BaseFactory {
     public int getDurableLength(Object immutable) {
         if (immutable == null)
             return 2;
-        return 34;
+        return DURABLE_LENGTH;
     }
 
     @Override

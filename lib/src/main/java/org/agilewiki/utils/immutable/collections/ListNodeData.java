@@ -4,6 +4,7 @@ import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
 import org.agilewiki.utils.immutable.Releasable;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 
@@ -414,7 +415,8 @@ public class ListNodeData implements Releasable {
         return thisNode;
     }
 
-    public ListNode remove(int ndx) {
+    public ListNode remove(int ndx)
+            throws IOException {
         if (isNil())
             return thisNode;
         int leftSize = leftNode.size();
@@ -469,7 +471,8 @@ public class ListNodeData implements Releasable {
     }
 
     @Override
-    public void release() {
+    public void release()
+            throws IOException {
         if (isNil())
             return;
         if (leftNode instanceof Releasable)

@@ -14,6 +14,7 @@ public class DbFactoryRegistry extends CascadingRegistry {
     public final VersionedMapNode nilVersionedMap;
     public final ListNode nilList;
     public final MapNode nilMap;
+    public final BlockReferenceFactory blockReferenceFactory;
 
     /**
      * Create a cascading factory registry.
@@ -28,5 +29,6 @@ public class DbFactoryRegistry extends CascadingRegistry {
         nilVersionedMap = new VersionedMapNodeFactory(this, 'm', '2', nilVersionedList).nilVersionedMap;
         nilList = new ListNodeFactory(this, 'n', '3').nilList;
         nilMap = new MapNodeFactory(this, 'o', '4', nilList).nilMap;
+        blockReferenceFactory = new BlockReferenceFactory(this, 'r', db);
     }
 }

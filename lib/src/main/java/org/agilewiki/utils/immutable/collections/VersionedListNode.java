@@ -3,6 +3,7 @@ package org.agilewiki.utils.immutable.collections;
 import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.Releasable;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -513,7 +514,8 @@ public class VersionedListNode implements Releasable {
     }
 
     @Override
-    public void release() {
+    public void release()
+            throws IOException {
         getData().release();
     }
 }

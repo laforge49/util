@@ -3,6 +3,7 @@ package org.agilewiki.utils.immutable.collections;
 import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.Releasable;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -125,7 +126,8 @@ public class MapNode implements Releasable {
      * @param ndx The index of the value.
      * @return The revised node.
      */
-    public MapNode remove(Comparable key, int ndx) {
+    public MapNode remove(Comparable key, int ndx)
+            throws IOException {
         if (isNil())
             return this;
         return getData().remove(key, ndx);
@@ -137,7 +139,8 @@ public class MapNode implements Releasable {
      * @param key The key of the list.
      * @return The revised node.
      */
-    public MapNode remove(Comparable key) {
+    public MapNode remove(Comparable key)
+            throws IOException {
         if (isNil())
             return this;
         return getData().remove(key);
@@ -414,7 +417,8 @@ public class MapNode implements Releasable {
     }
 
     @Override
-    public void release() {
+    public void release()
+            throws IOException {
         getData().release();
     }
 }

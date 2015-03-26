@@ -4,6 +4,7 @@ import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
 import org.agilewiki.utils.immutable.Releasable;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.NavigableMap;
@@ -282,7 +283,8 @@ public class MapNodeData implements Releasable {
         return thisNode;
     }
 
-    public MapNode remove(Comparable key) {
+    public MapNode remove(Comparable key)
+            throws IOException {
         if (isNil())
             return thisNode;
         int c = key.compareTo(this.key);
@@ -341,7 +343,8 @@ public class MapNodeData implements Releasable {
      * @param ndx The index of the value.
      * @return The revised node.
      */
-    public MapNode remove(Comparable key, int ndx) {
+    public MapNode remove(Comparable key, int ndx)
+            throws IOException {
         if (key == null)
             throw new IllegalArgumentException("key may not be null");
         if (isNil())
@@ -609,7 +612,8 @@ public class MapNodeData implements Releasable {
     }
 
     @Override
-    public void release() {
+    public void release()
+            throws IOException {
         if (isNil())
             return;
         if (leftNode instanceof Releasable)

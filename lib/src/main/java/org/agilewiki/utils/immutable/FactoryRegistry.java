@@ -40,6 +40,15 @@ public interface FactoryRegistry {
     ImmutableFactory getImmutableFactory(Object immutable);
 
     /**
+     * Map an immutable class to an immutable factory instance.
+     *
+     * @param immutableClass The immutable class.
+     * @return The immutable factory.
+     * @throws IllegalArgumentException when the immutable class is not recognized.
+     */
+    ImmutableFactory getImmutableFactory(Class immutableClass);
+
+    /**
      * Read an id and map it to a durable factory instance.
      *
      * @param byteBuffer The byte buffer to be read.
