@@ -155,7 +155,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         }
     }
 
-    public void write(ByteBuffer byteBuffer, int blockNbr)
+    public void writeBlock(ByteBuffer byteBuffer, int blockNbr)
             throws IOException {
         checkPrivilege();
         long position = blockNbr * (long) maxBlockSize;
