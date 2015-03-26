@@ -25,7 +25,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     public final DbFactoryRegistry dbFactoryRegistry;
     public final Path dbPath;
     private FileChannel fc;
-    private final int maxRootBlockSize;
+    private final int maxBlockSize;
     private long nextRootPosition;
     public Object immutable;
     protected Thread privilegedThread;
@@ -36,14 +36,14 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
      *
      * @param parentRegistry   The parent cascading registry.
      * @param dbPath           The path of the db file.
-     * @param maxRootBlockSize The maximum root block size.
+     * @param maxBlockSize The maximum root block size.
      */
     public Db(CascadingRegistry parentRegistry,
               Path dbPath,
-              int maxRootBlockSize) throws Exception {
+              int maxBlockSize) throws Exception {
         dbFactoryRegistry = new DbFactoryRegistry(this, parentRegistry);
         this.dbPath = dbPath;
-        this.maxRootBlockSize = maxRootBlockSize;
+        this.maxBlockSize = maxBlockSize;
     }
 
     /**
@@ -64,6 +64,8 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             else
                 fc = FileChannel.open(dbPath, READ, WRITE, SYNC, CREATE);
             dsm = new DiskSpaceManager();
+            dsm.allocate();
+            dsm.allocate();
             _update(immutable);
             _update(immutable);
         } catch (Exception ex) {
@@ -116,7 +118,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         dsm.commit();
         int contentSize = 8 + dsm.durableLength() + factory.getDurableLength(immutable);
         int blockSize = 4 + 4 + 34 + contentSize;
-        if (blockSize > maxRootBlockSize) {
+        if (blockSize > maxBlockSize) {
             throw new IllegalStateException("maxRootBlockSize is smaller than the block size " +
                     blockSize);
         }
@@ -127,7 +129,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         contentBuffer.flip();
         CS256 cs256 = new CS256(contentBuffer);
         ByteBuffer byteBuffer = ByteBuffer.allocate(blockSize);
-        byteBuffer.putInt(maxRootBlockSize);
+        byteBuffer.putInt(maxBlockSize);
         byteBuffer.putInt(blockSize);
         ImmutableFactory cs256Factory = dbFactoryRegistry.getImmutableFactory(cs256);
         cs256Factory.writeDurable(cs256, byteBuffer);
@@ -137,7 +139,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         while (byteBuffer.remaining() > 0) {
             p += fc.write(byteBuffer, p);
         }
-        nextRootPosition = (nextRootPosition + maxRootBlockSize) % (2 * maxRootBlockSize);
+        nextRootPosition = (nextRootPosition + maxBlockSize) % (2 * maxBlockSize);
         this.immutable = immutable;
         return;
     }
@@ -178,7 +180,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         try {
             fc = FileChannel.open(dbPath, READ, WRITE, SYNC);
             RootBlock rb0 = readRootBlock(0L);
-            RootBlock rb1 = readRootBlock(maxRootBlockSize);
+            RootBlock rb1 = readRootBlock(maxBlockSize);
             if (rb0 == null && rb1 == null) {
                 throw new IllegalStateException("no valid root blocks found");
             }
@@ -188,10 +190,10 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                 nextRootPosition = 0L;
             } else if (rb1 == null) {
                 rb = rb0;
-                nextRootPosition = maxRootBlockSize;
+                nextRootPosition = maxBlockSize;
             } else if (rb0.timestamp > rb1.timestamp) {
                 rb = rb0;
-                nextRootPosition = maxRootBlockSize;
+                nextRootPosition = maxBlockSize;
             } else {
                 rb = rb1;
                 nextRootPosition = 0L;
@@ -215,7 +217,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             }
             header.flip();
             int maxSize = header.getInt();
-            if (maxRootBlockSize != maxSize) {
+            if (maxBlockSize != maxSize) {
                 getReactor().warn("root block max size is incorrect");
                 return null;
             }
@@ -224,7 +226,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                 getReactor().warn("root block size is too small");
                 return null;
             }
-            if (blockSize > maxRootBlockSize) {
+            if (blockSize > maxBlockSize) {
                 getReactor().warn("root block size exceeds max root block size");
                 return null;
             }
