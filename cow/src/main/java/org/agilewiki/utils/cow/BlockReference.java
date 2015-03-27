@@ -12,6 +12,7 @@ import java.nio.ByteBuffer;
  * Holds a block number, block length and checksum.
  */
 public class BlockReference implements Releasable {
+
     /**
      * The database this object is a part of.
      */
@@ -37,10 +38,10 @@ public class BlockReference implements Releasable {
     /**
      * Create a reference to an existing block.
      *
-     * @param db             The database this object is a part of.
-     * @param blockNbr       The number of the block being referenced.
-     * @param blockLength    The length of the durable data held by the block.
-     * @param cs256          The checksum of the contents of the block.
+     * @param db          The database this object is a part of.
+     * @param blockNbr    The number of the block being referenced.
+     * @param blockLength The length of the durable data held by the block.
+     * @param cs256       The checksum of the contents of the block.
      */
     public BlockReference(Db db,
                           int blockNbr,
@@ -54,11 +55,12 @@ public class BlockReference implements Releasable {
 
     /**
      * Creates a new block and a reference to it.
-     * @param db           The database this object is a part of.
-     * @param immutable    The object to be saved in the new block.
+     *
+     * @param db        The database this object is a part of.
+     * @param immutable The object to be saved in the new block.
      */
     public BlockReference(Db db, Object immutable)
-            throws IOException{
+            throws IOException {
         this.db = db;
         ImmutableFactory factory = db.dbFactoryRegistry.getImmutableFactory(immutable);
         blockLength = factory.getDurableLength(immutable);

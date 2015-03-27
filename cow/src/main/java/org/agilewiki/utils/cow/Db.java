@@ -34,9 +34,9 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     /**
      * Create a Db actor.
      *
-     * @param parentRegistry   The parent cascading registry.
-     * @param dbPath           The path of the db file.
-     * @param maxBlockSize The maximum root block size.
+     * @param parentRegistry The parent cascading registry.
+     * @param dbPath         The path of the db file.
+     * @param maxBlockSize   The maximum root block size.
      */
     public Db(CascadingRegistry parentRegistry,
               Path dbPath,
@@ -239,7 +239,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             header.flip();
             int maxSize = header.getInt();
             if (maxBlockSize != maxSize) {
-                getReactor().warn("root block max size is incorrect "+maxSize);
+                getReactor().warn("root block max size is incorrect " + maxSize);
                 return null;
             }
             int blockSize = header.getInt();

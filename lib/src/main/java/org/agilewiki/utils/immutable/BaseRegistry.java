@@ -1,6 +1,5 @@
 package org.agilewiki.utils.immutable;
 
-import org.agilewiki.utils.immutable.collections.*;
 import org.agilewiki.utils.immutable.scalars.*;
 
 /**

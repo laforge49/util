@@ -1,6 +1,5 @@
 package org.agilewiki.utils.cow;
 
-import org.agilewiki.utils.immutable.BaseRegistry;
 import org.agilewiki.utils.immutable.CascadingRegistry;
 import org.agilewiki.utils.immutable.collections.*;
 
@@ -19,8 +18,8 @@ public class DbFactoryRegistry extends CascadingRegistry {
     /**
      * Create a cascading factory registry.
      *
-     * @param db        The database.
-     * @param parent    The parent registry.
+     * @param db     The database.
+     * @param parent The parent registry.
      */
     public DbFactoryRegistry(Db db, CascadingRegistry parent) {
         super(parent);

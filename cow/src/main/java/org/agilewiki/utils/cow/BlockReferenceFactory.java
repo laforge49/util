@@ -6,7 +6,6 @@ import org.agilewiki.utils.immutable.ImmutableFactory;
 import org.agilewiki.utils.immutable.scalars.CS256;
 import org.agilewiki.utils.immutable.scalars.CS256Factory;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**

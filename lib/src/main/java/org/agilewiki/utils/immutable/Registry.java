@@ -21,7 +21,7 @@ public class Registry extends CascadingRegistry {
     /**
      * Create a cascading factory registry.
      *
-     * @param parent    The parent registry.
+     * @param parent The parent registry.
      */
     public Registry(CascadingRegistry parent) {
         super(parent);
