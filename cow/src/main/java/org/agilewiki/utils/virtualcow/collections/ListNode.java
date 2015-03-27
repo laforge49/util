@@ -9,70 +9,27 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * An immutable list.
  */
-public class ListNode implements Releasable {
+public interface ListNode extends Releasable {
 
-    public final ListNodeFactory factory;
+    ListNodeFactory getFactory();
 
-    protected final AtomicReference<ListNodeData> dataReference = new AtomicReference<>();
-    protected final int durableLength;
-    protected ByteBuffer byteBuffer;
-
-    protected ListNode(ListNodeFactory factory) {
-        this.factory = factory;
-        dataReference.set(new ListNodeData(this));
-        durableLength = 2;
-    }
-
-    protected ListNode(ListNodeFactory factory, ByteBuffer byteBuffer) {
-        this.factory = factory;
-        durableLength = byteBuffer.getInt();
-        this.byteBuffer = byteBuffer.slice();
-        this.byteBuffer.limit(durableLength - 6);
-        byteBuffer.position(byteBuffer.position() + durableLength - 6);
-    }
-
-    protected ListNode(ListNodeFactory factory,
-                       int level,
-                       int totalSize,
-                       ListNode leftNode,
-                       Object value,
-                       ListNode rightNode) {
-        this.factory = factory;
-        ListNodeData data = new ListNodeData(
-                this,
-                level,
-                totalSize,
-                leftNode,
-                value,
-                rightNode);
-        durableLength = data.getDurableLength();
-        dataReference.set(data);
-    }
-
-    protected ListNodeData getData() {
-        ListNodeData data = dataReference.get();
-        if (data != null)
-            return data;
-        dataReference.compareAndSet(null, new ListNodeData(this, byteBuffer.slice()));
-        return dataReference.get();
-    }
+    ListNodeData getData();
 
     /**
      * Returns the count of all the values in the list, deleted or not.
      *
      * @return The count of all the values in the list.
      */
-    public int totalSize() {
+    default int totalSize() {
         return isNil() ? 0 : getData().totalSize;
     }
 
-    protected boolean isNil() {
-        return this == factory.nilList;
+    default boolean isNil() {
+        return this == getFactory().nilList;
     }
 
     /**
@@ -80,7 +37,7 @@ public class ListNode implements Releasable {
      *
      * @return The current size of the list.
      */
-    public int size() {
+    default int size() {
         if (isNil())
             return 0;
         return getData().size();
@@ -92,7 +49,7 @@ public class ListNode implements Releasable {
      * @param ndx The index of the selected value.
      * @return A value, or null.
      */
-    public Object get(int ndx) {
+    default Object get(int ndx) {
         ListNode n = getData().getListNode(ndx);
         if (n == null)
             return null;
@@ -106,7 +63,7 @@ public class ListNode implements Releasable {
      * @param value The value sought.
      * @return The index, or -1.
      */
-    public int getIndex(Object value) {
+    default int getIndex(Object value) {
         if (isNil())
             return -1;
         return getData().getIndex(value);
@@ -119,7 +76,7 @@ public class ListNode implements Releasable {
      * @param value The value sought.
      * @return The index, or -1.
      */
-    public int getIndexRight(Object value) {
+    default int getIndexRight(Object value) {
         if (isNil())
             return -1;
         return getData().getIndexRight(value);
@@ -132,7 +89,7 @@ public class ListNode implements Releasable {
      * @param value The value sought.
      * @return The index, or -1.
      */
-    public int findIndex(Object value) {
+    default int findIndex(Object value) {
         if (isNil())
             return -1;
         return getData().findIndex(value);
@@ -145,7 +102,7 @@ public class ListNode implements Releasable {
      * @param value The value sought.
      * @return The index, or -1.
      */
-    public int findIndexRight(Object value) {
+    default int findIndexRight(Object value) {
         if (isNil())
             return -1;
         return getData().findIndexRight(value);
@@ -157,7 +114,7 @@ public class ListNode implements Releasable {
      * @param ndx A given index.
      * @return An index that is higher, or -1.
      */
-    public int higherIndex(int ndx) {
+    default int higherIndex(int ndx) {
         if (isNil())
             return -1;
         if (ndx < 0)
@@ -171,7 +128,7 @@ public class ListNode implements Releasable {
      * @param ndx A given index.
      * @return An index that is equal, or -1.
      */
-    public int ceilingIndex(int ndx) {
+    default int ceilingIndex(int ndx) {
         if (isNil())
             return -1;
         if (ndx < 0)
@@ -184,7 +141,7 @@ public class ListNode implements Releasable {
      *
      * @return The index of the first value in the list, or -1.
      */
-    public int firstIndex() {
+    default int firstIndex() {
         return isNil() ? -1 : 0;
     }
 
@@ -194,7 +151,7 @@ public class ListNode implements Releasable {
      * @param ndx A given index.
      * @return An index of an existing value that is lower, or -1.
      */
-    public int lowerIndex(int ndx) {
+    default int lowerIndex(int ndx) {
         if (ndx <= 0 || isNil())
             return -1; //out of range
         int t = totalSize();
@@ -209,7 +166,7 @@ public class ListNode implements Releasable {
      * @param ndx A given index.
      * @return The index, or -1.
      */
-    public int floorIndex(int ndx) {
+    default int floorIndex(int ndx) {
         if (ndx < 0 || isNil())
             return -1; //out of range
         int t = totalSize();
@@ -223,7 +180,7 @@ public class ListNode implements Releasable {
      *
      * @return The index of the last value in the list, or -1.
      */
-    public int lastIndex() {
+    default int lastIndex() {
         return totalSize() - 1;
     }
 
@@ -232,7 +189,7 @@ public class ListNode implements Releasable {
      *
      * @return Returns true if the list is empty for the given time.
      */
-    public boolean isEmpty() {
+    default boolean isEmpty() {
         return isNil();
     }
 
@@ -241,7 +198,7 @@ public class ListNode implements Releasable {
      *
      * @return A list of all values.
      */
-    public List flatList() {
+    default List flatList() {
         List list = new ArrayList<>();
         getData().flatList(list);
         return list;
@@ -252,7 +209,7 @@ public class ListNode implements Releasable {
      *
      * @return The iterator.
      */
-    public Iterator iterator() {
+    default Iterator iterator() {
         return new Iterator() {
             int last = -1;
 
@@ -277,7 +234,7 @@ public class ListNode implements Releasable {
      *
      * @return A list accessor for the latest time.
      */
-    public ListAccessor listAccessor() {
+    default ListAccessor listAccessor() {
         return listAccessor(null);
     }
 
@@ -287,7 +244,7 @@ public class ListNode implements Releasable {
      * @param key The key for the list.
      * @return A list accessor for the given time.
      */
-    public ListAccessor listAccessor(Comparable key) {
+    default ListAccessor listAccessor(Comparable key) {
         return new ListAccessor() {
             @Override
             public Comparable key() {
@@ -382,7 +339,7 @@ public class ListNode implements Releasable {
      * @param value The value to be added.
      * @return The revised root node.
      */
-    public ListNode add(Object value) {
+    default ListNode add(Object value) {
         return add(-1, value);
     }
 
@@ -393,13 +350,14 @@ public class ListNode implements Releasable {
      * @param value The value to be added.
      * @return The revised root node.
      */
-    public ListNode add(int ndx, Object value) {
+    default ListNode add(int ndx, Object value) {
         if (value == null)
             throw new IllegalArgumentException("value may not be null");
         if (isNil()) {
             if (ndx != 0 && ndx != -1)
                 throw new IllegalArgumentException("index out of range");
-            return new ListNode(factory, 1, 1, factory.nilList, value, factory.nilList);
+            ListNodeFactory factory = getFactory();
+            return new ListNodeImpl(factory, 1, 1, factory.nilList, value, factory.nilList);
         }
         return getData().add(ndx, value);
     }
@@ -410,21 +368,19 @@ public class ListNode implements Releasable {
      *
      * @return The size in bytes of the serialized data.
      */
-    int getDurableLength() {
-        return durableLength;
-    }
+    int getDurableLength();
 
     /**
      * Write the durable to a byte buffer.
      *
      * @param byteBuffer The byte buffer.
      */
-    public void writeDurable(ByteBuffer byteBuffer) {
+    default void writeDurable(ByteBuffer byteBuffer) {
         if (isNil()) {
-            byteBuffer.putChar(factory.nilListId);
+            byteBuffer.putChar(getFactory().nilListId);
             return;
         }
-        byteBuffer.putChar(factory.id);
+        byteBuffer.putChar(getFactory().id);
         serialize(byteBuffer);
     }
 
@@ -433,20 +389,9 @@ public class ListNode implements Releasable {
      *
      * @param byteBuffer Where the serialized data is to be placed.
      */
-    public void serialize(ByteBuffer byteBuffer) {
-        if (this.byteBuffer == null) {
-            byteBuffer.putInt(getDurableLength());
-            getData().serialize(byteBuffer);
-            return;
-        }
-        ByteBuffer bb = byteBuffer.slice();
-        bb.limit(durableLength - 6);
-        byteBuffer.put(this.byteBuffer.slice());
-        this.byteBuffer = bb;
-        dataReference.set(null); //limit memory footprint, plugs memory leak.
-    }
+    void serialize(ByteBuffer byteBuffer);
 
-    public ListNode remove(int ndx)
+    default ListNode remove(int ndx)
             throws IOException {
         if (isNil())
             return this;
@@ -455,14 +400,8 @@ public class ListNode implements Releasable {
         return getData().remove(ndx);
     }
 
-    public String toString() {
-        if (isNil())
-            return "";
-        return getData().toString();
-    }
-
     @Override
-    public void release()
+    default void release()
             throws IOException {
         getData().release();
     }

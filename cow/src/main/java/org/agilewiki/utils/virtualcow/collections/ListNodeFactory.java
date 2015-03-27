@@ -18,7 +18,7 @@ public class ListNodeFactory extends BaseFactory {
         super(factoryRegistry, id);
         this.nilListId = nilListId;
         new NilListNodeFactory(this, nilListId);
-        nilList = new ListNode(this);
+        nilList = new ListNodeImpl(this);
     }
 
     @Override
@@ -30,7 +30,7 @@ public class ListNodeFactory extends BaseFactory {
 
     @Override
     public Class getImmutableClass() {
-        return ListNode.class;
+        return ListNodeImpl.class;
     }
 
     @Override
@@ -45,6 +45,6 @@ public class ListNodeFactory extends BaseFactory {
 
     @Override
     public ListNode deserialize(ByteBuffer byteBuffer) {
-        return new ListNode(this, byteBuffer);
+        return new ListNodeImpl(this, byteBuffer);
     }
 }

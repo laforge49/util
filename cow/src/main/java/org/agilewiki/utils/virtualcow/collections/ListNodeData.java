@@ -88,7 +88,7 @@ public class ListNodeData implements Releasable {
         this.leftNode = leftNode;
         this.value = value;
         this.rightNode = rightNode;
-        this.valueFactory = thisNode.factory.factoryRegistry.getImmutableFactory(value);
+        this.valueFactory = thisNode.getFactory().factoryRegistry.getImmutableFactory(value);
     }
 
     /**
@@ -101,7 +101,7 @@ public class ListNodeData implements Releasable {
         this.thisNode = thisNode;
         level = byteBuffer.getInt();
         totalSize = byteBuffer.getInt();
-        FactoryRegistry registry = thisNode.factory.factoryRegistry;
+        FactoryRegistry registry = thisNode.getFactory().factoryRegistry;
         ImmutableFactory f = registry.readId(byteBuffer);
         leftNode = (ListNode) f.deserialize(byteBuffer);
         valueFactory = registry.readId(byteBuffer);
@@ -288,15 +288,15 @@ public class ListNodeData implements Releasable {
             return thisNode;
         ListNodeData leftData = leftNode.getData();
         if (leftData.level == level) {
-            ListNode t = new ListNode(
-                    thisNode.factory,
+            ListNode t = new ListNodeImpl(
+                    thisNode.getFactory(),
                     level,
                     totalSize - leftData.totalSize + leftData.leftNode.totalSize(),
                     leftData.rightNode,
                     value,
                     rightNode);
-            return new ListNode(
-                    thisNode.factory,
+            return new ListNodeImpl(
+                    thisNode.getFactory(),
                     leftData.level,
                     totalSize,
                     leftData.leftNode,
@@ -318,15 +318,15 @@ public class ListNodeData implements Releasable {
         if (rightData.rightNode.isNil())
             return thisNode;
         if (level == rightData.rightNode.getData().level) {
-            ListNode t = new ListNode(
-                    thisNode.factory,
+            ListNode t = new ListNodeImpl(
+                    thisNode.getFactory(),
                     level,
                     totalSize - rightData.totalSize + rightData.leftNode.totalSize(),
                     leftNode,
                     value,
                     rightData.leftNode);
-            ListNode r = new ListNode(
-                    thisNode.factory,
+            ListNode r = new ListNodeImpl(
+                    thisNode.getFactory(),
                     rightData.level + 1,
                     totalSize,
                     t,
@@ -350,16 +350,16 @@ public class ListNodeData implements Releasable {
         int leftSize = leftNode.totalSize();
         ListNode t = thisNode;
         if (ndx <= leftSize) {
-            t = new ListNode(
-                    thisNode.factory,
+            t = new ListNodeImpl(
+                    thisNode.getFactory(),
                     level,
                     totalSize + 1,
                     leftNode.add(ndx, value),
                     this.value,
                     rightNode);
         } else {
-            t = new ListNode(
-                    thisNode.factory,
+            t = new ListNodeImpl(
+                    thisNode.getFactory(),
                     level,
                     totalSize + 1,
                     leftNode,
@@ -395,8 +395,8 @@ public class ListNodeData implements Releasable {
         if (shouldBe < level) {
             ListNode r;
             if (shouldBe < rd.level)
-                r = new ListNode(
-                        thisNode.factory,
+                r = new ListNodeImpl(
+                        thisNode.getFactory(),
                         shouldBe,
                         rd.totalSize,
                         rd.leftNode,
@@ -404,8 +404,8 @@ public class ListNodeData implements Releasable {
                         rd.rightNode);
             else
                 r = rightNode;
-            return new ListNode(
-                    thisNode.factory,
+            return new ListNodeImpl(
+                    thisNode.getFactory(),
                     shouldBe,
                     totalSize,
                     leftNode,
@@ -419,29 +419,30 @@ public class ListNodeData implements Releasable {
             throws IOException {
         if (isNil())
             return thisNode;
+        ListNodeFactory factory = thisNode.getFactory();
         int leftSize = leftNode.size();
         ListNode t = thisNode;
         if (ndx > leftSize) {
             ListNode r = rightNode.remove(ndx - leftSize - 1);
             if (r != rightNode)
-                t = new ListNode(thisNode.factory, level, totalSize - 1, leftNode, value, r);
+                t = new ListNodeImpl(factory, level, totalSize - 1, leftNode, value, r);
         } else if (ndx < leftSize) {
             ListNode l = leftNode.remove(ndx);
             if (l != leftNode)
-                t = new ListNode(thisNode.factory, level, totalSize - 1, l, value, rightNode);
+                t = new ListNodeImpl(factory, level, totalSize - 1, l, value, rightNode);
         } else {
             if (value instanceof Releasable)
                 ((Releasable) value).release();
-            ListNode nil = thisNode.factory.nilList;
+            ListNode nil = factory.nilList;
             if (totalSize == 1) {
                 return nil;
             }
             if (leftNode.isNil()) {
                 ListNode l = successor();
-                t = new ListNode(thisNode.factory, level, totalSize - 1, nil, l.getData().value, rightNode.remove(0));
+                t = new ListNodeImpl(factory, level, totalSize - 1, nil, l.getData().value, rightNode.remove(0));
             } else {
                 ListNode l = predecessor();
-                t = new ListNode(thisNode.factory, level, totalSize - 1, leftNode.remove(leftSize - 1), l.getData().value, rightNode);
+                t = new ListNodeImpl(factory, level, totalSize - 1, leftNode.remove(leftSize - 1), l.getData().value, rightNode);
             }
         }
         t = t.getData().decreaseLevel().getData().skew();
@@ -451,17 +452,17 @@ public class ListNodeData implements Releasable {
             ListNodeData rd = r.getData();
             ListNode rr = rd.rightNode.getData().skew();
             if (rd.rightNode != rr) {
-                r = new ListNode(thisNode.factory, rd.level, rd.totalSize, rd.leftNode, rd.value, rr);
+                r = new ListNodeImpl(factory, rd.level, rd.totalSize, rd.leftNode, rd.value, rr);
             }
         }
         if (r != td.rightNode) {
-            t = new ListNode(thisNode.factory, td.level, td.totalSize, td.leftNode, td.value, r);
+            t = new ListNodeImpl(factory, td.level, td.totalSize, td.leftNode, td.value, r);
         }
         t = t.getData().split();
         r = t.getData().rightNode.getData().split();
         td = t.getData();
         if (r != td.rightNode) {
-            t = new ListNode(thisNode.factory, td.level, td.totalSize, td.leftNode, td.value, r);
+            t = new ListNodeImpl(factory, td.level, td.totalSize, td.leftNode, td.value, r);
         }
         return t;
     }
