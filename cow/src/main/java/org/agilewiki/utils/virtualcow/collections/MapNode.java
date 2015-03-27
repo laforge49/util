@@ -1,4 +1,4 @@
-package org.agilewiki.utils.immutable.collections;
+package org.agilewiki.utils.virtualcow.collections;
 
 import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.Releasable;
