@@ -150,7 +150,6 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
 
     public void readBlock(ByteBuffer byteBuffer, int blockNbr)
             throws IOException {
-        checkPrivilege();
         long position = blockNbr * (long) maxBlockSize;
         while (byteBuffer.remaining() > 0) {
             position += fc.read(byteBuffer, position);
