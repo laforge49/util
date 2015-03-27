@@ -57,7 +57,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             getReactor().error("open on already open db");
             throw new IllegalStateException("already open");
         }
-        mapNode = dbFactoryRegistry.nilMap;
+        mapNode = null;
         try {
             if (createNew)
                 fc = FileChannel.open(dbPath, READ, WRITE, SYNC, CREATE_NEW);
@@ -66,8 +66,10 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             dsm = new DiskSpaceManager();
             dsm.allocate();
             dsm.allocate();
-            _update(mapNode);
-            _update(mapNode);
+            mapNode = null;
+            _update(dbFactoryRegistry.nilMap);
+            mapNode = null;
+            _update(dbFactoryRegistry.nilMap);
         } catch (Exception ex) {
             fc = null;
             getReactor().error("unable to open db to create a new file", ex);
@@ -238,7 +240,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             header.flip();
             int maxSize = header.getInt();
             if (maxBlockSize != maxSize) {
-                getReactor().warn("root block max size is incorrect");
+                getReactor().warn("root block max size is incorrect "+maxSize);
                 return null;
             }
             int blockSize = header.getInt();

@@ -14,6 +14,7 @@ public class DbTest extends TestCase {
         new Plant();
         try {
             Path dbPath = Paths.get("cow.db");
+            Files.deleteIfExists(dbPath);
             int maxRootBlockSize = 1000;
             try (Db db = new Db(new BaseRegistry(), dbPath, maxRootBlockSize)) {
                 Files.deleteIfExists(dbPath);
@@ -22,7 +23,8 @@ public class DbTest extends TestCase {
                     @Override
                     public MapNode transform(MapNode mapNode) {
                         System.out.println("block usage: " + db.usage());
-                        return mapNode.add("x", "hi!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                        mapNode = mapNode.add("x", "hi!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                        return mapNode;
                     }
                 };
                 db.update(t2).call();
