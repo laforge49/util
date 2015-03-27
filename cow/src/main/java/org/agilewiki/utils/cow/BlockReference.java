@@ -5,6 +5,7 @@ import org.agilewiki.utils.immutable.Releasable;
 import org.agilewiki.utils.immutable.scalars.CS256;
 
 import java.io.IOException;
+import java.lang.ref.SoftReference;
 import java.nio.ByteBuffer;
 
 /**
@@ -30,6 +31,8 @@ public class BlockReference implements Releasable {
      * The checksum of the contents of the block.
      */
     final public CS256 cs256;
+
+    protected SoftReference softReference;
 
     /**
      * Create a reference to an existing block.
@@ -90,6 +93,11 @@ public class BlockReference implements Releasable {
      */
     public Object get()
             throws IOException {
+        if (softReference != null) {
+            Object immutable = softReference.get();
+            if (immutable != null)
+                return immutable;
+        }
         ByteBuffer byteBuffer = ByteBuffer.allocate(blockLength);
         db.readBlock(byteBuffer, blockNbr);
         byteBuffer.flip();
@@ -99,6 +107,8 @@ public class BlockReference implements Releasable {
             throw new IllegalStateException("block has bad checksum");
         }
         ImmutableFactory factory = db.dbFactoryRegistry.readId(byteBuffer);
-        return factory.deserialize(byteBuffer);
+        Object immutable = factory.deserialize(byteBuffer);
+        softReference = new SoftReference(immutable);
+        return immutable;
     }
 }
