@@ -20,7 +20,7 @@ public class VersionedMapDurableTest extends TestCase {
             Db db = new Db(new BaseRegistry(), dbPath, maxRootBlockSize);
             DbFactoryRegistry registry = db.dbFactoryRegistry;
 
-            VersionedMapNode m1 = registry.nilVersionedMap;
+            VersionedMapNode m1 = registry.versionedNilMap;
             ImmutableFactory factory1 = registry.getImmutableFactory(m1);
             assertTrue(factory1 instanceof NilVersionedMapNodeFactory);
             assertEquals(2, factory1.getDurableLength(m1));
@@ -32,7 +32,7 @@ public class VersionedMapDurableTest extends TestCase {
             assertTrue(factory2 instanceof NilVersionedMapNodeFactory);
             Object object2 = factory2.deserialize(byteBuffer1);
             assertEquals(2, byteBuffer1.position());
-            assertTrue(object2.equals(registry.nilVersionedMap));
+            assertTrue(object2.equals(registry.versionedNilMap));
 
             VersionedMapNode m2 = m1;
             m2 = m2.add("a", "1", 1);

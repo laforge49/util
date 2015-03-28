@@ -18,11 +18,11 @@ public class VersionedMapRemoveTest extends TestCase {
             Db db = new Db(new BaseRegistry(), dbPath, maxRootBlockSize);
             DbFactoryRegistry registry = db.dbFactoryRegistry;
 
-            assertEquals(registry.nilVersionedMap, registry.nilVersionedMap.remove("", 0, 1));
-            registry.nilVersionedMap.clearMap(1);
-            assertEquals(1, registry.nilVersionedMap.set("1", "a", 1).size(1));
+            assertEquals(registry.versionedNilMap, registry.versionedNilMap.remove("", 0, 1));
+            registry.versionedNilMap.clearMap(1);
+            assertEquals(1, registry.versionedNilMap.set("1", "a", 1).size(1));
 
-            VersionedMapNode m1 = registry.nilVersionedMap.add("1", "a", 2);
+            VersionedMapNode m1 = registry.versionedNilMap.add("1", "a", 2);
             m1 = m1.remove("1", 0, 3);
 
             VersionedMapNode m2 = m1.copyMap();

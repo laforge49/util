@@ -20,7 +20,7 @@ public class VersionedMapSpeedTest extends TestCase {
             Db db = new Db(new BaseRegistry(), dbPath, maxRootBlockSize);
             DbFactoryRegistry registry = db.dbFactoryRegistry;
 
-            VersionedMapNode m1 = registry.nilVersionedMap;
+            VersionedMapNode m1 = registry.versionedNilMap;
             int c = 10;
             long t0 = System.currentTimeMillis();
             for (int i = 0; i < c; ++i) {

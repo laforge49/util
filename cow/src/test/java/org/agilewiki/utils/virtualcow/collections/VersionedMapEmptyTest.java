@@ -18,14 +18,14 @@ public class VersionedMapEmptyTest extends TestCase {
             Db db = new Db(new BaseRegistry(), dbPath, maxRootBlockSize);
             DbFactoryRegistry registry = db.dbFactoryRegistry;
 
-            assertEquals(0, registry.nilVersionedMap.totalSize(""));
+            assertEquals(0, registry.versionedNilMap.totalSize(""));
 
-            assertEquals(0, registry.nilVersionedMap.flatKeys(1).size());
+            assertEquals(0, registry.versionedNilMap.flatKeys(1).size());
 
-            ListAccessor la = registry.nilVersionedMap.listAccessor("");
+            ListAccessor la = registry.versionedNilMap.listAccessor("");
             assertNull(la.get(0));
 
-            MapAccessor ma = registry.nilVersionedMap.mapAccessor();
+            MapAccessor ma = registry.versionedNilMap.mapAccessor();
             assertNull(ma.firstKey());
             assertNull(ma.lastKey());
             assertEquals(0, ma.flatMap().size());

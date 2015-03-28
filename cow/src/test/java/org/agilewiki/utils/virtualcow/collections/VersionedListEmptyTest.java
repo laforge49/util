@@ -18,9 +18,9 @@ public class VersionedListEmptyTest extends TestCase {
             Db db = new Db(new BaseRegistry(), dbPath, maxRootBlockSize);
             DbFactoryRegistry registry = db.dbFactoryRegistry;
 
-            assertEquals(0, registry.nilVersionedList.totalSize());
+            assertEquals(0, registry.versionedNilList.totalSize());
 
-            ListAccessor la = registry.nilVersionedList.listAccessor();
+            ListAccessor la = registry.versionedNilList.listAccessor();
 
             assertEquals(BaseRegistry.MAX_TIME, la.time());
 

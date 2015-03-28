@@ -9,14 +9,26 @@ import org.agilewiki.utils.virtualcow.collections.*;
 public class DbFactoryRegistry extends CascadingRegistry {
     public final Db db;
 
-    public final VersionedListNode nilVersionedList;
-    public final VersionedMapNode nilVersionedMap;
+    public final VersionedListNode versionedNilList;
+    public final VersionedMapNode versionedNilMap;
     public final ListNode nilList;
-    public final MapNodeFactory mapNodeFactory;
-    public final char mapNodeImplId = 'o';
     public final MapNode nilMap;
-    public final char nilMapId = '4';
+
+    public final VersionedListNodeFactory versionedListNodeFactory;
+    public final VersionedMapNodeFactory versionedMapNodeFactory;
+    public final ListNodeFactory listNodeFactory;
+    public final MapNodeFactory mapNodeFactory;
     public final BlockReferenceFactory blockReferenceFactory;
+
+    public final char versionedListNodeImplId = 'l';
+    public final char versionedNilListId = '1';
+    public final char versionedMapNodeImplId = 'm';
+    public final char versionedNilMapId = '2';
+    public final char listNodeImplId = 'n';
+    public final char nilListId = '3';
+    public final char mapNodeImplId = 'o';
+    public final char nilMapId = '4';
+    public final char blockReferenceFactoryId = 'r';
 
     /**
      * Create a cascading factory registry.
@@ -27,11 +39,29 @@ public class DbFactoryRegistry extends CascadingRegistry {
     public DbFactoryRegistry(Db db, CascadingRegistry parent) {
         super(parent);
         this.db = db;
-        nilVersionedList = new VersionedListNodeFactory(this, 'l', '1').nilVersionedList;
-        nilVersionedMap = new VersionedMapNodeFactory(this, 'm', '2', nilVersionedList).nilVersionedMap;
-        nilList = new ListNodeFactory(this, 'n', '3').nilList;
-        mapNodeFactory = new MapNodeFactory(this, mapNodeImplId, nilMapId);
+        versionedListNodeFactory = new VersionedListNodeFactory(
+                this,
+                versionedListNodeImplId,
+                versionedNilListId);
+        versionedNilList = versionedListNodeFactory.nilVersionedList;
+        versionedMapNodeFactory = new VersionedMapNodeFactory(this,
+                versionedMapNodeImplId,
+                versionedNilMapId,
+                versionedNilList);
+        versionedNilMap = versionedMapNodeFactory.nilVersionedMap;
+        listNodeFactory = new ListNodeFactory(
+                this,
+                listNodeImplId,
+                nilListId);
+        nilList = listNodeFactory.nilList;
+        mapNodeFactory = new MapNodeFactory(
+                this,
+                mapNodeImplId,
+                nilMapId);
         nilMap = mapNodeFactory.nilMap;
-        blockReferenceFactory = new BlockReferenceFactory(this, 'r', db);
+        blockReferenceFactory = new BlockReferenceFactory(
+                this,
+                blockReferenceFactoryId,
+                db);
     }
 }

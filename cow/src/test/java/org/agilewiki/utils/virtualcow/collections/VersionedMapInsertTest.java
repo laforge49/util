@@ -19,7 +19,7 @@ public class VersionedMapInsertTest extends TestCase {
             Db db = new Db(new BaseRegistry(), dbPath, maxRootBlockSize);
             DbFactoryRegistry registry = db.dbFactoryRegistry;
 
-            VersionedMapNode m1 = registry.nilVersionedMap.add("1", "a", 2);
+            VersionedMapNode m1 = registry.versionedNilMap.add("1", "a", 2);
 
             assertEquals(1, m1.totalSize("1"));
 

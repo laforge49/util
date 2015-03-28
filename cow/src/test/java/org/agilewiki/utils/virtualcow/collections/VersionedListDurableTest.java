@@ -20,7 +20,7 @@ public class VersionedListDurableTest extends TestCase {
             Db db = new Db(new BaseRegistry(), dbPath, maxRootBlockSize);
             DbFactoryRegistry registry = db.dbFactoryRegistry;
 
-            VersionedListNode l1 = registry.nilVersionedList;
+            VersionedListNode l1 = registry.versionedNilList;
             ImmutableFactory factory1 = registry.getImmutableFactory(l1);
             assertTrue(factory1 instanceof NilVersionedListNodeFactory);
             assertEquals(2, factory1.getDurableLength(l1));
@@ -32,7 +32,7 @@ public class VersionedListDurableTest extends TestCase {
             assertTrue(factory2 instanceof NilVersionedListNodeFactory);
             Object object2 = factory2.deserialize(byteBuffer1);
             assertEquals(2, byteBuffer1.position());
-            assertTrue(object2.equals(registry.nilVersionedList));
+            assertTrue(object2.equals(registry.versionedNilList));
 
             VersionedListNode l2 = l1;
             l2 = l2.add("1", 1);

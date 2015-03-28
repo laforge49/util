@@ -19,13 +19,13 @@ public class VersionedListRemoveTest extends TestCase {
             Db db = new Db(new BaseRegistry(), dbPath, maxRootBlockSize);
             DbFactoryRegistry registry = db.dbFactoryRegistry;
 
-            VersionedListNode l1 = registry.nilVersionedList;
+            VersionedListNode l1 = registry.versionedNilList;
 
             l1 = l1.remove(-1, 1);
             l1 = l1.remove(0, 1);
             l1 = l1.remove(1, 1);
 
-            VersionedListNode l2 = registry.nilVersionedList.add("a", 2);
+            VersionedListNode l2 = registry.versionedNilList.add("a", 2);
             l2 = l2.add("b", 3);
             l2 = l2.add("c", 4);
             l2 = l2.add("d", 5);
