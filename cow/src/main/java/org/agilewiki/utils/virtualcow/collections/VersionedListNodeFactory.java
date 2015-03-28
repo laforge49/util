@@ -18,7 +18,7 @@ public class VersionedListNodeFactory extends BaseFactory {
         super(factoryRegistry, id);
         this.nilVersionedListId = nilVersionedListId;
         new NilVersionedListNodeFactory(this, nilVersionedListId);
-        nilVersionedList = new VersionedListNode(this);
+        nilVersionedList = new VersionedListNodeImpl(this);
     }
 
     @Override
@@ -30,7 +30,7 @@ public class VersionedListNodeFactory extends BaseFactory {
 
     @Override
     public Class getImmutableClass() {
-        return VersionedListNode.class;
+        return VersionedListNodeImpl.class;
     }
 
     @Override
@@ -45,6 +45,6 @@ public class VersionedListNodeFactory extends BaseFactory {
 
     @Override
     public VersionedListNode deserialize(ByteBuffer byteBuffer) {
-        return new VersionedListNode(this, byteBuffer);
+        return new VersionedListNodeImpl(this, byteBuffer);
     }
 }

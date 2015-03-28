@@ -14,69 +14,23 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * An immutable versioned list.
  */
-public class VersionedListNode implements Releasable {
+public interface VersionedListNode extends Releasable {
 
-    public final VersionedListNodeFactory factory;
+    VersionedListNodeFactory getFactory();
 
-    protected final AtomicReference<VersionedListNodeData> dataReference = new AtomicReference<>();
-    protected final int durableLength;
-    protected ByteBuffer byteBuffer;
-
-    protected VersionedListNode(VersionedListNodeFactory factory) {
-        this.factory = factory;
-        dataReference.set(new VersionedListNodeData(this));
-        durableLength = 2;
-    }
-
-    protected VersionedListNode(VersionedListNodeFactory factory, ByteBuffer byteBuffer) {
-        this.factory = factory;
-        durableLength = byteBuffer.getInt();
-        this.byteBuffer = byteBuffer.slice();
-        this.byteBuffer.limit(durableLength - 6);
-        byteBuffer.position(byteBuffer.position() + durableLength - 6);
-    }
-
-    protected VersionedListNode(VersionedListNodeFactory factory,
-                                int level,
-                                int totalSize,
-                                long created,
-                                long deleted,
-                                VersionedListNode leftNode,
-                                Object value,
-                                VersionedListNode rightNode) {
-        this.factory = factory;
-        VersionedListNodeData data = new VersionedListNodeData(
-                this,
-                level,
-                totalSize,
-                created,
-                deleted,
-                leftNode,
-                value,
-                rightNode);
-        durableLength = data.getDurableLength();
-        dataReference.set(data);
-    }
-
-    protected VersionedListNodeData getData() {
-        VersionedListNodeData data = dataReference.get();
-        if (data != null)
-            return data;
-        dataReference.compareAndSet(null, new VersionedListNodeData(this, byteBuffer.slice()));
-        return dataReference.get();
-    }
+    VersionedListNodeData getData();
 
     /**
      * Returns the count of all the values in the list, deleted or not.
      *
      * @return The count of all the values in the list.
      */
-    public int totalSize() {
+    default int totalSize() {
         return isNil() ? 0 : getData().totalSize;
     }
 
-    protected boolean isNil() {
-        return this == factory.nilVersionedList;
+    default boolean isNil() {
+        return this == getFactory().nilVersionedList;
     }
 
     /**
@@ -85,7 +39,7 @@ public class VersionedListNode implements Releasable {
      * @param time The time of the query.
      * @return The current size of the list.
      */
-    public int size(long time) {
+    default int size(long time) {
         if (isNil())
             return 0;
         return getData().size(time);
@@ -98,7 +52,7 @@ public class VersionedListNode implements Releasable {
      * @param time The time of the query.
      * @return A value, or null.
      */
-    public Object getExistingValue(int ndx, long time) {
+    default Object getExistingValue(int ndx, long time) {
         VersionedListNode n = getData().getListNode(ndx);
         if (n == null)
             return null;
@@ -113,7 +67,7 @@ public class VersionedListNode implements Releasable {
      * @param time  The time of the query.
      * @return The index, or -1.
      */
-    public int getIndex(Object value, long time) {
+    default int getIndex(Object value, long time) {
         if (isNil())
             return -1;
         return getData().getIndex(value, time);
@@ -127,7 +81,7 @@ public class VersionedListNode implements Releasable {
      * @param time  The time of the query.
      * @return The index, or -1.
      */
-    public int getIndexRight(Object value, long time) {
+    default int getIndexRight(Object value, long time) {
         if (isNil())
             return -1;
         return getData().getIndexRight(value, time);
@@ -141,7 +95,7 @@ public class VersionedListNode implements Releasable {
      * @param time  The time of the query.
      * @return The index, or -1.
      */
-    public int findIndex(Object value, long time) {
+    default int findIndex(Object value, long time) {
         if (isNil())
             return -1;
         return getData().findIndex(value, time);
@@ -155,7 +109,7 @@ public class VersionedListNode implements Releasable {
      * @param time  The time of the query.
      * @return The index, or -1.
      */
-    public int findIndexRight(Object value, long time) {
+    default int findIndexRight(Object value, long time) {
         if (isNil())
             return -1;
         return getData().findIndexRight(value, time);
@@ -168,7 +122,7 @@ public class VersionedListNode implements Releasable {
      * @param time The time of the query.
      * @return An index of an existing value that is higher, or -1.
      */
-    public int higherIndex(int ndx, long time) {
+    default int higherIndex(int ndx, long time) {
         return getData().higherIndex(ndx, time);
     }
 
@@ -179,7 +133,7 @@ public class VersionedListNode implements Releasable {
      * @param time The time of the query.
      * @return An index of an existing value that is higher or equal, or -1.
      */
-    public int ceilingIndex(int ndx, long time) {
+    default int ceilingIndex(int ndx, long time) {
         return getData().ceilingIndex(ndx, time);
     }
 
@@ -189,7 +143,7 @@ public class VersionedListNode implements Releasable {
      * @param time The time of the query.
      * @return The index of the first existing value in the list, or -1.
      */
-    public int firstIndex(long time) {
+    default int firstIndex(long time) {
         return ceilingIndex(0, time);
     }
 
@@ -200,7 +154,7 @@ public class VersionedListNode implements Releasable {
      * @param time The time of the query.
      * @return An index of an existing value that is lower, or -1.
      */
-    public int lowerIndex(int ndx, long time) {
+    default int lowerIndex(int ndx, long time) {
         if (ndx <= 0 || isNil())
             return -1; //out of range
         return getData().lowerIndex(ndx, time);
@@ -213,7 +167,7 @@ public class VersionedListNode implements Releasable {
      * @param time The time of the query.
      * @return An index of an existing value that is lower or equal, or -1.
      */
-    public int floorIndex(int ndx, long time) {
+    default int floorIndex(int ndx, long time) {
         if (ndx < 0 || isNil())
             return -1; //out of range
         return getData().floorIndex(ndx, time);
@@ -225,7 +179,7 @@ public class VersionedListNode implements Releasable {
      * @param time The time of the query.
      * @return The index of the last existing value in the list, or -1.
      */
-    public int lastIndex(long time) {
+    default int lastIndex(long time) {
         return floorIndex(totalSize(), time);
     }
 
@@ -235,7 +189,7 @@ public class VersionedListNode implements Releasable {
      * @param time The time of the query.
      * @return Returns true if the list is empty for the given time.
      */
-    public boolean isEmpty(long time) {
+    default boolean isEmpty(long time) {
         if (isNil())
             return true;
         return getData().isEmpty(time);
@@ -247,7 +201,7 @@ public class VersionedListNode implements Releasable {
      * @param time The time of the query.
      * @return A list of all values present for the given time.
      */
-    public List flatList(long time) {
+    default List flatList(long time) {
         List list = new ArrayList<>();
         getData().flatList(list, time);
         return list;
@@ -259,7 +213,7 @@ public class VersionedListNode implements Releasable {
      * @param time The time of the query.
      * @return The iterator.
      */
-    public Iterator iterator(long time) {
+    default Iterator iterator(long time) {
         return new Iterator() {
             int last = -1;
 
@@ -284,7 +238,7 @@ public class VersionedListNode implements Releasable {
      *
      * @return A list accessor for the latest time.
      */
-    public ListAccessor listAccessor() {
+    default ListAccessor listAccessor() {
         return listAccessor(null, FactoryRegistry.MAX_TIME);
     }
 
@@ -294,7 +248,7 @@ public class VersionedListNode implements Releasable {
      * @param key The key for the list.
      * @return A list accessor for the latest time.
      */
-    public ListAccessor listAccessor(Comparable key) {
+    default ListAccessor listAccessor(Comparable key) {
         return listAccessor(key, FactoryRegistry.MAX_TIME);
     }
 
@@ -305,7 +259,7 @@ public class VersionedListNode implements Releasable {
      * @param time The time of the query.
      * @return A list accessor for the given time.
      */
-    public ListAccessor listAccessor(Comparable key, long time) {
+    default ListAccessor listAccessor(Comparable key, long time) {
         return new ListAccessor() {
             @Override
             public Comparable key() {
@@ -401,7 +355,7 @@ public class VersionedListNode implements Releasable {
      * @param time  The time the value is added.
      * @return The revised root node.
      */
-    public VersionedListNode add(Object value, long time) {
+    default VersionedListNode add(Object value, long time) {
         return add(-1, value, time);
     }
 
@@ -413,17 +367,25 @@ public class VersionedListNode implements Releasable {
      * @param time  The time the value is added.
      * @return The revised root node.
      */
-    public VersionedListNode add(int ndx, Object value, long time) {
+    default VersionedListNode add(int ndx, Object value, long time) {
         return add(ndx, value, time, Long.MAX_VALUE);
     }
 
-    protected VersionedListNode add(int ndx, Object value, long created, long deleted) {
+    default VersionedListNode add(int ndx, Object value, long created, long deleted) {
         if (value == null)
             throw new IllegalArgumentException("value may not be null");
         if (isNil()) {
             if (ndx != 0 && ndx != -1)
                 throw new IllegalArgumentException("index out of range");
-            return new VersionedListNode(factory, 1, 1, created, deleted, factory.nilVersionedList, value, factory.nilVersionedList);
+            return new VersionedListNodeImpl(
+                    getFactory(),
+                    1,
+                    1,
+                    created,
+                    deleted,
+                    getFactory().nilVersionedList,
+                    value,
+                    getFactory().nilVersionedList);
         }
         return getData().add(ndx, value, created, deleted);
     }
@@ -435,7 +397,7 @@ public class VersionedListNode implements Releasable {
      * @param time The time of the deletion.
      * @return The revised node.
      */
-    public VersionedListNode remove(int ndx, long time) {
+    default VersionedListNode remove(int ndx, long time) {
         if (isNil())
             return this;
         return getData().remove(ndx, time);
@@ -446,7 +408,7 @@ public class VersionedListNode implements Releasable {
      *
      * @return A complete, but shallow copy of the list.
      */
-    public VersionedListNode copyList() {
+    default VersionedListNode copyList() {
         return copyList(0L);
     }
 
@@ -457,8 +419,8 @@ public class VersionedListNode implements Releasable {
      * @param time The given time.
      * @return A shortened copy of the list without some historical values.
      */
-    public VersionedListNode copyList(long time) {
-        return getData().copyList(factory.nilVersionedList, time);
+    default VersionedListNode copyList(long time) {
+        return getData().copyList(getFactory().nilVersionedList, time);
     }
 
     /**
@@ -467,7 +429,7 @@ public class VersionedListNode implements Releasable {
      * @param time The time of the deletion.
      * @return The currently empty versioned list.
      */
-    public VersionedListNode clearList(long time) {
+    default VersionedListNode clearList(long time) {
         return getData().clearList(time);
     }
 
@@ -477,21 +439,19 @@ public class VersionedListNode implements Releasable {
      *
      * @return The size in bytes of the serialized data.
      */
-    int getDurableLength() {
-        return durableLength;
-    }
+    int getDurableLength();
 
     /**
      * Write the durable to a byte buffer.
      *
      * @param byteBuffer The byte buffer.
      */
-    public void writeDurable(ByteBuffer byteBuffer) {
+    default void writeDurable(ByteBuffer byteBuffer) {
         if (isNil()) {
-            byteBuffer.putChar(factory.nilVersionedListId);
+            byteBuffer.putChar(getFactory().nilVersionedListId);
             return;
         }
-        byteBuffer.putChar(factory.id);
+        byteBuffer.putChar(getFactory().id);
         serialize(byteBuffer);
     }
 
@@ -500,21 +460,10 @@ public class VersionedListNode implements Releasable {
      *
      * @param byteBuffer Where the serialized data is to be placed.
      */
-    public void serialize(ByteBuffer byteBuffer) {
-        if (this.byteBuffer == null) {
-            byteBuffer.putInt(getDurableLength());
-            getData().serialize(byteBuffer);
-            return;
-        }
-        ByteBuffer bb = byteBuffer.slice();
-        bb.limit(durableLength - 6);
-        byteBuffer.put(this.byteBuffer.slice());
-        this.byteBuffer = bb;
-        dataReference.set(null); //limit memory footprint, plugs memory leak.
-    }
+    void serialize(ByteBuffer byteBuffer);
 
     @Override
-    public void release()
+    default void release()
             throws IOException {
         getData().release();
     }

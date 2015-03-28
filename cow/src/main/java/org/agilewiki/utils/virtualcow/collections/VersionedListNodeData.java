@@ -104,7 +104,7 @@ public class VersionedListNodeData implements Releasable {
         this.leftNode = leftNode;
         this.value = value;
         this.rightNode = rightNode;
-        this.valueFactory = thisNode.factory.factoryRegistry.getImmutableFactory(value);
+        this.valueFactory = thisNode.getFactory().factoryRegistry.getImmutableFactory(value);
     }
 
     /**
@@ -119,7 +119,7 @@ public class VersionedListNodeData implements Releasable {
         totalSize = byteBuffer.getInt();
         created = byteBuffer.getLong();
         deleted = byteBuffer.getLong();
-        FactoryRegistry registry = thisNode.factory.factoryRegistry;
+        FactoryRegistry registry = thisNode.getFactory().factoryRegistry;
         ImmutableFactory f = registry.readId(byteBuffer);
         leftNode = (VersionedListNode) f.deserialize(byteBuffer);
         valueFactory = registry.readId(byteBuffer);
@@ -438,8 +438,8 @@ public class VersionedListNodeData implements Releasable {
             return thisNode;
         VersionedListNodeData leftData = leftNode.getData();
         if (leftData.level == level) {
-            VersionedListNode t = new VersionedListNode(
-                    thisNode.factory,
+            VersionedListNode t = new VersionedListNodeImpl(
+                    thisNode.getFactory(),
                     level,
                     totalSize - leftData.totalSize + leftData.leftNode.totalSize(),
                     created,
@@ -447,8 +447,8 @@ public class VersionedListNodeData implements Releasable {
                     leftData.rightNode,
                     value,
                     rightNode);
-            return new VersionedListNode(
-                    thisNode.factory,
+            return new VersionedListNodeImpl(
+                    thisNode.getFactory(),
                     leftData.level,
                     totalSize,
                     leftData.created,
@@ -472,8 +472,8 @@ public class VersionedListNodeData implements Releasable {
         if (rightData.rightNode.isNil())
             return thisNode;
         if (level == rightData.rightNode.getData().level) {
-            VersionedListNode t = new VersionedListNode(
-                    thisNode.factory,
+            VersionedListNode t = new VersionedListNodeImpl(
+                    thisNode.getFactory(),
                     level,
                     totalSize - rightData.totalSize + rightData.leftNode.totalSize(),
                     created,
@@ -481,8 +481,8 @@ public class VersionedListNodeData implements Releasable {
                     leftNode,
                     value,
                     rightData.leftNode);
-            VersionedListNode r = new VersionedListNode(
-                    thisNode.factory,
+            VersionedListNode r = new VersionedListNodeImpl(
+                    thisNode.getFactory(),
                     rightData.level + 1,
                     totalSize,
                     rightData.created,
@@ -510,8 +510,8 @@ public class VersionedListNodeData implements Releasable {
         int leftSize = leftNode.totalSize();
         VersionedListNode t = thisNode;
         if (ndx <= leftSize) {
-            t = new VersionedListNode(
-                    thisNode.factory,
+            t = new VersionedListNodeImpl(
+                    thisNode.getFactory(),
                     level,
                     totalSize + 1,
                     this.created,
@@ -520,8 +520,8 @@ public class VersionedListNodeData implements Releasable {
                     this.value,
                     rightNode);
         } else {
-            t = new VersionedListNode(
-                    thisNode.factory,
+            t = new VersionedListNodeImpl(
+                    thisNode.getFactory(),
                     level,
                     totalSize + 1,
                     this.created,
@@ -546,8 +546,8 @@ public class VersionedListNodeData implements Releasable {
         int leftSize = leftNode.totalSize();
         if (ndx == leftSize) {
             if (exists(time))
-                return new VersionedListNode(
-                        thisNode.factory,
+                return new VersionedListNodeImpl(
+                        thisNode.getFactory(),
                         level,
                         totalSize,
                         created,
@@ -561,8 +561,8 @@ public class VersionedListNodeData implements Releasable {
             VersionedListNode n = leftNode.remove(ndx, time);
             if (leftNode == n)
                 return thisNode;
-            return new VersionedListNode(
-                    thisNode.factory,
+            return new VersionedListNodeImpl(
+                    thisNode.getFactory(),
                     level,
                     totalSize,
                     created,
@@ -574,8 +574,8 @@ public class VersionedListNodeData implements Releasable {
         VersionedListNode n = rightNode.remove(ndx - leftSize - 1, time);
         if (rightNode == n)
             return thisNode;
-        return new VersionedListNode(
-                thisNode.factory,
+        return new VersionedListNodeImpl(
+                thisNode.getFactory(),
                 level,
                 totalSize,
                 created,
@@ -615,7 +615,15 @@ public class VersionedListNodeData implements Releasable {
         VersionedListNode rn = rightNode.clearList(time);
         if (ln == leftNode && rn == rightNode && !exists(time))
             return thisNode;
-        return new VersionedListNode(thisNode.factory, level, totalSize, created, time, ln, value, rn);
+        return new VersionedListNodeImpl(
+                thisNode.getFactory(),
+                level,
+                totalSize,
+                created,
+                time,
+                ln,
+                value,
+                rn);
     }
 
     @Override
