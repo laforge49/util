@@ -11,61 +11,19 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * An immutable map of versioned lists.
  */
-public class VersionedMapNode implements Releasable {
+public interface VersionedMapNode extends Releasable {
 
-    public final VersionedMapNodeFactory factory;
+    VersionedMapNodeFactory getFactory();
 
-    protected final AtomicReference<VersionedMapNodeData> dataReference = new AtomicReference<>();
-    protected final int durableLength;
-    protected ByteBuffer byteBuffer;
+    VersionedMapNodeData getData();
 
-    protected VersionedMapNode(VersionedMapNodeFactory factory) {
-        this.factory = factory;
-        dataReference.set(new VersionedMapNodeData(this));
-        durableLength = 2;
+    default boolean isNil() {
+        return this == getFactory().nilVersionedMap;
     }
 
-    protected VersionedMapNode(VersionedMapNodeFactory factory, ByteBuffer byteBuffer) {
-        this.factory = factory;
-        durableLength = byteBuffer.getInt();
-        this.byteBuffer = byteBuffer.slice();
-        this.byteBuffer.limit(durableLength - 6);
-        byteBuffer.position(byteBuffer.position() + durableLength - 6);
-    }
-
-    protected VersionedMapNode(VersionedMapNodeFactory factory,
-                               int level,
-                               VersionedMapNode leftNode,
-                               VersionedListNode listNode,
-                               VersionedMapNode rightNode,
-                               Comparable key) {
-        this.factory = factory;
-        VersionedMapNodeData data = new VersionedMapNodeData(
-                this,
-                level,
-                leftNode,
-                listNode,
-                rightNode,
-                key);
-        durableLength = data.getDurableLength();
-        dataReference.set(data);
-    }
-
-    protected VersionedMapNodeData getData() {
-        VersionedMapNodeData data = dataReference.get();
-        if (data != null)
-            return data;
-        dataReference.compareAndSet(null, new VersionedMapNodeData(this, byteBuffer.slice()));
-        return dataReference.get();
-    }
-
-    protected boolean isNil() {
-        return this == factory.nilVersionedMap;
-    }
-
-    public VersionedListNode getList(Comparable key) {
+    default VersionedListNode getList(Comparable key) {
         if (isNil())
-            return factory.nilVersionedList;
+            return getFactory().nilVersionedList;
         return getData().getList(key);
     }
 
@@ -76,7 +34,7 @@ public class VersionedMapNode implements Releasable {
      * @param key The list identifier.
      * @return The count of all the values in the list.
      */
-    public int totalSize(Comparable key) {
+    default int totalSize(Comparable key) {
         return getList(key).totalSize();
     }
 
@@ -86,7 +44,7 @@ public class VersionedMapNode implements Releasable {
      * @param key The key for the list.
      * @return A list accessor for the latest time.
      */
-    public ListAccessor listAccessor(Comparable key) {
+    default ListAccessor listAccessor(Comparable key) {
         return getList(key).listAccessor(key);
     }
 
@@ -97,7 +55,7 @@ public class VersionedMapNode implements Releasable {
      * @param time The time of the query.
      * @return A list accessor for the given time.
      */
-    public ListAccessor listAccessor(Comparable key, long time) {
+    default ListAccessor listAccessor(Comparable key, long time) {
         return getList(key).listAccessor(key, time);
     }
 
@@ -109,7 +67,7 @@ public class VersionedMapNode implements Releasable {
      * @param time  The time the value is added.
      * @return The revised root node.
      */
-    public VersionedMapNode add(Comparable key, Object value, long time) {
+    default VersionedMapNode add(Comparable key, Object value, long time) {
         return add(key, -1, value, time);
     }
 
@@ -122,16 +80,17 @@ public class VersionedMapNode implements Releasable {
      * @param time  The time the value is added.
      * @return The revised root node.
      */
-    public VersionedMapNode add(Comparable key, int ndx, Object value, long time) {
+    default VersionedMapNode add(Comparable key, int ndx, Object value, long time) {
         return add(key, ndx, value, time, Long.MAX_VALUE);
     }
 
-    protected VersionedMapNode add(Comparable key, int ndx, Object value, long created, long deleted) {
+    default VersionedMapNode add(Comparable key, int ndx, Object value, long created, long deleted) {
         if (key == null)
             throw new IllegalArgumentException("key may not be null");
         if (isNil()) {
+            VersionedMapNodeFactory factory = getFactory();
             VersionedListNode listNode = factory.nilVersionedList.add(ndx, value, created, deleted);
-            return new VersionedMapNode(factory, 1, factory.nilVersionedMap, listNode, factory.nilVersionedMap, key);
+            return new VersionedMapNodeImpl(factory, 1, factory.nilVersionedMap, listNode, factory.nilVersionedMap, key);
         }
         return getData().add(key, ndx, value, created, deleted);
     }
@@ -144,7 +103,7 @@ public class VersionedMapNode implements Releasable {
      * @param time The time of the deletion.
      * @return The revised node.
      */
-    public VersionedMapNode remove(Comparable key, int ndx, long time) {
+    default VersionedMapNode remove(Comparable key, int ndx, long time) {
         if (isNil())
             return this;
         return getData().remove(key, ndx, time);
@@ -157,7 +116,7 @@ public class VersionedMapNode implements Releasable {
      * @param time The time of the deletion.
      * @return The revised node.
      */
-    public VersionedMapNode clearList(Comparable key, long time) {
+    default VersionedMapNode clearList(Comparable key, long time) {
         if (isNil())
             return this;
         return getData().clearList(key, time);
@@ -171,12 +130,13 @@ public class VersionedMapNode implements Releasable {
      * @param time  The time of the replacement.
      * @return The revised node.
      */
-    public VersionedMapNode set(Comparable key, Object value, long time) {
+    default VersionedMapNode set(Comparable key, Object value, long time) {
         if (value == null)
             throw new IllegalArgumentException("value may not be null");
         if (isNil()) {
+            VersionedMapNodeFactory factory = getFactory();
             VersionedListNode listNode = factory.nilVersionedList.add(value, time);
-            return new VersionedMapNode(factory, 1, factory.nilVersionedMap, listNode, factory.nilVersionedMap, key);
+            return new VersionedMapNodeImpl(factory, 1, factory.nilVersionedMap, listNode, factory.nilVersionedMap, key);
         }
         return getData().set(key, value, time);
     }
@@ -187,7 +147,7 @@ public class VersionedMapNode implements Releasable {
      * @param time The time of the deletion.
      * @return The currently empty versioned map.
      */
-    public VersionedMapNode clearMap(long time) {
+    default VersionedMapNode clearMap(long time) {
         if (isNil())
             return this;
         return getData().clearMap(time);
@@ -198,7 +158,7 @@ public class VersionedMapNode implements Releasable {
      *
      * @return A complete, but shallow copy of the list.
      */
-    public VersionedListNode copyList(Comparable key) {
+    default VersionedListNode copyList(Comparable key) {
         return getList(key).copyList();
     }
 
@@ -209,7 +169,7 @@ public class VersionedMapNode implements Releasable {
      * @param time The given time.
      * @return A shortened copy of the list without some historical values.
      */
-    public VersionedListNode copyList(Comparable key, long time) {
+    default VersionedListNode copyList(Comparable key, long time) {
         return getList(key).copyList(time);
     }
 
@@ -219,7 +179,7 @@ public class VersionedMapNode implements Releasable {
      * @param time The time of the query.
      * @return A set of the keys with content at the time of the query.
      */
-    public NavigableSet<Comparable> flatKeys(long time) {
+    default NavigableSet<Comparable> flatKeys(long time) {
         NavigableSet keys = new TreeSet<>();
         getData().flatKeys(keys, time);
         return keys;
@@ -231,7 +191,7 @@ public class VersionedMapNode implements Releasable {
      * @param time The time of the query.
      * @return A map of lists.
      */
-    public NavigableMap<Comparable, List> flatMap(long time) {
+    default NavigableMap<Comparable, List> flatMap(long time) {
         NavigableMap<Comparable, List> map = new TreeMap<Comparable, List>();
         getData().flatMap(map, time);
         return map;
@@ -242,7 +202,7 @@ public class VersionedMapNode implements Releasable {
      *
      * @return A complete, but shallow copy of the list.
      */
-    public VersionedMapNode copyMap() {
+    default VersionedMapNode copyMap() {
         return copyMap(0L);
     }
 
@@ -253,8 +213,8 @@ public class VersionedMapNode implements Releasable {
      * @param time The given time.
      * @return A shortened copy of the map without some historical values.
      */
-    public VersionedMapNode copyMap(long time) {
-        return getData().copyMap(factory.nilVersionedMap, time);
+    default VersionedMapNode copyMap(long time) {
+        return getData().copyMap(getFactory().nilVersionedMap, time);
     }
 
     /**
@@ -262,7 +222,7 @@ public class VersionedMapNode implements Releasable {
      *
      * @return The count of all the keys in the map.
      */
-    public int totalSize() {
+    default int totalSize() {
         if (isNil())
             return 0;
         return getData().totalSize();
@@ -274,7 +234,7 @@ public class VersionedMapNode implements Releasable {
      * @param time The time of the query.
      * @return The current size of the map.
      */
-    public int size(long time) {
+    default int size(long time) {
         if (isNil())
             return 0;
         return getData().size(time);
@@ -286,7 +246,7 @@ public class VersionedMapNode implements Releasable {
      * @param time The time of the query.
      * @return The smallest key, or null.
      */
-    public Comparable firstKey(long time) {
+    default Comparable firstKey(long time) {
         if (isNil())
             return null;
         return getData().firstKey(time);
@@ -298,7 +258,7 @@ public class VersionedMapNode implements Releasable {
      * @param time The time of the query.
      * @return The largest key, or null.
      */
-    public Comparable lastKey(long time) {
+    default Comparable lastKey(long time) {
         if (isNil())
             return null;
         return getData().lastKey(time);
@@ -311,7 +271,7 @@ public class VersionedMapNode implements Releasable {
      * @param time The time of the query.
      * @return The next greater key with content at the time of the query, or null.
      */
-    public Comparable higherKey(Comparable key, long time) {
+    default Comparable higherKey(Comparable key, long time) {
         if (isNil())
             return null;
         return getData().higherKey(key, time);
@@ -324,7 +284,7 @@ public class VersionedMapNode implements Releasable {
      * @param time The time of the query.
      * @return The key greater than or equal to the given key, or null.
      */
-    public Comparable ceilingKey(Comparable key, long time) {
+    default Comparable ceilingKey(Comparable key, long time) {
         if (isNil())
             return null;
         return getData().ceilingKey(key, time);
@@ -337,7 +297,7 @@ public class VersionedMapNode implements Releasable {
      * @param time The time of the query.
      * @return The next smaller key with content at the time of the query, or null.
      */
-    public Comparable lowerKey(Comparable key, long time) {
+    default Comparable lowerKey(Comparable key, long time) {
         if (isNil())
             return null;
         return getData().lowerKey(key, time);
@@ -350,7 +310,7 @@ public class VersionedMapNode implements Releasable {
      * @param time The time of the query.
      * @return The key smaller than or equal to the given key, or null.
      */
-    public Comparable floorKey(Comparable key, long time) {
+    default Comparable floorKey(Comparable key, long time) {
         if (isNil())
             return null;
         return getData().floorKey(key, time);
@@ -362,7 +322,7 @@ public class VersionedMapNode implements Releasable {
      * @param time The time of the query.
      * @return The iterator.
      */
-    public Iterator<ListAccessor> iterator(long time) {
+    default Iterator<ListAccessor> iterator(long time) {
         return new Iterator<ListAccessor>() {
             Comparable last = null;
 
@@ -389,7 +349,7 @@ public class VersionedMapNode implements Releasable {
      *
      * @return A map accessor for the latest time.
      */
-    public MapAccessor mapAccessor() {
+    default MapAccessor mapAccessor() {
         return mapAccessor(FactoryRegistry.MAX_TIME);
     }
 
@@ -399,7 +359,7 @@ public class VersionedMapNode implements Releasable {
      * @param time The time of the query.
      * @return A map accessor for the given time.
      */
-    public MapAccessor mapAccessor(long time) {
+    default MapAccessor mapAccessor(long time) {
         return new MapAccessor() {
 
             @Override
@@ -470,21 +430,19 @@ public class VersionedMapNode implements Releasable {
      *
      * @return The size in bytes of the serialized data.
      */
-    public int getDurableLength() {
-        return durableLength;
-    }
+    int getDurableLength();
 
     /**
      * Write the durable to a byte buffer.
      *
      * @param byteBuffer The byte buffer.
      */
-    public void writeDurable(ByteBuffer byteBuffer) {
+    default void writeDurable(ByteBuffer byteBuffer) {
         if (isNil()) {
-            byteBuffer.putChar(factory.nilVersionedMapId);
+            byteBuffer.putChar(getFactory().nilVersionedMapId);
             return;
         }
-        byteBuffer.putChar(factory.id);
+        byteBuffer.putChar(getFactory().id);
         serialize(byteBuffer);
     }
 
@@ -493,21 +451,10 @@ public class VersionedMapNode implements Releasable {
      *
      * @param byteBuffer Where the serialized data is to be placed.
      */
-    public void serialize(ByteBuffer byteBuffer) {
-        if (this.byteBuffer == null) {
-            byteBuffer.putInt(getDurableLength());
-            getData().serialize(byteBuffer);
-            return;
-        }
-        ByteBuffer bb = byteBuffer.slice();
-        bb.limit(durableLength - 2);
-        byteBuffer.put(this.byteBuffer.slice());
-        this.byteBuffer = bb;
-        dataReference.set(null); //limit memory footprint, plugs memory leak.
-    }
+    void serialize(ByteBuffer byteBuffer);
 
     @Override
-    public void release()
+    default void release()
             throws IOException {
         getData().release();
     }

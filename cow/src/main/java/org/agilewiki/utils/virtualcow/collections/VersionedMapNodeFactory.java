@@ -24,7 +24,7 @@ public class VersionedMapNodeFactory extends BaseFactory {
         this.nilVersionedMapId = nilVersionedMapId;
         this.nilVersionedList = nilVersionedList;
         new NilVersionedMapNodeFactory(this, nilVersionedMapId);
-        nilVersionedMap = new VersionedMapNode(this);
+        nilVersionedMap = new VersionedMapNodeImpl(this);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class VersionedMapNodeFactory extends BaseFactory {
 
     @Override
     public Class getImmutableClass() {
-        return VersionedMapNode.class;
+        return VersionedMapNodeImpl.class;
     }
 
     @Override
@@ -51,6 +51,6 @@ public class VersionedMapNodeFactory extends BaseFactory {
 
     @Override
     public VersionedMapNode deserialize(ByteBuffer byteBuffer) {
-        return new VersionedMapNode(this, byteBuffer);
+        return new VersionedMapNodeImpl(this, byteBuffer);
     }
 }
