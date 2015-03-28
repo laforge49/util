@@ -24,7 +24,7 @@ public class MapNodeFactory extends BaseFactory {
         this.nilMapId = nilMapId;
         this.nilList = nilList;
         new NilMapNodeFactory(this, nilMapId);
-        nilMap = new MapNode(this);
+        nilMap = new MapNodeImpl(this);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class MapNodeFactory extends BaseFactory {
 
     @Override
     public Class getImmutableClass() {
-        return MapNode.class;
+        return MapNodeImpl.class;
     }
 
     @Override
@@ -51,6 +51,6 @@ public class MapNodeFactory extends BaseFactory {
 
     @Override
     public MapNode deserialize(ByteBuffer byteBuffer) {
-        return new MapNode(this, byteBuffer);
+        return new MapNodeImpl(this, byteBuffer);
     }
 }

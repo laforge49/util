@@ -61,7 +61,7 @@ public class MapNodeData implements Releasable {
         this.thisNode = thisNode;
         this.level = 0;
         this.leftNode = thisNode;
-        this.listNode = thisNode.factory.nilList;
+        this.listNode = thisNode.getFactory().nilList;
         this.rightNode = thisNode;
         key = null;
 
@@ -90,7 +90,7 @@ public class MapNodeData implements Releasable {
         this.listNode = listNode;
         this.rightNode = rightNode;
         this.key = key;
-        keyFactory = thisNode.factory.factoryRegistry.getImmutableFactory(key);
+        keyFactory = thisNode.getFactory().factoryRegistry.getImmutableFactory(key);
     }
 
     /**
@@ -102,7 +102,7 @@ public class MapNodeData implements Releasable {
     public MapNodeData(MapNode thisNode, ByteBuffer byteBuffer) {
         this.thisNode = thisNode;
         level = byteBuffer.getInt();
-        FactoryRegistry factoryRegistry = thisNode.factory.factoryRegistry;
+        FactoryRegistry factoryRegistry = thisNode.getFactory().factoryRegistry;
         ImmutableFactory f = factoryRegistry.readId(byteBuffer);
         leftNode = (MapNode) f.deserialize(byteBuffer);
         f = factoryRegistry.readId(byteBuffer);
@@ -149,15 +149,15 @@ public class MapNodeData implements Releasable {
             return thisNode;
         MapNodeData leftData = leftNode.getData();
         if (leftData.level == level) {
-            MapNode t = new MapNode(
-                    thisNode.factory,
+            MapNode t = new MapNodeImpl(
+                    thisNode.getFactory(),
                     level,
                     leftData.rightNode,
                     listNode,
                     rightNode,
                     key);
-            return new MapNode(
-                    thisNode.factory,
+            return new MapNodeImpl(
+                    thisNode.getFactory(),
                     leftData.level,
                     leftData.leftNode,
                     leftData.listNode,
@@ -179,15 +179,15 @@ public class MapNodeData implements Releasable {
         if (rightData.rightNode.isNil())
             return thisNode;
         if (level == rightData.rightNode.getData().level) {
-            MapNode t = new MapNode(
-                    thisNode.factory,
+            MapNode t = new MapNodeImpl(
+                    thisNode.getFactory(),
                     level,
                     leftNode,
                     listNode,
                     rightData.leftNode,
                     key);
-            MapNode r = new MapNode(
-                    thisNode.factory,
+            MapNode r = new MapNodeImpl(
+                    thisNode.getFactory(),
                     rightData.level + 1,
                     t,
                     rightData.listNode,
@@ -210,24 +210,24 @@ public class MapNodeData implements Releasable {
         MapNode t;
         int c = key.compareTo(this.key);
         if (c < 0) {
-            t = new MapNode(
-                    thisNode.factory,
+            t = new MapNodeImpl(
+                    thisNode.getFactory(),
                     level,
                     leftNode.add(key, ndx, value),
                     listNode,
                     rightNode,
                     this.key);
         } else if (c == 0) {
-            return new MapNode(
-                    thisNode.factory,
+            return new MapNodeImpl(
+                    thisNode.getFactory(),
                     level,
                     leftNode,
                     listNode.add(ndx, value),
                     rightNode,
                     this.key);
         } else {
-            t = new MapNode(
-                    thisNode.factory,
+            t = new MapNodeImpl(
+                    thisNode.getFactory(),
                     level,
                     leftNode,
                     listNode,
@@ -263,8 +263,8 @@ public class MapNodeData implements Releasable {
         if (shouldBe < level) {
             MapNode r;
             if (shouldBe < rd.level)
-                r = new MapNode(
-                        thisNode.factory,
+                r = new MapNodeImpl(
+                        thisNode.getFactory(),
                         shouldBe,
                         rd.leftNode,
                         rd.listNode,
@@ -272,8 +272,8 @@ public class MapNodeData implements Releasable {
                         rd.key);
             else
                 r = rightNode;
-            return new MapNode(
-                    thisNode.factory,
+            return new MapNodeImpl(
+                    thisNode.getFactory(),
                     shouldBe,
                     leftNode,
                     listNode,
@@ -287,31 +287,32 @@ public class MapNodeData implements Releasable {
             throws IOException {
         if (isNil())
             return thisNode;
+        MapNodeFactory factory = thisNode.getFactory();
         int c = key.compareTo(this.key);
         MapNode t = thisNode;
         if (c > 0) {
             MapNode r = rightNode.remove(key);
             if (r != rightNode)
-                t = new MapNode(thisNode.factory, level, leftNode, listNode, r, this.key);
+                t = new MapNodeImpl(factory, level, leftNode, listNode, r, this.key);
         } else if (c < 0) {
             MapNode l = leftNode.remove(key);
             if (l != leftNode)
-                t = new MapNode(thisNode.factory, level, l, listNode, rightNode, this.key);
+                t = new MapNodeImpl(factory, level, l, listNode, rightNode, this.key);
         } else {
             if (listNode instanceof Releasable)
                 ((Releasable) listNode).release();
-            MapNode nil = thisNode.factory.nilMap;
+            MapNode nil = factory.nilMap;
             if (leftNode.isNil() && rightNode.isNil()) {
                 return nil;
             }
             if (leftNode.isNil()) {
                 MapNode l = successor();
                 MapNodeData ld = l.getData();
-                t = new MapNode(thisNode.factory, level, nil, ld.listNode, rightNode.remove(ld.key), ld.key);
+                t = new MapNodeImpl(factory, level, nil, ld.listNode, rightNode.remove(ld.key), ld.key);
             } else {
                 MapNode l = predecessor();
                 MapNodeData ld = l.getData();
-                t = new MapNode(thisNode.factory, level, leftNode.remove(ld.key), ld.listNode, rightNode, ld.key);
+                t = new MapNodeImpl(factory, level, leftNode.remove(ld.key), ld.listNode, rightNode, ld.key);
             }
         }
         t = t.getData().decreaseLevel().getData().skew();
@@ -321,17 +322,17 @@ public class MapNodeData implements Releasable {
             MapNodeData rd = r.getData();
             MapNode rr = rd.rightNode.getData().skew();
             if (rd.rightNode != rr) {
-                r = new MapNode(thisNode.factory, rd.level, rd.leftNode, rd.listNode, rr, rd.key);
+                r = new MapNodeImpl(factory, rd.level, rd.leftNode, rd.listNode, rr, rd.key);
             }
         }
         if (r != td.rightNode) {
-            t = new MapNode(thisNode.factory, td.level, td.leftNode, td.listNode, r, td.key);
+            t = new MapNodeImpl(factory, td.level, td.leftNode, td.listNode, r, td.key);
         }
         t = t.getData().split();
         r = t.getData().rightNode.getData().split();
         td = t.getData();
         if (r != td.rightNode) {
-            t = new MapNode(thisNode.factory, td.level, td.leftNode, td.listNode, r, td.key);
+            t = new MapNodeImpl(factory, td.level, td.leftNode, td.listNode, r, td.key);
         }
         return t;
     }
@@ -354,20 +355,20 @@ public class MapNodeData implements Releasable {
             MapNode n = leftNode.remove(key, ndx);
             if (n == leftNode)
                 return thisNode;
-            return new MapNode(thisNode.factory, level, n, listNode, rightNode, this.key);
+            return new MapNodeImpl(thisNode.getFactory(), level, n, listNode, rightNode, this.key);
         }
         if (c > 0) {
             MapNode n = rightNode.remove(key, ndx);
             if (n == rightNode)
                 return thisNode;
-            return new MapNode(thisNode.factory, level, leftNode, listNode, n, this.key);
+            return new MapNodeImpl(thisNode.getFactory(), level, leftNode, listNode, n, this.key);
         }
         ListNode n = listNode.remove(ndx);
         if (n == listNode)
             return thisNode;
         if (n.isNil())
             return remove(key);
-        return new MapNode(thisNode.factory, level, leftNode, n, rightNode, this.key);
+        return new MapNodeImpl(thisNode.getFactory(), level, leftNode, n, rightNode, this.key);
     }
 
     /**
@@ -381,13 +382,13 @@ public class MapNodeData implements Releasable {
         int c = key.compareTo(this.key);
         if (c < 0) {
             MapNode n = leftNode.set(key, value);
-            return new MapNode(thisNode.factory, level, n, listNode, rightNode, this.key);
+            return new MapNodeImpl(thisNode.getFactory(), level, n, listNode, rightNode, this.key);
         } else if (c == 0) {
-            ListNode n = thisNode.factory.nilList.add(value);
-            return new MapNode(thisNode.factory, level, leftNode, n, rightNode, this.key);
+            ListNode n = thisNode.getFactory().nilList.add(value);
+            return new MapNodeImpl(thisNode.getFactory(), level, leftNode, n, rightNode, this.key);
         } else {
             MapNode n = rightNode.set(key, value);
-            return new MapNode(thisNode.factory, level, leftNode, listNode, n, this.key);
+            return new MapNodeImpl(thisNode.getFactory(), level, leftNode, listNode, n, this.key);
         }
     }
 
@@ -422,20 +423,21 @@ public class MapNodeData implements Releasable {
     protected MapNode addList(Comparable key, ListNode listNode) {
         if (listNode.isNil())
             return thisNode;
+        MapNodeFactory factory = thisNode.getFactory();
         if (isNil()) {
-            return new MapNode(
-                    thisNode.factory,
+            return new MapNodeImpl(
+                    factory,
                     1,
-                    thisNode.factory.nilMap,
+                    factory.nilMap,
                     listNode,
-                    thisNode.factory.nilMap,
+                    factory.nilMap,
                     key);
         }
         MapNode t;
         int c = key.compareTo(this.key);
         if (c < 0) {
-            t = new MapNode(
-                    thisNode.factory,
+            t = new MapNodeImpl(
+                    factory,
                     level,
                     leftNode.getData().addList(key, listNode),
                     listNode,
@@ -444,8 +446,8 @@ public class MapNodeData implements Releasable {
         } else if (c == 0) {
             throw new IllegalArgumentException("duplicate key not supported");
         } else {
-            t = new MapNode(
-                    thisNode.factory,
+            t = new MapNodeImpl(
+                    factory,
                     level,
                     leftNode,
                     listNode,

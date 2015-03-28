@@ -11,61 +11,19 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * An immutable map of versioned lists.
  */
-public class MapNode implements Releasable {
+public interface MapNode extends Releasable {
 
-    public final MapNodeFactory factory;
+    MapNodeFactory getFactory();
 
-    protected final AtomicReference<MapNodeData> dataReference = new AtomicReference<>();
-    protected final int durableLength;
-    protected ByteBuffer byteBuffer;
+    MapNodeData getData();
 
-    protected MapNode(MapNodeFactory factory) {
-        this.factory = factory;
-        dataReference.set(new MapNodeData(this));
-        durableLength = 2;
+    default boolean isNil() {
+        return this == getFactory().nilMap;
     }
 
-    protected MapNode(MapNodeFactory factory, ByteBuffer byteBuffer) {
-        this.factory = factory;
-        durableLength = byteBuffer.getInt();
-        this.byteBuffer = byteBuffer.slice();
-        this.byteBuffer.limit(durableLength - 6);
-        byteBuffer.position(byteBuffer.position() + durableLength - 6);
-    }
-
-    protected MapNode(MapNodeFactory factory,
-                      int level,
-                      MapNode leftNode,
-                      ListNode listNode,
-                      MapNode rightNode,
-                      Comparable key) {
-        this.factory = factory;
-        MapNodeData data = new MapNodeData(
-                this,
-                level,
-                leftNode,
-                listNode,
-                rightNode,
-                key);
-        durableLength = data.getDurableLength();
-        dataReference.set(data);
-    }
-
-    protected MapNodeData getData() {
-        MapNodeData data = dataReference.get();
-        if (data != null)
-            return data;
-        dataReference.compareAndSet(null, new MapNodeData(this, byteBuffer.slice()));
-        return dataReference.get();
-    }
-
-    protected boolean isNil() {
-        return this == factory.nilMap;
-    }
-
-    public ListNode getList(Comparable key) {
+    default ListNode getList(Comparable key) {
         if (isNil())
-            return factory.nilList;
+            return getFactory().nilList;
         return getData().getList(key);
     }
 
@@ -76,7 +34,7 @@ public class MapNode implements Releasable {
      * @param key The list identifier.
      * @return The count of all the values in the list.
      */
-    public int totalSize(Comparable key) {
+    default int totalSize(Comparable key) {
         return getList(key).totalSize();
     }
 
@@ -86,7 +44,7 @@ public class MapNode implements Releasable {
      * @param key The key for the list.
      * @return A list accessor.
      */
-    public ListAccessor listAccessor(Comparable key) {
+    default ListAccessor listAccessor(Comparable key) {
         return getList(key).listAccessor(key);
     }
 
@@ -97,7 +55,7 @@ public class MapNode implements Releasable {
      * @param value The value to be added.
      * @return The revised root node.
      */
-    public MapNode add(Comparable key, Object value) {
+    default MapNode add(Comparable key, Object value) {
         return add(key, -1, value);
     }
 
@@ -109,12 +67,13 @@ public class MapNode implements Releasable {
      * @param value The value to be added.
      * @return The revised root node.
      */
-    public MapNode add(Comparable key, int ndx, Object value) {
+    default MapNode add(Comparable key, int ndx, Object value) {
         if (key == null)
             throw new IllegalArgumentException("key may not be null");
         if (isNil()) {
+            MapNodeFactory factory = getFactory();
             ListNode listNode = factory.nilList.add(ndx, value);
-            return new MapNode(factory, 1, factory.nilMap, listNode, factory.nilMap, key);
+            return new MapNodeImpl(factory, 1, factory.nilMap, listNode, factory.nilMap, key);
         }
         return getData().add(key, ndx, value);
     }
@@ -126,7 +85,7 @@ public class MapNode implements Releasable {
      * @param ndx The index of the value.
      * @return The revised node.
      */
-    public MapNode remove(Comparable key, int ndx)
+    default MapNode remove(Comparable key, int ndx)
             throws IOException {
         if (isNil())
             return this;
@@ -139,7 +98,7 @@ public class MapNode implements Releasable {
      * @param key The key of the list.
      * @return The revised node.
      */
-    public MapNode remove(Comparable key)
+    default MapNode remove(Comparable key)
             throws IOException {
         if (isNil())
             return this;
@@ -153,12 +112,13 @@ public class MapNode implements Releasable {
      * @param value The new value.
      * @return The revised node.
      */
-    public MapNode set(Comparable key, Object value) {
+    default MapNode set(Comparable key, Object value) {
         if (value == null)
             throw new IllegalArgumentException("value may not be null");
         if (isNil()) {
+            MapNodeFactory factory = getFactory();
             ListNode listNode = factory.nilList.add(value);
-            return new MapNode(factory, 1, factory.nilMap, listNode, factory.nilMap, key);
+            return new MapNodeImpl(factory, 1, factory.nilMap, listNode, factory.nilMap, key);
         }
         return getData().set(key, value);
     }
@@ -168,7 +128,7 @@ public class MapNode implements Releasable {
      *
      * @return A set of the keys.
      */
-    public NavigableSet flatKeys() {
+    default NavigableSet flatKeys() {
         NavigableSet keys = new TreeSet<>();
         getData().flatKeys(keys);
         return keys;
@@ -179,7 +139,7 @@ public class MapNode implements Releasable {
      *
      * @return A map of lists.
      */
-    public NavigableMap<Comparable, List> flatMap() {
+    default NavigableMap<Comparable, List> flatMap() {
         NavigableMap<Comparable, List> map = new TreeMap<Comparable, List>();
         getData().flatMap(map);
         return map;
@@ -190,7 +150,7 @@ public class MapNode implements Releasable {
      *
      * @return The count of all the keys in the map.
      */
-    public int totalSize() {
+    default int totalSize() {
         if (isNil())
             return 0;
         return getData().totalSize();
@@ -201,7 +161,7 @@ public class MapNode implements Releasable {
      *
      * @return The current size of the map.
      */
-    public int size() {
+    default int size() {
         if (isNil())
             return 0;
         return getData().size();
@@ -212,7 +172,7 @@ public class MapNode implements Releasable {
      *
      * @return The smallest key, or null.
      */
-    public Comparable firstKey() {
+    default Comparable firstKey() {
         if (isNil())
             return null;
         return getData().firstKey();
@@ -223,7 +183,7 @@ public class MapNode implements Releasable {
      *
      * @return The largest key, or null.
      */
-    public Comparable lastKey() {
+    default Comparable lastKey() {
         if (isNil())
             return null;
         return getData().lastKey();
@@ -235,7 +195,7 @@ public class MapNode implements Releasable {
      * @param key The given key.
      * @return The next greater key, or null.
      */
-    public Comparable higherKey(Comparable key) {
+    default Comparable higherKey(Comparable key) {
         if (isNil())
             return null;
         return getData().higherKey(key);
@@ -247,7 +207,7 @@ public class MapNode implements Releasable {
      * @param key The given key.
      * @return The key greater than or equal to the given key, or null.
      */
-    public Comparable ceilingKey(Comparable key) {
+    default Comparable ceilingKey(Comparable key) {
         if (isNil())
             return null;
         return getData().ceilingKey(key);
@@ -259,7 +219,7 @@ public class MapNode implements Releasable {
      * @param key The given key.
      * @return The next smaller key, or null.
      */
-    public Comparable lowerKey(Comparable key) {
+    default Comparable lowerKey(Comparable key) {
         if (isNil())
             return null;
         return getData().lowerKey(key);
@@ -271,7 +231,7 @@ public class MapNode implements Releasable {
      * @param key The given key.
      * @return The key smaller than or equal to the given key, or null.
      */
-    public Comparable floorKey(Comparable key) {
+    default Comparable floorKey(Comparable key) {
         if (isNil())
             return null;
         return getData().floorKey(key);
@@ -282,7 +242,7 @@ public class MapNode implements Releasable {
      *
      * @return The iterator.
      */
-    public Iterator<ListAccessor> iterator() {
+    default Iterator<ListAccessor> iterator() {
         return new Iterator<ListAccessor>() {
             Comparable last = null;
 
@@ -309,7 +269,7 @@ public class MapNode implements Releasable {
      *
      * @return A map accessor.
      */
-    public MapAccessor mapAccessor() {
+    default MapAccessor mapAccessor() {
         return new MapAccessor() {
 
             @Override
@@ -380,21 +340,19 @@ public class MapNode implements Releasable {
      *
      * @return The size in bytes of the serialized data.
      */
-    public int getDurableLength() {
-        return durableLength;
-    }
+    int getDurableLength();
 
     /**
      * Write the durable to a byte buffer.
      *
      * @param byteBuffer The byte buffer.
      */
-    public void writeDurable(ByteBuffer byteBuffer) {
+    default void writeDurable(ByteBuffer byteBuffer) {
         if (isNil()) {
-            byteBuffer.putChar(factory.nilMapId);
+            byteBuffer.putChar(getFactory().nilMapId);
             return;
         }
-        byteBuffer.putChar(factory.id);
+        byteBuffer.putChar(getFactory().id);
         serialize(byteBuffer);
     }
 
@@ -403,21 +361,10 @@ public class MapNode implements Releasable {
      *
      * @param byteBuffer Where the serialized data is to be placed.
      */
-    public void serialize(ByteBuffer byteBuffer) {
-        if (this.byteBuffer == null) {
-            byteBuffer.putInt(getDurableLength());
-            getData().serialize(byteBuffer);
-            return;
-        }
-        ByteBuffer bb = byteBuffer.slice();
-        bb.limit(durableLength - 2);
-        byteBuffer.put(this.byteBuffer.slice());
-        this.byteBuffer = bb;
-        dataReference.set(null); //limit memory footprint, plugs memory leak.
-    }
+    public void serialize(ByteBuffer byteBuffer);
 
     @Override
-    public void release()
+    default void release()
             throws IOException {
         getData().release();
     }
