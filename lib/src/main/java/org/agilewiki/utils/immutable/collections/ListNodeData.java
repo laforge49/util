@@ -431,7 +431,7 @@ public class ListNodeData implements Releasable {
                 t = new ListNode(thisNode.factory, level, totalSize - 1, l, value, rightNode);
         } else {
             if (value instanceof Releasable)
-                ((Releasable) value).release();
+                ((Releasable) value).releaseAll();
             ListNode nil = thisNode.factory.nilList;
             if (totalSize == 1) {
                 return nil;
@@ -471,15 +471,15 @@ public class ListNodeData implements Releasable {
     }
 
     @Override
-    public void release()
+    public void releaseAll()
             throws IOException {
         if (isNil())
             return;
         if (leftNode instanceof Releasable)
-            ((Releasable) leftNode).release();
+            ((Releasable) leftNode).releaseAll();
         if (value instanceof Releasable)
-            ((Releasable) value).release();
+            ((Releasable) value).releaseAll();
         if (rightNode instanceof Releasable)
-            ((Releasable) rightNode).release();
+            ((Releasable) rightNode).releaseAll();
     }
 }

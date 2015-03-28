@@ -6,7 +6,6 @@ import org.agilewiki.utils.immutable.Releasable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * An immutable map of versioned lists.
@@ -55,7 +54,8 @@ public interface MapNode extends Releasable {
      * @param value The value to be added.
      * @return The revised root node.
      */
-    default MapNode add(Comparable key, Object value) {
+    default MapNode add(Comparable key, Object value)
+            throws IOException {
         return add(key, -1, value);
     }
 
@@ -67,13 +67,14 @@ public interface MapNode extends Releasable {
      * @param value The value to be added.
      * @return The revised root node.
      */
-    default MapNode add(Comparable key, int ndx, Object value) {
+    default MapNode add(Comparable key, int ndx, Object value)
+            throws IOException{
         if (key == null)
             throw new IllegalArgumentException("key may not be null");
         if (isNil()) {
             MapNodeFactory factory = getFactory();
             ListNode listNode = factory.nilList.add(ndx, value);
-            return new MapNodeImpl(factory, 1, factory.nilMap, listNode, factory.nilMap, key);
+            return getData().replace(1, listNode, key);
         }
         return getData().add(key, ndx, value);
     }
@@ -112,13 +113,14 @@ public interface MapNode extends Releasable {
      * @param value The new value.
      * @return The revised node.
      */
-    default MapNode set(Comparable key, Object value) {
+    default MapNode set(Comparable key, Object value)
+            throws IOException {
         if (value == null)
             throw new IllegalArgumentException("value may not be null");
         if (isNil()) {
             MapNodeFactory factory = getFactory();
             ListNode listNode = factory.nilList.add(value);
-            return new MapNodeImpl(factory, 1, factory.nilMap, listNode, factory.nilMap, key);
+            return getData().replace(1, listNode, key);
         }
         return getData().set(key, value);
     }
@@ -364,8 +366,8 @@ public interface MapNode extends Releasable {
     public void serialize(ByteBuffer byteBuffer);
 
     @Override
-    default void release()
+    default void releaseAll()
             throws IOException {
-        getData().release();
+        getData().releaseAll();
     }
 }

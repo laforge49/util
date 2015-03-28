@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * An immutable versioned list.
@@ -463,8 +462,8 @@ public interface VersionedListNode extends Releasable {
     void serialize(ByteBuffer byteBuffer);
 
     @Override
-    default void release()
+    default void releaseAll()
             throws IOException {
-        getData().release();
+        getData().releaseAll();
     }
 }

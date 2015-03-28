@@ -417,8 +417,8 @@ public class MapNode implements Releasable {
     }
 
     @Override
-    public void release()
+    public void releaseAll()
             throws IOException {
-        getData().release();
+        getData().releaseAll();
     }
 }

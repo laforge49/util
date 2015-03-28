@@ -6,7 +6,6 @@ import org.agilewiki.utils.immutable.Releasable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * An immutable map of versioned lists.
@@ -454,8 +453,8 @@ public interface VersionedMapNode extends Releasable {
     void serialize(ByteBuffer byteBuffer);
 
     @Override
-    default void release()
+    default void releaseAll()
             throws IOException {
-        getData().release();
+        getData().releaseAll();
     }
 }

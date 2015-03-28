@@ -144,25 +144,14 @@ public class MapNodeData implements Releasable {
      *
      * @return Revised root node.
      */
-    public MapNode skew() {
+    public MapNode skew()
+            throws IOException {
         if (isNil() || leftNode.isNil())
             return thisNode;
         MapNodeData leftData = leftNode.getData();
         if (leftData.level == level) {
-            MapNode t = new MapNodeImpl(
-                    thisNode.getFactory(),
-                    level,
-                    leftData.rightNode,
-                    listNode,
-                    rightNode,
-                    key);
-            return new MapNodeImpl(
-                    thisNode.getFactory(),
-                    leftData.level,
-                    leftData.leftNode,
-                    leftData.listNode,
-                    t,
-                    leftData.key);
+            MapNode t = replaceLeft(leftData.rightNode);
+            return leftData.replaceRight(t);
         } else
             return thisNode;
     }
@@ -172,28 +161,16 @@ public class MapNodeData implements Releasable {
      *
      * @return The revised root node.
      */
-    public MapNode split() {
+    public MapNode split()
+            throws IOException {
         if (isNil() || rightNode.isNil())
             return thisNode;
         MapNodeData rightData = rightNode.getData();
         if (rightData.rightNode.isNil())
             return thisNode;
         if (level == rightData.rightNode.getData().level) {
-            MapNode t = new MapNodeImpl(
-                    thisNode.getFactory(),
-                    level,
-                    leftNode,
-                    listNode,
-                    rightData.leftNode,
-                    key);
-            MapNode r = new MapNodeImpl(
-                    thisNode.getFactory(),
-                    rightData.level + 1,
-                    t,
-                    rightData.listNode,
-                    rightData.rightNode,
-                    rightData.key);
-            return r;
+            MapNode t = replaceRight(rightData.leftNode);
+            return rightData.replaceLeft(rightData.level + 1, t);
         }
         return thisNode;
     }
@@ -206,33 +183,16 @@ public class MapNodeData implements Releasable {
      * @param value The value to be added.
      * @return The revised root node.
      */
-    public MapNode add(Comparable key, int ndx, Object value) {
+    public MapNode add(Comparable key, int ndx, Object value)
+            throws IOException {
         MapNode t;
         int c = key.compareTo(this.key);
         if (c < 0) {
-            t = new MapNodeImpl(
-                    thisNode.getFactory(),
-                    level,
-                    leftNode.add(key, ndx, value),
-                    listNode,
-                    rightNode,
-                    this.key);
+            t = replaceLeft(leftNode.add(key, ndx, value));
         } else if (c == 0) {
-            return new MapNodeImpl(
-                    thisNode.getFactory(),
-                    level,
-                    leftNode,
-                    listNode.add(ndx, value),
-                    rightNode,
-                    this.key);
+            return replace(listNode.add(ndx, value));
         } else {
-            t = new MapNodeImpl(
-                    thisNode.getFactory(),
-                    level,
-                    leftNode,
-                    listNode,
-                    rightNode.add(key, ndx, value),
-                    this.key);
+            t = replaceRight(rightNode.add(key, ndx, value));
         }
         return t.getData().skew().getData().split();
     }
@@ -257,28 +217,17 @@ public class MapNodeData implements Releasable {
         return thisNode;
     }
 
-    private MapNode decreaseLevel() {
+    private MapNode decreaseLevel()
+            throws IOException {
         MapNodeData rd = rightNode.getData();
         int shouldBe = min(leftNode.getData().level, rd.level) + 1;
         if (shouldBe < level) {
             MapNode r;
             if (shouldBe < rd.level)
-                r = new MapNodeImpl(
-                        thisNode.getFactory(),
-                        shouldBe,
-                        rd.leftNode,
-                        rd.listNode,
-                        rd.rightNode,
-                        rd.key);
+                r = rd.replace(shouldBe);
             else
                 r = rightNode;
-            return new MapNodeImpl(
-                    thisNode.getFactory(),
-                    shouldBe,
-                    leftNode,
-                    listNode,
-                    r,
-                    key);
+            return replaceRight(shouldBe, r);
         }
         return thisNode;
     }
@@ -293,14 +242,14 @@ public class MapNodeData implements Releasable {
         if (c > 0) {
             MapNode r = rightNode.remove(key);
             if (r != rightNode)
-                t = new MapNodeImpl(factory, level, leftNode, listNode, r, this.key);
+                t = replaceRight(r);
         } else if (c < 0) {
             MapNode l = leftNode.remove(key);
             if (l != leftNode)
-                t = new MapNodeImpl(factory, level, l, listNode, rightNode, this.key);
+                t = replaceLeft(l);
         } else {
             if (listNode instanceof Releasable)
-                ((Releasable) listNode).release();
+                ((Releasable) listNode).releaseAll();
             MapNode nil = factory.nilMap;
             if (leftNode.isNil() && rightNode.isNil()) {
                 return nil;
@@ -308,11 +257,11 @@ public class MapNodeData implements Releasable {
             if (leftNode.isNil()) {
                 MapNode l = successor();
                 MapNodeData ld = l.getData();
-                t = new MapNodeImpl(factory, level, nil, ld.listNode, rightNode.remove(ld.key), ld.key);
+                t = ld.replace(level, nil, rightNode.remove(ld.key));
             } else {
                 MapNode l = predecessor();
                 MapNodeData ld = l.getData();
-                t = new MapNodeImpl(factory, level, leftNode.remove(ld.key), ld.listNode, rightNode, ld.key);
+                t = ld.replaceLeft(level, leftNode.remove(ld.key));
             }
         }
         t = t.getData().decreaseLevel().getData().skew();
@@ -322,17 +271,17 @@ public class MapNodeData implements Releasable {
             MapNodeData rd = r.getData();
             MapNode rr = rd.rightNode.getData().skew();
             if (rd.rightNode != rr) {
-                r = new MapNodeImpl(factory, rd.level, rd.leftNode, rd.listNode, rr, rd.key);
+                r = rd.replaceRight(rr);
             }
         }
         if (r != td.rightNode) {
-            t = new MapNodeImpl(factory, td.level, td.leftNode, td.listNode, r, td.key);
+            t = td.replaceRight(r);
         }
         t = t.getData().split();
         r = t.getData().rightNode.getData().split();
         td = t.getData();
         if (r != td.rightNode) {
-            t = new MapNodeImpl(factory, td.level, td.leftNode, td.listNode, r, td.key);
+            t = td.replaceRight(r);
         }
         return t;
     }
@@ -355,20 +304,20 @@ public class MapNodeData implements Releasable {
             MapNode n = leftNode.remove(key, ndx);
             if (n == leftNode)
                 return thisNode;
-            return new MapNodeImpl(thisNode.getFactory(), level, n, listNode, rightNode, this.key);
+            return replaceLeft(n);
         }
         if (c > 0) {
             MapNode n = rightNode.remove(key, ndx);
             if (n == rightNode)
                 return thisNode;
-            return new MapNodeImpl(thisNode.getFactory(), level, leftNode, listNode, n, this.key);
+            return replaceRight(n);
         }
         ListNode n = listNode.remove(ndx);
         if (n == listNode)
             return thisNode;
         if (n.isNil())
             return remove(key);
-        return new MapNodeImpl(thisNode.getFactory(), level, leftNode, n, rightNode, this.key);
+        return replace(n);
     }
 
     /**
@@ -378,17 +327,19 @@ public class MapNodeData implements Releasable {
      * @param value The new value.
      * @return The revised node.
      */
-    public MapNode set(Comparable key, Object value) {
+    public MapNode set(Comparable key, Object value)
+            throws IOException {
         int c = key.compareTo(this.key);
         if (c < 0) {
             MapNode n = leftNode.set(key, value);
-            return new MapNodeImpl(thisNode.getFactory(), level, n, listNode, rightNode, this.key);
+            return replaceLeft(n);
         } else if (c == 0) {
+            listNode.releaseAll();
             ListNode n = thisNode.getFactory().nilList.add(value);
-            return new MapNodeImpl(thisNode.getFactory(), level, leftNode, n, rightNode, this.key);
+            return replace(n);
         } else {
             MapNode n = rightNode.set(key, value);
-            return new MapNodeImpl(thisNode.getFactory(), level, leftNode, listNode, n, this.key);
+            return replaceRight(n);
         }
     }
 
@@ -420,39 +371,22 @@ public class MapNodeData implements Releasable {
         rightNode.getData().flatMap(map);
     }
 
-    protected MapNode addList(Comparable key, ListNode listNode) {
+    protected MapNode addList(Comparable key, ListNode listNode)
+            throws IOException {
         if (listNode.isNil())
             return thisNode;
         MapNodeFactory factory = thisNode.getFactory();
         if (isNil()) {
-            return new MapNodeImpl(
-                    factory,
-                    1,
-                    factory.nilMap,
-                    listNode,
-                    factory.nilMap,
-                    key);
+            return replace(1, listNode, key);
         }
         MapNode t;
         int c = key.compareTo(this.key);
         if (c < 0) {
-            t = new MapNodeImpl(
-                    factory,
-                    level,
-                    leftNode.getData().addList(key, listNode),
-                    listNode,
-                    rightNode,
-                    key);
+            t = replaceLeft(leftNode.getData().addList(key, listNode));
         } else if (c == 0) {
             throw new IllegalArgumentException("duplicate key not supported");
         } else {
-            t = new MapNodeImpl(
-                    factory,
-                    level,
-                    leftNode,
-                    listNode,
-                    rightNode.getData().addList(key, listNode),
-                    key);
+            t = replaceRight(rightNode.getData().addList(key, listNode));
         }
         return t.getData().skew().getData().split();
     }
@@ -614,15 +548,63 @@ public class MapNodeData implements Releasable {
     }
 
     @Override
-    public void release()
+    public void releaseAll()
             throws IOException {
         if (isNil())
             return;
         if (leftNode instanceof Releasable)
-            ((Releasable) leftNode).release();
+            ((Releasable) leftNode).releaseAll();
         if (listNode instanceof Releasable)
-            ((Releasable) listNode).release();
+            ((Releasable) listNode).releaseAll();
         if (rightNode instanceof Releasable)
-            ((Releasable) rightNode).release();
+            ((Releasable) rightNode).releaseAll();
+    }
+
+    public MapNode replace(int level)
+            throws IOException {
+        thisNode.releaseLocal();
+        return new MapNodeImpl(thisNode.getFactory(), level, leftNode, listNode, rightNode, key);
+    }
+
+    public MapNode replace(ListNode listNode)
+            throws IOException {
+        thisNode.releaseLocal();
+        return new MapNodeImpl(thisNode.getFactory(), level, leftNode, listNode, rightNode, key);
+    }
+
+    public MapNode replace(int level, ListNode listNode, Comparable key)
+            throws IOException {
+        thisNode.releaseLocal();
+        return new MapNodeImpl(thisNode.getFactory(), level, leftNode, listNode, rightNode, key);
+    }
+
+    public MapNode replace(int level, MapNode leftNode, MapNode rightNode)
+            throws IOException {
+        thisNode.releaseLocal();
+        return new MapNodeImpl(thisNode.getFactory(), level, leftNode, listNode, rightNode, key);
+    }
+
+    public MapNode replaceLeft(MapNode leftNode)
+            throws IOException {
+        thisNode.releaseLocal();
+        return new MapNodeImpl(thisNode.getFactory(), level, leftNode, listNode, rightNode, key);
+    }
+
+    public MapNode replaceLeft(int level, MapNode leftNode)
+            throws IOException {
+        thisNode.releaseLocal();
+        return new MapNodeImpl(thisNode.getFactory(), level, leftNode, listNode, rightNode, key);
+    }
+
+    public MapNode replaceRight(MapNode rightNode)
+            throws IOException {
+        thisNode.releaseLocal();
+        return new MapNodeImpl(thisNode.getFactory(), level, leftNode, listNode, rightNode, key);
+    }
+
+    public MapNode replaceRight(int level, MapNode rightNode)
+            throws IOException {
+        thisNode.releaseLocal();
+        return new MapNodeImpl(thisNode.getFactory(), level, leftNode, listNode, rightNode, key);
     }
 }

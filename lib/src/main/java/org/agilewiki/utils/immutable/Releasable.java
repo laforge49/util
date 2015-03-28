@@ -9,6 +9,12 @@ public interface Releasable {
     /**
      * release all resources.
      */
-    void release()
+    void releaseAll()
             throws IOException;
+
+    /**
+     * release the local resources.
+     */
+    default void releaseLocal()
+            throws IOException {}
 }

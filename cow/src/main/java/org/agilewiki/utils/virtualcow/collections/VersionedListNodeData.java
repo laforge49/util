@@ -627,13 +627,13 @@ public class VersionedListNodeData implements Releasable {
     }
 
     @Override
-    public void release()
+    public void releaseAll()
             throws IOException {
         if (leftNode instanceof Releasable)
-            ((Releasable) leftNode).release();
+            ((Releasable) leftNode).releaseAll();
         if (value instanceof Releasable)
-            ((Releasable) value).release();
+            ((Releasable) value).releaseAll();
         if (rightNode instanceof Releasable)
-            ((Releasable) rightNode).release();
+            ((Releasable) rightNode).releaseAll();
     }
 }

@@ -401,8 +401,8 @@ public interface ListNode extends Releasable {
     }
 
     @Override
-    default void release()
+    default void releaseAll()
             throws IOException {
-        getData().release();
+        getData().releaseAll();
     }
 }

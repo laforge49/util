@@ -80,11 +80,20 @@ public class BlockReference implements Releasable {
      * Releases the contents of the block as well as the block.
      */
     @Override
-    public void release()
+    public void releaseAll()
             throws IOException {
         Object immutable = get();
         if (immutable instanceof Releasable)
-            ((Releasable) immutable).release();
+            ((Releasable) immutable).releaseAll();
+        releaseLocal();
+    }
+
+    /**
+     * Releases the block.
+     */
+    @Override
+    public void releaseLocal()
+            throws IOException {
         db.release(blockNbr);
     }
 

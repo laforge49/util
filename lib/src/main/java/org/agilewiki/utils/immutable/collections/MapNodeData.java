@@ -299,7 +299,7 @@ public class MapNodeData implements Releasable {
                 t = new MapNode(thisNode.factory, level, l, listNode, rightNode, this.key);
         } else {
             if (listNode instanceof Releasable)
-                ((Releasable) listNode).release();
+                ((Releasable) listNode).releaseAll();
             MapNode nil = thisNode.factory.nilMap;
             if (leftNode.isNil() && rightNode.isNil()) {
                 return nil;
@@ -440,7 +440,7 @@ public class MapNodeData implements Releasable {
                     leftNode.getData().addList(key, listNode),
                     listNode,
                     rightNode,
-                    key);
+                    this.key);
         } else if (c == 0) {
             throw new IllegalArgumentException("duplicate key not supported");
         } else {
@@ -450,7 +450,7 @@ public class MapNodeData implements Releasable {
                     leftNode,
                     listNode,
                     rightNode.getData().addList(key, listNode),
-                    key);
+                    this.key);
         }
         return t.getData().skew().getData().split();
     }
@@ -612,15 +612,15 @@ public class MapNodeData implements Releasable {
     }
 
     @Override
-    public void release()
+    public void releaseAll()
             throws IOException {
         if (isNil())
             return;
         if (leftNode instanceof Releasable)
-            ((Releasable) leftNode).release();
+            ((Releasable) leftNode).releaseAll();
         if (listNode instanceof Releasable)
-            ((Releasable) listNode).release();
+            ((Releasable) listNode).releaseAll();
         if (rightNode instanceof Releasable)
-            ((Releasable) rightNode).release();
+            ((Releasable) rightNode).releaseAll();
     }
 }
