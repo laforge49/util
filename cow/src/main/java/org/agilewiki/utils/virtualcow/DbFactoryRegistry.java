@@ -30,7 +30,7 @@ public class DbFactoryRegistry extends CascadingRegistry {
         nilVersionedList = new VersionedListNodeFactory(this, 'l', '1').nilVersionedList;
         nilVersionedMap = new VersionedMapNodeFactory(this, 'm', '2', nilVersionedList).nilVersionedMap;
         nilList = new ListNodeFactory(this, 'n', '3').nilList;
-        mapNodeFactory = new MapNodeFactory(this, mapNodeImplId, nilMapId, nilList);
+        mapNodeFactory = new MapNodeFactory(this, mapNodeImplId, nilMapId);
         nilMap = mapNodeFactory.nilMap;
         blockReferenceFactory = new BlockReferenceFactory(this, 'r', db);
     }

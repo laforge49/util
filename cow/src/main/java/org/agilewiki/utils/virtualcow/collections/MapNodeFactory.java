@@ -15,17 +15,14 @@ public class MapNodeFactory extends BaseFactory {
     public final DbFactoryRegistry factoryRegistry;
     public final char nilMapId;
     public final MapNode nilMap;
-    public final ListNode nilList;
 
     public MapNodeFactory(
             DbFactoryRegistry factoryRegistry,
             char id,
-            char nilMapId,
-            ListNode nilList) {
+            char nilMapId) {
         super(factoryRegistry, id);
         this.factoryRegistry = factoryRegistry;
         this.nilMapId = nilMapId;
-        this.nilList = nilList;
         new NilMapNodeFactory(this, nilMapId);
         nilMap = new MapNodeImpl(factoryRegistry);
     }
