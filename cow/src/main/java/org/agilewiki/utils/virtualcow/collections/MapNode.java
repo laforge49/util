@@ -2,6 +2,7 @@ package org.agilewiki.utils.virtualcow.collections;
 
 import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.Releasable;
+import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -12,17 +13,17 @@ import java.util.*;
  */
 public interface MapNode extends Releasable {
 
-    MapNodeFactory getFactory();
+    DbFactoryRegistry getRegistry();
 
     MapNodeData getData();
 
     default boolean isNil() {
-        return this == getFactory().nilMap;
+        return this == getRegistry().nilMap;
     }
 
     default ListNode getList(Comparable key) {
         if (isNil())
-            return getFactory().nilList;
+            return getRegistry().nilList;
         return getData().getList(key);
     }
 
@@ -72,8 +73,7 @@ public interface MapNode extends Releasable {
         if (key == null)
             throw new IllegalArgumentException("key may not be null");
         if (isNil()) {
-            MapNodeFactory factory = getFactory();
-            ListNode listNode = factory.nilList.add(ndx, value);
+            ListNode listNode = getRegistry().nilList.add(ndx, value);
             return getData().replace(1, listNode, key);
         }
         return getData().add(key, ndx, value);
@@ -118,8 +118,7 @@ public interface MapNode extends Releasable {
         if (value == null)
             throw new IllegalArgumentException("value may not be null");
         if (isNil()) {
-            MapNodeFactory factory = getFactory();
-            ListNode listNode = factory.nilList.add(value);
+            ListNode listNode = getRegistry().nilList.add(value);
             return getData().replace(1, listNode, key);
         }
         return getData().set(key, value);
@@ -351,10 +350,10 @@ public interface MapNode extends Releasable {
      */
     default void writeDurable(ByteBuffer byteBuffer) {
         if (isNil()) {
-            byteBuffer.putChar(getFactory().nilMapId);
+            byteBuffer.putChar(getRegistry().nilMapId);
             return;
         }
-        byteBuffer.putChar(getFactory().id);
+        byteBuffer.putChar(getRegistry().mapNodeImplId);
         serialize(byteBuffer);
     }
 

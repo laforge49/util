@@ -12,7 +12,10 @@ public class DbFactoryRegistry extends CascadingRegistry {
     public final VersionedListNode nilVersionedList;
     public final VersionedMapNode nilVersionedMap;
     public final ListNode nilList;
+    public final MapNodeFactory mapNodeFactory;
+    public final char mapNodeImplId = 'o';
     public final MapNode nilMap;
+    public final char nilMapId = '4';
     public final BlockReferenceFactory blockReferenceFactory;
 
     /**
@@ -27,7 +30,8 @@ public class DbFactoryRegistry extends CascadingRegistry {
         nilVersionedList = new VersionedListNodeFactory(this, 'l', '1').nilVersionedList;
         nilVersionedMap = new VersionedMapNodeFactory(this, 'm', '2', nilVersionedList).nilVersionedMap;
         nilList = new ListNodeFactory(this, 'n', '3').nilList;
-        nilMap = new MapNodeFactory(this, 'o', '4', nilList).nilMap;
+        mapNodeFactory = new MapNodeFactory(this, mapNodeImplId, nilMapId, nilList);
+        nilMap = mapNodeFactory.nilMap;
         blockReferenceFactory = new BlockReferenceFactory(this, 'r', db);
     }
 }

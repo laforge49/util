@@ -61,7 +61,7 @@ public class MapNodeData implements Releasable {
         this.thisNode = thisNode;
         this.level = 0;
         this.leftNode = thisNode;
-        this.listNode = thisNode.getFactory().nilList;
+        this.listNode = thisNode.getRegistry().nilList;
         this.rightNode = thisNode;
         key = null;
 
@@ -90,7 +90,7 @@ public class MapNodeData implements Releasable {
         this.listNode = listNode;
         this.rightNode = rightNode;
         this.key = key;
-        keyFactory = thisNode.getFactory().factoryRegistry.getImmutableFactory(key);
+        keyFactory = thisNode.getRegistry().getImmutableFactory(key);
     }
 
     /**
@@ -102,7 +102,7 @@ public class MapNodeData implements Releasable {
     public MapNodeData(MapNode thisNode, ByteBuffer byteBuffer) {
         this.thisNode = thisNode;
         level = byteBuffer.getInt();
-        FactoryRegistry factoryRegistry = thisNode.getFactory().factoryRegistry;
+        FactoryRegistry factoryRegistry = thisNode.getRegistry();
         ImmutableFactory f = factoryRegistry.readId(byteBuffer);
         leftNode = (MapNode) f.deserialize(byteBuffer);
         f = factoryRegistry.readId(byteBuffer);
@@ -236,7 +236,7 @@ public class MapNodeData implements Releasable {
             throws IOException {
         if (isNil())
             return thisNode;
-        MapNodeFactory factory = thisNode.getFactory();
+        MapNodeFactory factory = thisNode.getRegistry().mapNodeFactory;
         int c = key.compareTo(this.key);
         MapNode t = thisNode;
         if (c > 0) {
@@ -335,7 +335,7 @@ public class MapNodeData implements Releasable {
             return replaceLeft(n);
         } else if (c == 0) {
             listNode.releaseAll();
-            ListNode n = thisNode.getFactory().nilList.add(value);
+            ListNode n = thisNode.getRegistry().nilList.add(value);
             return replace(n);
         } else {
             MapNode n = rightNode.set(key, value);
@@ -375,7 +375,6 @@ public class MapNodeData implements Releasable {
             throws IOException {
         if (listNode.isNil())
             return thisNode;
-        MapNodeFactory factory = thisNode.getFactory();
         if (isNil()) {
             return replace(1, listNode, key);
         }
@@ -563,48 +562,48 @@ public class MapNodeData implements Releasable {
     public MapNode replace(int level)
             throws IOException {
         thisNode.releaseLocal();
-        return new MapNodeImpl(thisNode.getFactory(), level, leftNode, listNode, rightNode, key);
+        return new MapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
     }
 
     public MapNode replace(ListNode listNode)
             throws IOException {
         thisNode.releaseLocal();
-        return new MapNodeImpl(thisNode.getFactory(), level, leftNode, listNode, rightNode, key);
+        return new MapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
     }
 
     public MapNode replace(int level, ListNode listNode, Comparable key)
             throws IOException {
         thisNode.releaseLocal();
-        return new MapNodeImpl(thisNode.getFactory(), level, leftNode, listNode, rightNode, key);
+        return new MapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
     }
 
     public MapNode replace(int level, MapNode leftNode, MapNode rightNode)
             throws IOException {
         thisNode.releaseLocal();
-        return new MapNodeImpl(thisNode.getFactory(), level, leftNode, listNode, rightNode, key);
+        return new MapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
     }
 
     public MapNode replaceLeft(MapNode leftNode)
             throws IOException {
         thisNode.releaseLocal();
-        return new MapNodeImpl(thisNode.getFactory(), level, leftNode, listNode, rightNode, key);
+        return new MapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
     }
 
     public MapNode replaceLeft(int level, MapNode leftNode)
             throws IOException {
         thisNode.releaseLocal();
-        return new MapNodeImpl(thisNode.getFactory(), level, leftNode, listNode, rightNode, key);
+        return new MapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
     }
 
     public MapNode replaceRight(MapNode rightNode)
             throws IOException {
         thisNode.releaseLocal();
-        return new MapNodeImpl(thisNode.getFactory(), level, leftNode, listNode, rightNode, key);
+        return new MapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
     }
 
     public MapNode replaceRight(int level, MapNode rightNode)
             throws IOException {
         thisNode.releaseLocal();
-        return new MapNodeImpl(thisNode.getFactory(), level, leftNode, listNode, rightNode, key);
+        return new MapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
     }
 }

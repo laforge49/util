@@ -2,6 +2,7 @@ package org.agilewiki.utils.virtualcow.collections;
 
 import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.Releasable;
+import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -13,33 +14,33 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class MapNodeImpl implements MapNode {
 
-    public final MapNodeFactory factory;
+    public final DbFactoryRegistry registry;
 
     protected final AtomicReference<MapNodeData> dataReference = new AtomicReference<>();
     protected final int durableLength;
     protected ByteBuffer byteBuffer;
 
-    protected MapNodeImpl(MapNodeFactory factory) {
-        this.factory = factory;
+    protected MapNodeImpl(DbFactoryRegistry registry) {
+        this.registry = registry;
         dataReference.set(new MapNodeData(this));
         durableLength = 2;
     }
 
-    protected MapNodeImpl(MapNodeFactory factory, ByteBuffer byteBuffer) {
-        this.factory = factory;
+    protected MapNodeImpl(DbFactoryRegistry registry, ByteBuffer byteBuffer) {
+        this.registry = registry;
         durableLength = byteBuffer.getInt();
         this.byteBuffer = byteBuffer.slice();
         this.byteBuffer.limit(durableLength - 6);
         byteBuffer.position(byteBuffer.position() + durableLength - 6);
     }
 
-    protected MapNodeImpl(MapNodeFactory factory,
+    protected MapNodeImpl(DbFactoryRegistry registry,
                           int level,
                           MapNode leftNode,
                           ListNode listNode,
                           MapNode rightNode,
                           Comparable key) {
-        this.factory = factory;
+        this.registry = registry;
         MapNodeData data = new MapNodeData(
                 this,
                 level,
@@ -52,8 +53,8 @@ public class MapNodeImpl implements MapNode {
     }
 
     @Override
-    public MapNodeFactory getFactory() {
-        return factory;
+    public DbFactoryRegistry getRegistry() {
+        return registry;
     }
 
     @Override
