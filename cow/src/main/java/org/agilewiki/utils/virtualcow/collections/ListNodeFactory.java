@@ -18,7 +18,7 @@ public class ListNodeFactory extends BaseFactory {
     public ListNodeFactory(DbFactoryRegistry registry) {
         super(registry, registry.listNodeImplId);
         nilListNodeFactory = new NilListNodeFactory(registry);
-        nilList = new ListNodeImpl(this);
+        nilList = new ListNodeImpl(registry);
     }
 
     @Override
@@ -45,6 +45,6 @@ public class ListNodeFactory extends BaseFactory {
 
     @Override
     public ListNode deserialize(ByteBuffer byteBuffer) {
-        return new ListNodeImpl(this, byteBuffer);
+        return new ListNodeImpl((DbFactoryRegistry) factoryRegistry, byteBuffer);
     }
 }

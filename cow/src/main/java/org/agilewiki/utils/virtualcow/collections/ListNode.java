@@ -16,7 +16,7 @@ import java.util.NoSuchElementException;
  */
 public interface ListNode extends Releasable {
 
-    ListNodeFactory getFactory();
+    DbFactoryRegistry getRegistry();
 
     ListNodeData getData();
 
@@ -30,7 +30,7 @@ public interface ListNode extends Releasable {
     }
 
     default boolean isNil() {
-        return this == getFactory().nilList;
+        return this == getRegistry().nilList;
     }
 
     /**
@@ -357,8 +357,8 @@ public interface ListNode extends Releasable {
         if (isNil()) {
             if (ndx != 0 && ndx != -1)
                 throw new IllegalArgumentException("index out of range");
-            ListNodeFactory factory = getFactory();
-            return new ListNodeImpl(factory, 1, 1, factory.nilList, value, factory.nilList);
+            DbFactoryRegistry registry = getRegistry();
+            return new ListNodeImpl(registry, 1, 1, registry.nilList, value, registry.nilList);
         }
         return getData().add(ndx, value);
     }
@@ -378,10 +378,10 @@ public interface ListNode extends Releasable {
      */
     default void writeDurable(ByteBuffer byteBuffer) {
         if (isNil()) {
-            byteBuffer.putChar(((DbFactoryRegistry) getFactory().factoryRegistry).nilListId);
+            byteBuffer.putChar(getRegistry().nilListId);
             return;
         }
-        byteBuffer.putChar(getFactory().id);
+        byteBuffer.putChar(getRegistry().listNodeImplId);
         serialize(byteBuffer);
     }
 
