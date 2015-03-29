@@ -1,6 +1,7 @@
 package org.agilewiki.utils.virtualcow.collections;
 
 import org.agilewiki.utils.immutable.BaseFactory;
+import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 
 import java.nio.ByteBuffer;
 
@@ -9,11 +10,8 @@ import java.nio.ByteBuffer;
  */
 public class VersionedNilListNodeFactory extends BaseFactory {
 
-    public final VersionedListNodeFactory factory;
-
-    public VersionedNilListNodeFactory(VersionedListNodeFactory factory, char id) {
-        super(factory.factoryRegistry, id);
-        this.factory = factory;
+    public VersionedNilListNodeFactory(DbFactoryRegistry registry) {
+        super(registry, registry.versionedNilListId);
     }
 
     @Override
@@ -38,6 +36,6 @@ public class VersionedNilListNodeFactory extends BaseFactory {
 
     @Override
     public VersionedListNode deserialize(ByteBuffer byteBuffer) {
-        return factory.nilVersionedList;
+        return ((DbFactoryRegistry) factoryRegistry).versionedNilList;
     }
 }

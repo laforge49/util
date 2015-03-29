@@ -3,6 +3,7 @@ package org.agilewiki.utils.virtualcow.collections;
 import org.agilewiki.utils.immutable.BaseFactory;
 import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
+import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 
 import java.nio.ByteBuffer;
 
@@ -14,10 +15,10 @@ public class VersionedListNodeFactory extends BaseFactory {
     public final char nilVersionedListId;
     public final VersionedListNode nilVersionedList;
 
-    public VersionedListNodeFactory(FactoryRegistry factoryRegistry, char id, char nilVersionedListId) {
+    public VersionedListNodeFactory(DbFactoryRegistry factoryRegistry, char id, char nilVersionedListId) {
         super(factoryRegistry, id);
         this.nilVersionedListId = nilVersionedListId;
-        new VersionedNilListNodeFactory(this, nilVersionedListId);
+        new VersionedNilListNodeFactory(factoryRegistry);
         nilVersionedList = new VersionedListNodeImpl(this);
     }
 
