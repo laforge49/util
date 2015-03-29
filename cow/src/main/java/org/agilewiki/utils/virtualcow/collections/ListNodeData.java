@@ -289,14 +289,10 @@ public class ListNodeData implements Releasable {
             return thisNode;
         ListNodeData leftData = leftNode.getData();
         if (leftData.level == level) {
-            ListNode t = replaceLeft(totalSize - leftData.totalSize + leftData.rightNode.totalSize(), leftData.rightNode);
-            return new ListNodeImpl(
-                    thisNode.getRegistry(),
-                    leftData.level,
-                    totalSize,
-                    leftData.leftNode,
-                    leftData.value,
-                    t);
+            ListNode t = replaceLeft(
+                    totalSize - leftData.totalSize + leftData.rightNode.totalSize(),
+                    leftData.rightNode);
+            return leftData.replaceRight(totalSize, t);
         } else
             return thisNode;
     }
@@ -306,27 +302,21 @@ public class ListNodeData implements Releasable {
      *
      * @return The revised root node.
      */
-    public ListNode split() {
+    public ListNode split()
+            throws IOException {
         if (isNil() || rightNode.isNil())
             return thisNode;
         ListNodeData rightData = rightNode.getData();
         if (rightData.rightNode.isNil())
             return thisNode;
         if (level == rightData.rightNode.getData().level) {
-            ListNode t = new ListNodeImpl(
-                    thisNode.getRegistry(),
-                    level,
+            ListNode t = replaceRight(
                     totalSize - rightData.totalSize + rightData.leftNode.totalSize(),
-                    leftNode,
-                    value,
                     rightData.leftNode);
-            ListNode r = new ListNodeImpl(
-                    thisNode.getRegistry(),
+            ListNode r = rightData.replaceLeft(
                     rightData.level + 1,
                     totalSize,
-                    t,
-                    rightData.value,
-                    rightData.rightNode);
+                    t);
             return r;
         }
         return thisNode;
@@ -346,21 +336,9 @@ public class ListNodeData implements Releasable {
         int leftSize = leftNode.totalSize();
         ListNode t = thisNode;
         if (ndx <= leftSize) {
-            t = new ListNodeImpl(
-                    thisNode.getRegistry(),
-                    level,
-                    totalSize + 1,
-                    leftNode.add(ndx, value),
-                    this.value,
-                    rightNode);
+            t = replaceLeft(totalSize + 1, leftNode.add(ndx, value));
         } else {
-            t = new ListNodeImpl(
-                    thisNode.getRegistry(),
-                    level,
-                    totalSize + 1,
-                    leftNode,
-                    this.value,
-                    rightNode.add(ndx - leftSize - 1, value));
+            t = replaceRight(totalSize + 1, rightNode.add(ndx - leftSize - 1, value));
         }
         return t.getData().skew().getData().split();
     }
@@ -385,28 +363,17 @@ public class ListNodeData implements Releasable {
         return thisNode;
     }
 
-    private ListNode decreaseLevel() {
+    private ListNode decreaseLevel()
+            throws IOException {
         ListNodeData rd = rightNode.getData();
         int shouldBe = min(leftNode.getData().level, rd.level) + 1;
         if (shouldBe < level) {
             ListNode r;
             if (shouldBe < rd.level)
-                r = new ListNodeImpl(
-                        thisNode.getRegistry(),
-                        shouldBe,
-                        rd.totalSize,
-                        rd.leftNode,
-                        rd.value,
-                        rd.rightNode);
+                r = rd.replace(shouldBe, rd.totalSize);
             else
                 r = rightNode;
-            return new ListNodeImpl(
-                    thisNode.getRegistry(),
-                    shouldBe,
-                    totalSize,
-                    leftNode,
-                    value,
-                    r);
+            return replaceRight(shouldBe, totalSize, r);
         }
         return thisNode;
     }
@@ -421,11 +388,11 @@ public class ListNodeData implements Releasable {
         if (ndx > leftSize) {
             ListNode r = rightNode.remove(ndx - leftSize - 1);
             if (r != rightNode)
-                t = new ListNodeImpl(registry, level, totalSize - 1, leftNode, value, r);
+                t = replaceRight(totalSize - 1, r);
         } else if (ndx < leftSize) {
             ListNode l = leftNode.remove(ndx);
             if (l != leftNode)
-                t = new ListNodeImpl(registry, level, totalSize - 1, l, value, rightNode);
+                t = replaceLeft(totalSize - 1, l);
         } else {
             if (value instanceof Releasable)
                 ((Releasable) value).releaseAll();
@@ -435,10 +402,10 @@ public class ListNodeData implements Releasable {
             }
             if (leftNode.isNil()) {
                 ListNode l = successor();
-                t = new ListNodeImpl(registry, level, totalSize - 1, nil, l.getData().value, rightNode.remove(0));
+                t = replaceRight(totalSize - 1, l.getData().value, rightNode.remove(0));
             } else {
                 ListNode l = predecessor();
-                t = new ListNodeImpl(registry, level, totalSize - 1, leftNode.remove(leftSize - 1), l.getData().value, rightNode);
+                t = replaceLeft(totalSize - 1, leftNode.remove(leftSize - 1), l.getData().value);
             }
         }
         t = t.getData().decreaseLevel().getData().skew();
@@ -448,17 +415,17 @@ public class ListNodeData implements Releasable {
             ListNodeData rd = r.getData();
             ListNode rr = rd.rightNode.getData().skew();
             if (rd.rightNode != rr) {
-                r = new ListNodeImpl(registry, rd.level, rd.totalSize, rd.leftNode, rd.value, rr);
+                r = rd.replaceRight(rr);
             }
         }
         if (r != td.rightNode) {
-            t = new ListNodeImpl(registry, td.level, td.totalSize, td.leftNode, td.value, r);
+            t = td.replaceRight(r);
         }
         t = t.getData().split();
         r = t.getData().rightNode.getData().split();
         td = t.getData();
         if (r != td.rightNode) {
-            t = new ListNodeImpl(registry, td.level, td.totalSize, td.leftNode, td.value, r);
+            t = td.replaceRight(r);
         }
         return t;
     }
@@ -480,13 +447,7 @@ public class ListNodeData implements Releasable {
             ((Releasable) rightNode).releaseAll();
     }
 
-    public ListNode replace(int level)
-            throws IOException {
-        thisNode.releaseLocal();
-        return new ListNodeImpl(thisNode.getRegistry(), level, totalSize, leftNode, value, rightNode);
-    }
-
-    public ListNode replace(Object value)
+    public ListNode replace(int level, int totalSize)
             throws IOException {
         thisNode.releaseLocal();
         return new ListNodeImpl(thisNode.getRegistry(), level, totalSize, leftNode, value, rightNode);
@@ -498,7 +459,7 @@ public class ListNodeData implements Releasable {
         return new ListNodeImpl(thisNode.getRegistry(), level, totalSize, leftNode, value, rightNode);
     }
 
-    public ListNode replace(int level, ListNode leftNode, ListNode rightNode)
+    public ListNode replaceLeft(int totalSize, ListNode leftNode, Object value)
             throws IOException {
         thisNode.releaseLocal();
         return new ListNodeImpl(thisNode.getRegistry(), level, totalSize, leftNode, value, rightNode);
@@ -522,7 +483,19 @@ public class ListNodeData implements Releasable {
         return new ListNodeImpl(thisNode.getRegistry(), level, totalSize, leftNode, value, rightNode);
     }
 
-    public ListNode replaceRight(int level, ListNode rightNode)
+    public ListNode replaceRight(int totalSize, ListNode rightNode)
+            throws IOException {
+        thisNode.releaseLocal();
+        return new ListNodeImpl(thisNode.getRegistry(), level, totalSize, leftNode, value, rightNode);
+    }
+
+    public ListNode replaceRight(int totalSize, Object value, ListNode rightNode)
+            throws IOException {
+        thisNode.releaseLocal();
+        return new ListNodeImpl(thisNode.getRegistry(), level, totalSize, leftNode, value, rightNode);
+    }
+
+    public ListNode replaceRight(int level, int totalSize, ListNode rightNode)
             throws IOException {
         thisNode.releaseLocal();
         return new ListNodeImpl(thisNode.getRegistry(), level, totalSize, leftNode, value, rightNode);
