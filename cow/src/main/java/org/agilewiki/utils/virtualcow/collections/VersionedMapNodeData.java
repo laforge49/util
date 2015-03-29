@@ -1,5 +1,6 @@
 package org.agilewiki.utils.virtualcow.collections;
 
+import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
 import org.agilewiki.utils.immutable.Releasable;
@@ -59,7 +60,7 @@ public class VersionedMapNodeData implements Releasable {
         this.thisNode = thisNode;
         this.level = 0;
         this.leftNode = thisNode;
-        this.listNode = thisNode.getFactory().nilVersionedList;
+        this.listNode = thisNode.getRegistry().versionedNilList;
         this.rightNode = thisNode;
         key = null;
 
@@ -88,7 +89,7 @@ public class VersionedMapNodeData implements Releasable {
         this.listNode = listNode;
         this.rightNode = rightNode;
         this.key = key;
-        keyFactory = thisNode.getFactory().factoryRegistry.getImmutableFactory(key);
+        keyFactory = thisNode.getRegistry().getImmutableFactory(key);
     }
 
     /**
@@ -100,14 +101,14 @@ public class VersionedMapNodeData implements Releasable {
     public VersionedMapNodeData(VersionedMapNode thisNode, ByteBuffer byteBuffer) {
         this.thisNode = thisNode;
         level = byteBuffer.getInt();
-        FactoryRegistry factoryRegistry = thisNode.getFactory().factoryRegistry;
-        ImmutableFactory f = factoryRegistry.readId(byteBuffer);
+        DbFactoryRegistry registry = thisNode.getRegistry();
+        ImmutableFactory f = registry.readId(byteBuffer);
         leftNode = (VersionedMapNode) f.deserialize(byteBuffer);
-        f = factoryRegistry.readId(byteBuffer);
+        f = registry.readId(byteBuffer);
         listNode = (VersionedListNode) f.deserialize(byteBuffer);
-        f = factoryRegistry.readId(byteBuffer);
+        f = registry.readId(byteBuffer);
         rightNode = (VersionedMapNode) f.deserialize(byteBuffer);
-        keyFactory = factoryRegistry.readId(byteBuffer);
+        keyFactory = registry.readId(byteBuffer);
         key = (Comparable) keyFactory.deserialize(byteBuffer);
     }
 
@@ -148,14 +149,14 @@ public class VersionedMapNodeData implements Releasable {
         VersionedMapNodeData leftData = leftNode.getData();
         if (leftData.level == level) {
             VersionedMapNode t = new VersionedMapNodeImpl(
-                    thisNode.getFactory(),
+                    thisNode.getRegistry(),
                     level,
                     leftData.rightNode,
                     listNode,
                     rightNode,
                     key);
             return new VersionedMapNodeImpl(
-                    thisNode.getFactory(),
+                    thisNode.getRegistry(),
                     leftData.level,
                     leftData.leftNode,
                     leftData.listNode,
@@ -178,14 +179,14 @@ public class VersionedMapNodeData implements Releasable {
             return thisNode;
         if (level == rightData.rightNode.getData().level) {
             VersionedMapNode t = new VersionedMapNodeImpl(
-                    thisNode.getFactory(),
+                    thisNode.getRegistry(),
                     level,
                     leftNode,
                     listNode,
                     rightData.leftNode,
                     key);
             VersionedMapNode r = new VersionedMapNodeImpl(
-                    thisNode.getFactory(),
+                    thisNode.getRegistry(),
                     rightData.level + 1,
                     t,
                     rightData.listNode,
@@ -211,7 +212,7 @@ public class VersionedMapNodeData implements Releasable {
         int c = key.compareTo(this.key);
         if (c < 0) {
             t = new VersionedMapNodeImpl(
-                    thisNode.getFactory(),
+                    thisNode.getRegistry(),
                     level,
                     leftNode.add(key, ndx, value, created, deleted),
                     listNode,
@@ -219,7 +220,7 @@ public class VersionedMapNodeData implements Releasable {
                     this.key);
         } else if (c == 0) {
             return new VersionedMapNodeImpl(
-                    thisNode.getFactory(),
+                    thisNode.getRegistry(),
                     level,
                     leftNode,
                     listNode.add(ndx, value, created, deleted),
@@ -227,7 +228,7 @@ public class VersionedMapNodeData implements Releasable {
                     this.key);
         } else {
             t = new VersionedMapNodeImpl(
-                    thisNode.getFactory(),
+                    thisNode.getRegistry(),
                     level,
                     leftNode,
                     listNode,
@@ -255,17 +256,17 @@ public class VersionedMapNodeData implements Releasable {
             VersionedMapNode n = leftNode.remove(key, ndx, time);
             if (n == leftNode)
                 return thisNode;
-            return new VersionedMapNodeImpl(thisNode.getFactory(), level, n, listNode, rightNode, this.key);
+            return new VersionedMapNodeImpl(thisNode.getRegistry(), level, n, listNode, rightNode, this.key);
         } else if (c == 0) {
             VersionedListNode n = listNode.remove(ndx, time);
             if (n == listNode)
                 return thisNode;
-            return new VersionedMapNodeImpl(thisNode.getFactory(), level, leftNode, n, rightNode, this.key);
+            return new VersionedMapNodeImpl(thisNode.getRegistry(), level, leftNode, n, rightNode, this.key);
         } else {
             VersionedMapNode n = rightNode.remove(key, ndx, time);
             if (n == rightNode)
                 return thisNode;
-            return new VersionedMapNodeImpl(thisNode.getFactory(), level, leftNode, listNode, n, this.key);
+            return new VersionedMapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, n, this.key);
         }
     }
 
@@ -286,17 +287,17 @@ public class VersionedMapNodeData implements Releasable {
             VersionedMapNode n = leftNode.clearList(key, time);
             if (n == leftNode)
                 return thisNode;
-            return new VersionedMapNodeImpl(thisNode.getFactory(), level, n, listNode, rightNode, this.key);
+            return new VersionedMapNodeImpl(thisNode.getRegistry(), level, n, listNode, rightNode, this.key);
         } else if (c == 0) {
             VersionedListNode n = listNode.clearList(time);
             if (n == listNode)
                 return thisNode;
-            return new VersionedMapNodeImpl(thisNode.getFactory(), level, leftNode, n, rightNode, this.key);
+            return new VersionedMapNodeImpl(thisNode.getRegistry(), level, leftNode, n, rightNode, this.key);
         } else {
             VersionedMapNode n = rightNode.clearList(key, time);
             if (n == rightNode)
                 return thisNode;
-            return new VersionedMapNodeImpl(thisNode.getFactory(), level, leftNode, listNode, n, this.key);
+            return new VersionedMapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, n, this.key);
         }
     }
 
@@ -312,14 +313,14 @@ public class VersionedMapNodeData implements Releasable {
         int c = key.compareTo(this.key);
         if (c < 0) {
             VersionedMapNode n = leftNode.set(key, value, time);
-            return new VersionedMapNodeImpl(thisNode.getFactory(), level, n, listNode, rightNode, this.key);
+            return new VersionedMapNodeImpl(thisNode.getRegistry(), level, n, listNode, rightNode, this.key);
         } else if (c == 0) {
             VersionedListNode n = listNode.clearList(time);
             n = n.add(value, time);
-            return new VersionedMapNodeImpl(thisNode.getFactory(), level, leftNode, n, rightNode, this.key);
+            return new VersionedMapNodeImpl(thisNode.getRegistry(), level, leftNode, n, rightNode, this.key);
         } else {
             VersionedMapNode n = rightNode.set(key, value, time);
-            return new VersionedMapNodeImpl(thisNode.getFactory(), level, leftNode, listNode, n, this.key);
+            return new VersionedMapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, n, this.key);
         }
     }
 
@@ -337,7 +338,7 @@ public class VersionedMapNodeData implements Releasable {
         if (ln == leftNode && rn == rightNode && listNode.isEmpty(time))
             return thisNode;
         return new VersionedMapNodeImpl(
-                thisNode.getFactory(),
+                thisNode.getRegistry(),
                 level,
                 ln,
                 listNode.clearList(time),
@@ -394,21 +395,21 @@ public class VersionedMapNodeData implements Releasable {
     protected VersionedMapNode addList(Comparable key, VersionedListNode listNode) {
         if (listNode.isNil())
             return thisNode;
-        VersionedMapNodeFactory factory = thisNode.getFactory();
+        DbFactoryRegistry registry = thisNode.getRegistry();
         if (isNil()) {
             return new VersionedMapNodeImpl(
-                    factory,
+                    registry,
                     1,
-                    factory.nilVersionedMap,
+                    registry.versionedNilMap,
                     listNode,
-                    factory.nilVersionedMap,
+                    registry.versionedNilMap,
                     key);
         }
         VersionedMapNode t;
         int c = key.compareTo(this.key);
         if (c < 0) {
             t = new VersionedMapNodeImpl(
-                    factory,
+                    registry,
                     level,
                     leftNode.getData().addList(key, listNode),
                     listNode,
@@ -418,7 +419,7 @@ public class VersionedMapNodeData implements Releasable {
             throw new IllegalArgumentException("duplicate key not supported");
         } else {
             t = new VersionedMapNodeImpl(
-                    factory,
+                    registry,
                     level,
                     leftNode,
                     listNode,

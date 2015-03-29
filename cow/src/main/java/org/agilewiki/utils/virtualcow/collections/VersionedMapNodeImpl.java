@@ -1,10 +1,8 @@
 package org.agilewiki.utils.virtualcow.collections;
 
-import org.agilewiki.utils.immutable.FactoryRegistry;
+import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -12,33 +10,33 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class VersionedMapNodeImpl implements VersionedMapNode {
 
-    public final VersionedMapNodeFactory factory;
+    public final DbFactoryRegistry registry;
 
     protected final AtomicReference<VersionedMapNodeData> dataReference = new AtomicReference<>();
     protected final int durableLength;
     protected ByteBuffer byteBuffer;
 
-    protected VersionedMapNodeImpl(VersionedMapNodeFactory factory) {
-        this.factory = factory;
+    protected VersionedMapNodeImpl(DbFactoryRegistry registry) {
+        this.registry = registry;
         dataReference.set(new VersionedMapNodeData(this));
         durableLength = 2;
     }
 
-    protected VersionedMapNodeImpl(VersionedMapNodeFactory factory, ByteBuffer byteBuffer) {
-        this.factory = factory;
+    protected VersionedMapNodeImpl(DbFactoryRegistry registry, ByteBuffer byteBuffer) {
+        this.registry = registry;
         durableLength = byteBuffer.getInt();
         this.byteBuffer = byteBuffer.slice();
         this.byteBuffer.limit(durableLength - 6);
         byteBuffer.position(byteBuffer.position() + durableLength - 6);
     }
 
-    protected VersionedMapNodeImpl(VersionedMapNodeFactory factory,
+    protected VersionedMapNodeImpl(DbFactoryRegistry registry,
                                    int level,
                                    VersionedMapNode leftNode,
                                    VersionedListNode listNode,
                                    VersionedMapNode rightNode,
                                    Comparable key) {
-        this.factory = factory;
+        this.registry = registry;
         VersionedMapNodeData data = new VersionedMapNodeData(
                 this,
                 level,
@@ -51,8 +49,8 @@ public class VersionedMapNodeImpl implements VersionedMapNode {
     }
 
     @Override
-    public VersionedMapNodeFactory getFactory() {
-        return factory;
+    public DbFactoryRegistry getRegistry() {
+        return registry;
     }
 
     @Override

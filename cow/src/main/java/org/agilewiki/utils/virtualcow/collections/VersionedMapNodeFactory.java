@@ -11,26 +11,20 @@ import java.nio.ByteBuffer;
  */
 public class VersionedMapNodeFactory extends BaseFactory {
 
-    public final char nilVersionedMapId;
-    public final VersionedMapNode nilVersionedMap;
-    public final VersionedListNode nilVersionedList;
+    public final VersionedMapNode versionedNilMap;
+    public final VersionedNilMapNodeFactory versionedNilMapNodeFactory;
 
     public VersionedMapNodeFactory(
-            DbFactoryRegistry factoryRegistry,
-            char id,
-            char nilVersionedMapId,
-            VersionedListNode nilVersionedList) {
-        super(factoryRegistry, id);
-        this.nilVersionedMapId = nilVersionedMapId;
-        this.nilVersionedList = nilVersionedList;
-        new VersionedNilMapNodeFactory(factoryRegistry);
-        nilVersionedMap = new VersionedMapNodeImpl(this);
+            DbFactoryRegistry registry) {
+        super(registry, registry.versionedMapNodeImplId);
+        versionedNilMapNodeFactory = new VersionedNilMapNodeFactory(registry);
+        versionedNilMap = new VersionedMapNodeImpl(registry);
     }
 
     @Override
     public ImmutableFactory getImmutableFactory(Object immutable) {
         if (((VersionedMapNode) immutable).isNil())
-            return factoryRegistry.getImmutableFactory(nilVersionedMapId);
+            return versionedNilMapNodeFactory;
         return this;
     }
 
@@ -51,6 +45,6 @@ public class VersionedMapNodeFactory extends BaseFactory {
 
     @Override
     public VersionedMapNode deserialize(ByteBuffer byteBuffer) {
-        return new VersionedMapNodeImpl(this, byteBuffer);
+        return new VersionedMapNodeImpl((DbFactoryRegistry) factoryRegistry, byteBuffer);
     }
 }

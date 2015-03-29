@@ -2,6 +2,7 @@ package org.agilewiki.utils.virtualcow.collections;
 
 import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.Releasable;
+import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -12,17 +13,17 @@ import java.util.*;
  */
 public interface VersionedMapNode extends Releasable {
 
-    VersionedMapNodeFactory getFactory();
+    DbFactoryRegistry getRegistry();
 
     VersionedMapNodeData getData();
 
     default boolean isNil() {
-        return this == getFactory().nilVersionedMap;
+        return this == getRegistry().versionedNilMap;
     }
 
     default VersionedListNode getList(Comparable key) {
         if (isNil())
-            return getFactory().nilVersionedList;
+            return getRegistry().versionedNilList;
         return getData().getList(key);
     }
 
@@ -87,9 +88,9 @@ public interface VersionedMapNode extends Releasable {
         if (key == null)
             throw new IllegalArgumentException("key may not be null");
         if (isNil()) {
-            VersionedMapNodeFactory factory = getFactory();
-            VersionedListNode listNode = factory.nilVersionedList.add(ndx, value, created, deleted);
-            return new VersionedMapNodeImpl(factory, 1, factory.nilVersionedMap, listNode, factory.nilVersionedMap, key);
+            DbFactoryRegistry registry = getRegistry();
+            VersionedListNode listNode = registry.versionedNilList.add(ndx, value, created, deleted);
+            return new VersionedMapNodeImpl(registry, 1, registry.versionedNilMap, listNode, registry.versionedNilMap, key);
         }
         return getData().add(key, ndx, value, created, deleted);
     }
@@ -133,9 +134,9 @@ public interface VersionedMapNode extends Releasable {
         if (value == null)
             throw new IllegalArgumentException("value may not be null");
         if (isNil()) {
-            VersionedMapNodeFactory factory = getFactory();
-            VersionedListNode listNode = factory.nilVersionedList.add(value, time);
-            return new VersionedMapNodeImpl(factory, 1, factory.nilVersionedMap, listNode, factory.nilVersionedMap, key);
+            DbFactoryRegistry registry = getRegistry();
+            VersionedListNode listNode = registry.versionedNilList.add(value, time);
+            return new VersionedMapNodeImpl(registry, 1, registry.versionedNilMap, listNode, registry.versionedNilMap, key);
         }
         return getData().set(key, value, time);
     }
@@ -213,7 +214,7 @@ public interface VersionedMapNode extends Releasable {
      * @return A shortened copy of the map without some historical values.
      */
     default VersionedMapNode copyMap(long time) {
-        return getData().copyMap(getFactory().nilVersionedMap, time);
+        return getData().copyMap(getRegistry().versionedNilMap, time);
     }
 
     /**
@@ -438,10 +439,10 @@ public interface VersionedMapNode extends Releasable {
      */
     default void writeDurable(ByteBuffer byteBuffer) {
         if (isNil()) {
-            byteBuffer.putChar(getFactory().nilVersionedMapId);
+            byteBuffer.putChar(getRegistry().versionedNilMapId);
             return;
         }
-        byteBuffer.putChar(getFactory().id);
+        byteBuffer.putChar(getRegistry().versionedMapNodeImplId);
         serialize(byteBuffer);
     }
 
