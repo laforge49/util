@@ -412,7 +412,7 @@ public class VersionedMapNodeData implements Releasable {
                     leftNode.getData().addList(key, listNode),
                     listNode,
                     rightNode,
-                    key);
+                    this.key);
         } else if (c == 0) {
             throw new IllegalArgumentException("duplicate key not supported");
         } else {
@@ -422,7 +422,7 @@ public class VersionedMapNodeData implements Releasable {
                     leftNode,
                     listNode,
                     rightNode.getData().addList(key, listNode),
-                    key);
+                    this.key);
         }
         return t.getData().skew().getData().split();
     }
