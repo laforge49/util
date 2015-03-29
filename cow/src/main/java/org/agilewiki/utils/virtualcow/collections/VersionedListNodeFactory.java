@@ -1,7 +1,6 @@
 package org.agilewiki.utils.virtualcow.collections;
 
 import org.agilewiki.utils.immutable.BaseFactory;
-import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
 import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 
@@ -12,20 +11,19 @@ import java.nio.ByteBuffer;
  */
 public class VersionedListNodeFactory extends BaseFactory {
 
-    public final char nilVersionedListId;
-    public final VersionedListNode nilVersionedList;
+    public final VersionedNilListNodeFactory versionedNilListNodeFactory;
+    public final VersionedListNode versionedNilList;
 
-    public VersionedListNodeFactory(DbFactoryRegistry factoryRegistry, char id, char nilVersionedListId) {
-        super(factoryRegistry, id);
-        this.nilVersionedListId = nilVersionedListId;
-        new VersionedNilListNodeFactory(factoryRegistry);
-        nilVersionedList = new VersionedListNodeImpl(this);
+    public VersionedListNodeFactory(DbFactoryRegistry registry) {
+        super(registry, registry.versionedListNodeImplId);
+        versionedNilListNodeFactory = new VersionedNilListNodeFactory(registry);
+        versionedNilList = new VersionedListNodeImpl(registry);
     }
 
     @Override
     public ImmutableFactory getImmutableFactory(Object immutable) {
         if (((VersionedListNode) immutable).isNil())
-            return factoryRegistry.getImmutableFactory(nilVersionedListId);
+            return versionedNilListNodeFactory;
         return this;
     }
 
@@ -46,6 +44,6 @@ public class VersionedListNodeFactory extends BaseFactory {
 
     @Override
     public VersionedListNode deserialize(ByteBuffer byteBuffer) {
-        return new VersionedListNodeImpl(this, byteBuffer);
+        return new VersionedListNodeImpl((DbFactoryRegistry) factoryRegistry, byteBuffer);
     }
 }

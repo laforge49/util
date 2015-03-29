@@ -1,5 +1,6 @@
 package org.agilewiki.utils.virtualcow.collections;
 
+import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.Releasable;
 
@@ -15,7 +16,7 @@ import java.util.NoSuchElementException;
  */
 public interface VersionedListNode extends Releasable {
 
-    VersionedListNodeFactory getFactory();
+    DbFactoryRegistry getRegistry();
 
     VersionedListNodeData getData();
 
@@ -29,7 +30,7 @@ public interface VersionedListNode extends Releasable {
     }
 
     default boolean isNil() {
-        return this == getFactory().nilVersionedList;
+        return this == getRegistry().versionedNilList;
     }
 
     /**
@@ -377,14 +378,14 @@ public interface VersionedListNode extends Releasable {
             if (ndx != 0 && ndx != -1)
                 throw new IllegalArgumentException("index out of range");
             return new VersionedListNodeImpl(
-                    getFactory(),
+                    getRegistry(),
                     1,
                     1,
                     created,
                     deleted,
-                    getFactory().nilVersionedList,
+                    getRegistry().versionedNilList,
                     value,
-                    getFactory().nilVersionedList);
+                    getRegistry().versionedNilList);
         }
         return getData().add(ndx, value, created, deleted);
     }
@@ -419,7 +420,7 @@ public interface VersionedListNode extends Releasable {
      * @return A shortened copy of the list without some historical values.
      */
     default VersionedListNode copyList(long time) {
-        return getData().copyList(getFactory().nilVersionedList, time);
+        return getData().copyList(getRegistry().versionedNilList, time);
     }
 
     /**
@@ -447,10 +448,10 @@ public interface VersionedListNode extends Releasable {
      */
     default void writeDurable(ByteBuffer byteBuffer) {
         if (isNil()) {
-            byteBuffer.putChar(getFactory().nilVersionedListId);
+            byteBuffer.putChar(getRegistry().versionedNilListId);
             return;
         }
-        byteBuffer.putChar(getFactory().id);
+        byteBuffer.putChar(getRegistry().versionedListNodeImplId);
         serialize(byteBuffer);
     }
 

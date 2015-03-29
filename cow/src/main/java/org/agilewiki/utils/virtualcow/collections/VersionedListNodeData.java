@@ -104,7 +104,7 @@ public class VersionedListNodeData implements Releasable {
         this.leftNode = leftNode;
         this.value = value;
         this.rightNode = rightNode;
-        this.valueFactory = thisNode.getFactory().factoryRegistry.getImmutableFactory(value);
+        this.valueFactory = thisNode.getRegistry().getImmutableFactory(value);
     }
 
     /**
@@ -119,7 +119,7 @@ public class VersionedListNodeData implements Releasable {
         totalSize = byteBuffer.getInt();
         created = byteBuffer.getLong();
         deleted = byteBuffer.getLong();
-        FactoryRegistry registry = thisNode.getFactory().factoryRegistry;
+        FactoryRegistry registry = thisNode.getRegistry();
         ImmutableFactory f = registry.readId(byteBuffer);
         leftNode = (VersionedListNode) f.deserialize(byteBuffer);
         valueFactory = registry.readId(byteBuffer);
@@ -439,7 +439,7 @@ public class VersionedListNodeData implements Releasable {
         VersionedListNodeData leftData = leftNode.getData();
         if (leftData.level == level) {
             VersionedListNode t = new VersionedListNodeImpl(
-                    thisNode.getFactory(),
+                    thisNode.getRegistry(),
                     level,
                     totalSize - leftData.totalSize + leftData.leftNode.totalSize(),
                     created,
@@ -448,7 +448,7 @@ public class VersionedListNodeData implements Releasable {
                     value,
                     rightNode);
             return new VersionedListNodeImpl(
-                    thisNode.getFactory(),
+                    thisNode.getRegistry(),
                     leftData.level,
                     totalSize,
                     leftData.created,
@@ -473,7 +473,7 @@ public class VersionedListNodeData implements Releasable {
             return thisNode;
         if (level == rightData.rightNode.getData().level) {
             VersionedListNode t = new VersionedListNodeImpl(
-                    thisNode.getFactory(),
+                    thisNode.getRegistry(),
                     level,
                     totalSize - rightData.totalSize + rightData.leftNode.totalSize(),
                     created,
@@ -482,7 +482,7 @@ public class VersionedListNodeData implements Releasable {
                     value,
                     rightData.leftNode);
             VersionedListNode r = new VersionedListNodeImpl(
-                    thisNode.getFactory(),
+                    thisNode.getRegistry(),
                     rightData.level + 1,
                     totalSize,
                     rightData.created,
@@ -511,7 +511,7 @@ public class VersionedListNodeData implements Releasable {
         VersionedListNode t = thisNode;
         if (ndx <= leftSize) {
             t = new VersionedListNodeImpl(
-                    thisNode.getFactory(),
+                    thisNode.getRegistry(),
                     level,
                     totalSize + 1,
                     this.created,
@@ -521,7 +521,7 @@ public class VersionedListNodeData implements Releasable {
                     rightNode);
         } else {
             t = new VersionedListNodeImpl(
-                    thisNode.getFactory(),
+                    thisNode.getRegistry(),
                     level,
                     totalSize + 1,
                     this.created,
@@ -547,7 +547,7 @@ public class VersionedListNodeData implements Releasable {
         if (ndx == leftSize) {
             if (exists(time))
                 return new VersionedListNodeImpl(
-                        thisNode.getFactory(),
+                        thisNode.getRegistry(),
                         level,
                         totalSize,
                         created,
@@ -562,7 +562,7 @@ public class VersionedListNodeData implements Releasable {
             if (leftNode == n)
                 return thisNode;
             return new VersionedListNodeImpl(
-                    thisNode.getFactory(),
+                    thisNode.getRegistry(),
                     level,
                     totalSize,
                     created,
@@ -575,7 +575,7 @@ public class VersionedListNodeData implements Releasable {
         if (rightNode == n)
             return thisNode;
         return new VersionedListNodeImpl(
-                thisNode.getFactory(),
+                thisNode.getRegistry(),
                 level,
                 totalSize,
                 created,
@@ -616,7 +616,7 @@ public class VersionedListNodeData implements Releasable {
         if (ln == leftNode && rn == rightNode && !exists(time))
             return thisNode;
         return new VersionedListNodeImpl(
-                thisNode.getFactory(),
+                thisNode.getRegistry(),
                 level,
                 totalSize,
                 created,

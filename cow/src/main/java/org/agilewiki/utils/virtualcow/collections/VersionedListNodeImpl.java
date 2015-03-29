@@ -1,14 +1,8 @@
 package org.agilewiki.utils.virtualcow.collections;
 
-import org.agilewiki.utils.immutable.FactoryRegistry;
-import org.agilewiki.utils.immutable.Releasable;
+import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -16,27 +10,27 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class VersionedListNodeImpl implements VersionedListNode {
 
-    public final VersionedListNodeFactory factory;
+    public final DbFactoryRegistry registry;
 
     protected final AtomicReference<VersionedListNodeData> dataReference = new AtomicReference<>();
     protected final int durableLength;
     protected ByteBuffer byteBuffer;
 
-    protected VersionedListNodeImpl(VersionedListNodeFactory factory) {
-        this.factory = factory;
+    protected VersionedListNodeImpl(DbFactoryRegistry registry) {
+        this.registry = registry;
         dataReference.set(new VersionedListNodeData(this));
         durableLength = 2;
     }
 
-    protected VersionedListNodeImpl(VersionedListNodeFactory factory, ByteBuffer byteBuffer) {
-        this.factory = factory;
+    protected VersionedListNodeImpl(DbFactoryRegistry registry, ByteBuffer byteBuffer) {
+        this.registry = registry;
         durableLength = byteBuffer.getInt();
         this.byteBuffer = byteBuffer.slice();
         this.byteBuffer.limit(durableLength - 6);
         byteBuffer.position(byteBuffer.position() + durableLength - 6);
     }
 
-    protected VersionedListNodeImpl(VersionedListNodeFactory factory,
+    protected VersionedListNodeImpl(DbFactoryRegistry registry,
                                     int level,
                                     int totalSize,
                                     long created,
@@ -44,7 +38,7 @@ public class VersionedListNodeImpl implements VersionedListNode {
                                     VersionedListNode leftNode,
                                     Object value,
                                     VersionedListNode rightNode) {
-        this.factory = factory;
+        this.registry = registry;
         VersionedListNodeData data = new VersionedListNodeData(
                 this,
                 level,
@@ -59,8 +53,8 @@ public class VersionedListNodeImpl implements VersionedListNode {
     }
 
     @Override
-    public VersionedListNodeFactory getFactory() {
-        return factory;
+    public DbFactoryRegistry getRegistry() {
+        return registry;
     }
 
     @Override

@@ -39,10 +39,8 @@ public class DbFactoryRegistry extends CascadingRegistry {
     public DbFactoryRegistry(Db db, CascadingRegistry parent) {
         super(parent);
         this.db = db;
-        versionedListNodeFactory = new VersionedListNodeFactory(this,
-                versionedListNodeImplId,
-                versionedNilListId);
-        versionedNilList = versionedListNodeFactory.nilVersionedList;
+        versionedListNodeFactory = new VersionedListNodeFactory(this);
+        versionedNilList = versionedListNodeFactory.versionedNilList;
         versionedMapNodeFactory = new VersionedMapNodeFactory(this);
         versionedNilMap = versionedMapNodeFactory.versionedNilMap;
         listNodeFactory = new ListNodeFactory(this);
