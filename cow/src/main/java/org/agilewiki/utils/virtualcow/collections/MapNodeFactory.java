@@ -1,7 +1,6 @@
 package org.agilewiki.utils.virtualcow.collections;
 
 import org.agilewiki.utils.immutable.BaseFactory;
-import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
 import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 
@@ -12,25 +11,20 @@ import java.nio.ByteBuffer;
  */
 public class MapNodeFactory extends BaseFactory {
 
-    public final DbFactoryRegistry factoryRegistry;
-    public final char nilMapId;
+    public final DbFactoryRegistry registry;
     public final MapNode nilMap;
 
-    public MapNodeFactory(
-            DbFactoryRegistry factoryRegistry,
-            char id,
-            char nilMapId) {
-        super(factoryRegistry, id);
-        this.factoryRegistry = factoryRegistry;
-        this.nilMapId = nilMapId;
-        new NilMapNodeFactory(this, nilMapId);
-        nilMap = new MapNodeImpl(factoryRegistry);
+    public MapNodeFactory(DbFactoryRegistry registry) {
+        super(registry, registry.mapNodeImplId);
+        this.registry = registry;
+        new NilMapNodeFactory(registry);
+        nilMap = new MapNodeImpl(registry);
     }
 
     @Override
     public ImmutableFactory getImmutableFactory(Object durable) {
         if (((MapNode) durable).isNil())
-            return factoryRegistry.getImmutableFactory(nilMapId);
+            return registry.getImmutableFactory(registry.nilMapId);
         return this;
     }
 
@@ -51,6 +45,6 @@ public class MapNodeFactory extends BaseFactory {
 
     @Override
     public MapNode deserialize(ByteBuffer byteBuffer) {
-        return new MapNodeImpl(factoryRegistry, byteBuffer);
+        return new MapNodeImpl(registry, byteBuffer);
     }
 }

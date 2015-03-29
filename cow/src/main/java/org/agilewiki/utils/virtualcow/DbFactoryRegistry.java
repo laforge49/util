@@ -54,10 +54,7 @@ public class DbFactoryRegistry extends CascadingRegistry {
                 listNodeImplId,
                 nilListId);
         nilList = listNodeFactory.nilList;
-        mapNodeFactory = new MapNodeFactory(
-                this,
-                mapNodeImplId,
-                nilMapId);
+        mapNodeFactory = new MapNodeFactory(this);
         nilMap = mapNodeFactory.nilMap;
         blockReferenceFactory = new BlockReferenceFactory(
                 this,
