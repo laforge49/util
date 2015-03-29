@@ -291,7 +291,7 @@ public class ListNodeData implements Releasable {
             ListNode t = new ListNode(
                     thisNode.factory,
                     level,
-                    totalSize - leftData.totalSize + leftData.leftNode.totalSize(),
+                    totalSize - leftData.totalSize + leftData.rightNode.totalSize(),
                     leftData.rightNode,
                     value,
                     rightNode);

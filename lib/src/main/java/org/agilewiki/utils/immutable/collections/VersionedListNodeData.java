@@ -441,7 +441,7 @@ public class VersionedListNodeData implements Releasable {
             VersionedListNode t = new VersionedListNode(
                     thisNode.factory,
                     level,
-                    totalSize - leftData.totalSize + leftData.leftNode.totalSize(),
+                    totalSize - leftData.totalSize + leftData.rightNode.totalSize(),
                     created,
                     deleted,
                     leftData.rightNode,

@@ -340,7 +340,8 @@ public interface ListNode extends Releasable {
      * @param value The value to be added.
      * @return The revised root node.
      */
-    default ListNode add(Object value) {
+    default ListNode add(Object value)
+            throws IOException {
         return add(-1, value);
     }
 
@@ -351,14 +352,15 @@ public interface ListNode extends Releasable {
      * @param value The value to be added.
      * @return The revised root node.
      */
-    default ListNode add(int ndx, Object value) {
+    default ListNode add(int ndx, Object value)
+            throws IOException {
         if (value == null)
             throw new IllegalArgumentException("value may not be null");
         if (isNil()) {
             if (ndx != 0 && ndx != -1)
                 throw new IllegalArgumentException("index out of range");
             DbFactoryRegistry registry = getRegistry();
-            return new ListNodeImpl(registry, 1, 1, registry.nilList, value, registry.nilList);
+            return getData().replace(1, 1, value);
         }
         return getData().add(ndx, value);
     }
