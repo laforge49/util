@@ -17,7 +17,7 @@ public class VersionedListNodeFactory extends BaseFactory {
     public VersionedListNodeFactory(FactoryRegistry factoryRegistry, char id, char nilVersionedListId) {
         super(factoryRegistry, id);
         this.nilVersionedListId = nilVersionedListId;
-        new NilVersionedListNodeFactory(this, nilVersionedListId);
+        new VersionedNilListNodeFactory(this, nilVersionedListId);
         nilVersionedList = new VersionedListNodeImpl(this);
     }
 

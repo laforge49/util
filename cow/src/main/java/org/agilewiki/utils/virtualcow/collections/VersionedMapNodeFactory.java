@@ -1,8 +1,8 @@
 package org.agilewiki.utils.virtualcow.collections;
 
 import org.agilewiki.utils.immutable.BaseFactory;
-import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
+import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 
 import java.nio.ByteBuffer;
 
@@ -16,14 +16,14 @@ public class VersionedMapNodeFactory extends BaseFactory {
     public final VersionedListNode nilVersionedList;
 
     public VersionedMapNodeFactory(
-            FactoryRegistry factoryRegistry,
+            DbFactoryRegistry factoryRegistry,
             char id,
             char nilVersionedMapId,
             VersionedListNode nilVersionedList) {
         super(factoryRegistry, id);
         this.nilVersionedMapId = nilVersionedMapId;
         this.nilVersionedList = nilVersionedList;
-        new NilVersionedMapNodeFactory(this, nilVersionedMapId);
+        new VersionedNilMapNodeFactory(factoryRegistry);
         nilVersionedMap = new VersionedMapNodeImpl(this);
     }
 

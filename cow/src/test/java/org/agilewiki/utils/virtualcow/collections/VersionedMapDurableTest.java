@@ -22,14 +22,14 @@ public class VersionedMapDurableTest extends TestCase {
 
             VersionedMapNode m1 = registry.versionedNilMap;
             ImmutableFactory factory1 = registry.getImmutableFactory(m1);
-            assertTrue(factory1 instanceof NilVersionedMapNodeFactory);
+            assertTrue(factory1 instanceof VersionedNilMapNodeFactory);
             assertEquals(2, factory1.getDurableLength(m1));
             ByteBuffer byteBuffer1 = ByteBuffer.allocate(factory1.getDurableLength(m1));
             factory1.writeDurable(m1, byteBuffer1);
             assertEquals(2, byteBuffer1.position());
             byteBuffer1.flip();
             ImmutableFactory factory2 = registry.readId(byteBuffer1);
-            assertTrue(factory2 instanceof NilVersionedMapNodeFactory);
+            assertTrue(factory2 instanceof VersionedNilMapNodeFactory);
             Object object2 = factory2.deserialize(byteBuffer1);
             assertEquals(2, byteBuffer1.position());
             assertTrue(object2.equals(registry.versionedNilMap));

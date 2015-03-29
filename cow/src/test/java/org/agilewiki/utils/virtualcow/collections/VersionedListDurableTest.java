@@ -22,14 +22,14 @@ public class VersionedListDurableTest extends TestCase {
 
             VersionedListNode l1 = registry.versionedNilList;
             ImmutableFactory factory1 = registry.getImmutableFactory(l1);
-            assertTrue(factory1 instanceof NilVersionedListNodeFactory);
+            assertTrue(factory1 instanceof VersionedNilListNodeFactory);
             assertEquals(2, factory1.getDurableLength(l1));
             ByteBuffer byteBuffer1 = ByteBuffer.allocate(factory1.getDurableLength(l1));
             factory1.writeDurable(l1, byteBuffer1);
             assertEquals(2, byteBuffer1.position());
             byteBuffer1.flip();
             ImmutableFactory factory2 = registry.readId(byteBuffer1);
-            assertTrue(factory2 instanceof NilVersionedListNodeFactory);
+            assertTrue(factory2 instanceof VersionedNilListNodeFactory);
             Object object2 = factory2.deserialize(byteBuffer1);
             assertEquals(2, byteBuffer1.position());
             assertTrue(object2.equals(registry.versionedNilList));
