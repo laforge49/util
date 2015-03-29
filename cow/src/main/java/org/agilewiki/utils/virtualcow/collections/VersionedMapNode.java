@@ -67,7 +67,8 @@ public interface VersionedMapNode extends Releasable {
      * @param time  The time the value is added.
      * @return The revised root node.
      */
-    default VersionedMapNode add(Comparable key, Object value, long time) {
+    default VersionedMapNode add(Comparable key, Object value, long time)
+            throws IOException {
         return add(key, -1, value, time);
     }
 
@@ -80,17 +81,19 @@ public interface VersionedMapNode extends Releasable {
      * @param time  The time the value is added.
      * @return The revised root node.
      */
-    default VersionedMapNode add(Comparable key, int ndx, Object value, long time) {
+    default VersionedMapNode add(Comparable key, int ndx, Object value, long time)
+            throws IOException {
         return add(key, ndx, value, time, Long.MAX_VALUE);
     }
 
-    default VersionedMapNode add(Comparable key, int ndx, Object value, long created, long deleted) {
+    default VersionedMapNode add(Comparable key, int ndx, Object value, long created, long deleted)
+            throws IOException {
         if (key == null)
             throw new IllegalArgumentException("key may not be null");
         if (isNil()) {
             DbFactoryRegistry registry = getRegistry();
             VersionedListNode listNode = registry.versionedNilList.add(ndx, value, created, deleted);
-            return new VersionedMapNodeImpl(registry, 1, registry.versionedNilMap, listNode, registry.versionedNilMap, key);
+            return getData().replace(1, listNode, key);
         }
         return getData().add(key, ndx, value, created, deleted);
     }
@@ -103,7 +106,8 @@ public interface VersionedMapNode extends Releasable {
      * @param time The time of the deletion.
      * @return The revised node.
      */
-    default VersionedMapNode remove(Comparable key, int ndx, long time) {
+    default VersionedMapNode remove(Comparable key, int ndx, long time)
+            throws IOException {
         if (isNil())
             return this;
         return getData().remove(key, ndx, time);
@@ -116,7 +120,8 @@ public interface VersionedMapNode extends Releasable {
      * @param time The time of the deletion.
      * @return The revised node.
      */
-    default VersionedMapNode clearList(Comparable key, long time) {
+    default VersionedMapNode clearList(Comparable key, long time)
+            throws IOException {
         if (isNil())
             return this;
         return getData().clearList(key, time);
@@ -130,13 +135,14 @@ public interface VersionedMapNode extends Releasable {
      * @param time  The time of the replacement.
      * @return The revised node.
      */
-    default VersionedMapNode set(Comparable key, Object value, long time) {
+    default VersionedMapNode set(Comparable key, Object value, long time)
+            throws IOException {
         if (value == null)
             throw new IllegalArgumentException("value may not be null");
         if (isNil()) {
             DbFactoryRegistry registry = getRegistry();
             VersionedListNode listNode = registry.versionedNilList.add(value, time);
-            return new VersionedMapNodeImpl(registry, 1, registry.versionedNilMap, listNode, registry.versionedNilMap, key);
+            return getData().replace(1, listNode, key);
         }
         return getData().set(key, value, time);
     }
@@ -147,7 +153,8 @@ public interface VersionedMapNode extends Releasable {
      * @param time The time of the deletion.
      * @return The currently empty versioned map.
      */
-    default VersionedMapNode clearMap(long time) {
+    default VersionedMapNode clearMap(long time)
+            throws IOException {
         if (isNil())
             return this;
         return getData().clearMap(time);
@@ -202,7 +209,8 @@ public interface VersionedMapNode extends Releasable {
      *
      * @return A complete, but shallow copy of the list.
      */
-    default VersionedMapNode copyMap() {
+    default VersionedMapNode copyMap()
+            throws IOException {
         return copyMap(0L);
     }
 
@@ -213,7 +221,8 @@ public interface VersionedMapNode extends Releasable {
      * @param time The given time.
      * @return A shortened copy of the map without some historical values.
      */
-    default VersionedMapNode copyMap(long time) {
+    default VersionedMapNode copyMap(long time)
+            throws IOException {
         return getData().copyMap(getRegistry().versionedNilMap, time);
     }
 
