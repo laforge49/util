@@ -39,8 +39,7 @@ public class DbFactoryRegistry extends CascadingRegistry {
     public DbFactoryRegistry(Db db, CascadingRegistry parent) {
         super(parent);
         this.db = db;
-        versionedListNodeFactory = new VersionedListNodeFactory(
-                this,
+        versionedListNodeFactory = new VersionedListNodeFactory(this,
                 versionedListNodeImplId,
                 versionedNilListId);
         versionedNilList = versionedListNodeFactory.nilVersionedList;
@@ -50,9 +49,6 @@ public class DbFactoryRegistry extends CascadingRegistry {
         nilList = listNodeFactory.nilList;
         mapNodeFactory = new MapNodeFactory(this);
         nilMap = mapNodeFactory.nilMap;
-        blockReferenceFactory = new BlockReferenceFactory(
-                this,
-                blockReferenceFactoryId,
-                db);
+        blockReferenceFactory = new BlockReferenceFactory(this);
     }
 }

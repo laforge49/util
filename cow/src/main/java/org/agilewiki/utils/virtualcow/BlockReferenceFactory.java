@@ -12,10 +12,6 @@ import java.nio.ByteBuffer;
  * Defines how a BlockReference is serialized / deserialized.
  */
 public class BlockReferenceFactory extends BaseFactory {
-    /**
-     * The database.
-     */
-    final public Db db;
 
     /**
      * the CS256 factory.
@@ -25,13 +21,11 @@ public class BlockReferenceFactory extends BaseFactory {
     /**
      * Create and register the factory.
      *
-     * @param factoryRegistry The registry where the factory is registered.
-     * @param id              The char used to identify the factory.
+     * @param registry        The registry where the factory is registered.
      */
-    public BlockReferenceFactory(FactoryRegistry factoryRegistry, char id, Db db) {
-        super(factoryRegistry, id);
-        this.db = db;
-        cs256Factory = (CS256Factory) factoryRegistry.getImmutableFactory(CS256.class);
+    public BlockReferenceFactory(DbFactoryRegistry registry) {
+        super(registry, registry.blockReferenceFactoryId);
+        cs256Factory = (CS256Factory) registry.getImmutableFactory(CS256.class);
     }
 
     @Override
@@ -58,6 +52,6 @@ public class BlockReferenceFactory extends BaseFactory {
         int blockLength = byteBuffer.getInt();
         ImmutableFactory factory = factoryRegistry.readId(byteBuffer);
         CS256 cs256 = (CS256) factory.deserialize(byteBuffer);
-        return new BlockReference(db, blockNbr, blockLength, cs256);
+        return new BlockReference(((DbFactoryRegistry) factoryRegistry).db, blockNbr, blockLength, cs256);
     }
 }
