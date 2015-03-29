@@ -10,11 +10,8 @@ import java.nio.ByteBuffer;
  */
 public class NilMapNodeFactory extends BaseFactory {
 
-    public final DbFactoryRegistry registry;
-
     public NilMapNodeFactory(DbFactoryRegistry registry) {
         super(registry, registry.nilMapId);
-        this.registry = registry;
     }
 
     @Override
@@ -39,6 +36,6 @@ public class NilMapNodeFactory extends BaseFactory {
 
     @Override
     public MapNode deserialize(ByteBuffer byteBuffer) {
-        return registry.nilMap;
+        return ((DbFactoryRegistry) factoryRegistry).nilMap;
     }
 }

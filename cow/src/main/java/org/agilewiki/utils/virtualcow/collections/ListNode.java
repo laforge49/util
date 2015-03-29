@@ -2,6 +2,7 @@ package org.agilewiki.utils.virtualcow.collections;
 
 import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.Releasable;
+import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -377,7 +378,7 @@ public interface ListNode extends Releasable {
      */
     default void writeDurable(ByteBuffer byteBuffer) {
         if (isNil()) {
-            byteBuffer.putChar(getFactory().nilListId);
+            byteBuffer.putChar(((DbFactoryRegistry) getFactory().factoryRegistry).nilListId);
             return;
         }
         byteBuffer.putChar(getFactory().id);

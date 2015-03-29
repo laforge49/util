@@ -3,6 +3,7 @@ package org.agilewiki.utils.virtualcow.collections;
 import org.agilewiki.utils.immutable.BaseFactory;
 import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
+import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 
 import java.nio.ByteBuffer;
 
@@ -11,20 +12,19 @@ import java.nio.ByteBuffer;
  */
 public class ListNodeFactory extends BaseFactory {
 
-    public final char nilListId;
     public final ListNode nilList;
+    public final NilListNodeFactory nilListNodeFactory;
 
-    public ListNodeFactory(FactoryRegistry factoryRegistry, char id, char nilListId) {
-        super(factoryRegistry, id);
-        this.nilListId = nilListId;
-        new NilListNodeFactory(this, nilListId);
+    public ListNodeFactory(DbFactoryRegistry registry) {
+        super(registry, registry.listNodeImplId);
+        nilListNodeFactory = new NilListNodeFactory(registry);
         nilList = new ListNodeImpl(this);
     }
 
     @Override
     public ImmutableFactory getImmutableFactory(Object immutable) {
         if (((ListNode) immutable).isNil())
-            return factoryRegistry.getImmutableFactory(nilListId);
+            return nilListNodeFactory;
         return this;
     }
 

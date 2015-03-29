@@ -11,20 +11,19 @@ import java.nio.ByteBuffer;
  */
 public class MapNodeFactory extends BaseFactory {
 
-    public final DbFactoryRegistry registry;
     public final MapNode nilMap;
+    public final NilMapNodeFactory nilMapNodeFactory;
 
     public MapNodeFactory(DbFactoryRegistry registry) {
         super(registry, registry.mapNodeImplId);
-        this.registry = registry;
-        new NilMapNodeFactory(registry);
+        nilMapNodeFactory = new NilMapNodeFactory(registry);
         nilMap = new MapNodeImpl(registry);
     }
 
     @Override
     public ImmutableFactory getImmutableFactory(Object durable) {
         if (((MapNode) durable).isNil())
-            return registry.getImmutableFactory(registry.nilMapId);
+            return nilMapNodeFactory;
         return this;
     }
 
@@ -45,6 +44,6 @@ public class MapNodeFactory extends BaseFactory {
 
     @Override
     public MapNode deserialize(ByteBuffer byteBuffer) {
-        return new MapNodeImpl(registry, byteBuffer);
+        return new MapNodeImpl(((DbFactoryRegistry) factoryRegistry), byteBuffer);
     }
 }
