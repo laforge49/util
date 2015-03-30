@@ -120,10 +120,19 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             return;
         ImmutableFactory factory = dbFactoryRegistry.getImmutableFactory(mapNode);
         dsm.commit();
-        int contentSize = 8 + dsm.durableLength() + factory.getDurableLength(mapNode);
+        int dsmLength = dsm.durableLength();
+        int maxDurableLength = maxBlockSize - 4 - 4 - 34 - 8 - dsmLength;
+        int dl = mapNode.getDurableLength();
+        while (dl > maxDurableLength) {
+            mapNode = (MapNode) mapNode.resize(maxDurableLength);
+            dsmLength = dsm.durableLength(); // may have grown
+            maxDurableLength = maxBlockSize - 4 - 4 - 34 - 8 - dsmLength;
+            dl = mapNode.getDurableLength();
+        }
+        int contentSize = 8 + dsmLength + dl;
         int blockSize = 4 + 4 + 34 + contentSize;
         if (blockSize > maxBlockSize) {
-            throw new IllegalStateException("maxRootBlockSize is smaller than the block size " +
+            throw new IllegalStateException("maxBlockSize is smaller than the block size " +
                     blockSize);
         }
         ByteBuffer contentBuffer = ByteBuffer.allocate(contentSize);
