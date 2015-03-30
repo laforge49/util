@@ -92,18 +92,4 @@ public interface ImmutableFactory {
      * @return The deserialized object.
      */
     Object deserialize(ByteBuffer byteBuffer);
-
-    /**
-     * Resize nodes which are too large.
-     * (Used in virtual AA trees.)
-     *
-     * @param maxSize    Max size allowed for durable length.
-     * @param immutable  The immutable to be resized.
-     * @return The revised structure.
-     */
-    default Object resize(int maxSize, Object immutable) throws IOException {
-        if (getDurableLength(immutable) > maxSize)
-            throw new UnsupportedOperationException("Unable to resize");
-        return this;
-    }
 }
