@@ -1,5 +1,6 @@
 package org.agilewiki.utils.immutable;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
@@ -91,4 +92,15 @@ public interface ImmutableFactory {
      * @return The deserialized object.
      */
     Object deserialize(ByteBuffer byteBuffer);
+
+    /**
+     * Resize nodes which are too large.
+     * (Used in virtual AA trees.)
+     *
+     * @return
+     * @throws IOException
+     */
+    default Object resize() throws IOException {
+        return this;
+    }
 }
