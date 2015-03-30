@@ -65,7 +65,7 @@ public class BlockReference implements Releasable {
         ImmutableFactory factory = db.dbFactoryRegistry.getImmutableFactory(immutable);
         int bl = factory.getDurableLength(immutable);
         if (bl > db.maxBlockSize && immutable instanceof Releasable) {
-            immutable = ((Releasable) immutable).resize(db.maxBlockSize);
+            immutable = ((Releasable) immutable).resize(db.maxBlockSize, db.maxBlockSize);
             bl = factory.getDurableLength(immutable);
         }
         if (bl > db.maxBlockSize) {

@@ -22,9 +22,10 @@ public interface Releasable {
      * Resize immutables which are too large.
      *
      * @param maxSize    Max size allowed for durable length.
+     * @param maxBlockSize Maximum block size.
      * @return The revised structure.
      */
-    default Object resize(int maxSize) throws IOException {
+    default Object resize(int maxSize, int maxBlockSize) throws IOException {
         return this;
     }
 

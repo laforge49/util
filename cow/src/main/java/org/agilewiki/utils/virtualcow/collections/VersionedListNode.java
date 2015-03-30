@@ -472,7 +472,8 @@ public interface VersionedListNode extends Releasable {
     }
 
     @Override
-    default Object resize(int maxSize) throws IOException {
-        return getData().resize(maxSize);
+    default Object resize(int maxSize, int maxBlockSize)
+            throws IOException {
+        return getData().resize(maxSize, maxBlockSize);
     }
 }

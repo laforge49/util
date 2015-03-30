@@ -124,7 +124,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         int maxDurableLength = maxBlockSize - 4 - 4 - 34 - 8 - dsmLength;
         int dl = mapNode.getDurableLength();
         while (dl > maxDurableLength) {
-            mapNode = (MapNode) mapNode.resize(maxDurableLength);
+            mapNode = (MapNode) mapNode.resize(maxDurableLength, maxBlockSize);
             dsmLength = dsm.durableLength(); // may have grown
             maxDurableLength = maxBlockSize - 4 - 4 - 34 - 8 - dsmLength;
             dl = mapNode.getDurableLength();

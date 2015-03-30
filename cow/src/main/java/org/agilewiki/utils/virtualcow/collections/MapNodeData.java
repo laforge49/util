@@ -583,6 +583,12 @@ public class MapNodeData implements Releasable {
         return new MapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
     }
 
+    public MapNode replace(MapNode leftNode, ListNode listNode, MapNode rightNode)
+            throws IOException {
+        thisNode.releaseLocal();
+        return new MapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
+    }
+
     public MapNode replaceLeft(MapNode leftNode)
             throws IOException {
         thisNode.releaseLocal();
@@ -605,5 +611,47 @@ public class MapNodeData implements Releasable {
             throws IOException {
         thisNode.releaseLocal();
         return new MapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
+    }
+
+    @Override
+    public Object resize(int maxSize, int maxBlockSize) throws IOException {
+        if (thisNode.getDurableLength() <= maxSize) {
+            return thisNode;
+        }
+
+        MapNode l = leftNode;
+        if (l.getDurableLength() > maxBlockSize)
+            l = (MapNode) l.resize(maxBlockSize, maxBlockSize);
+        MapNode r = rightNode;
+        if (r.getDurableLength() > maxBlockSize)
+            r = (MapNode) r.resize(maxBlockSize, maxBlockSize);
+        ListNode v = listNode;
+        if (v.getDurableLength() > maxBlockSize)
+            v = (ListNode) v.resize(maxBlockSize, maxBlockSize);
+        if (l != leftNode || r != rightNode || v != listNode)
+            return replace(l, v, r).resize(maxSize, maxBlockSize);
+
+        int ldl = leftNode.getDurableLength();
+        int vdl = listNode.getDurableLength();
+        int rdl = rightNode.getDurableLength();
+        Releasable s = leftNode;
+        int dl = ldl;
+        if (vdl > dl) {
+            dl = vdl;
+            s = listNode;
+        }
+        if (rdl > dl) {
+            dl = rdl;
+            s = rightNode;
+        }
+        Object q = s.shrink();
+        MapNode n;
+        if (leftNode == s)
+            n = replaceLeft((MapNode) q);
+        else if (listNode == s)
+            n = replace((ListNode) q);
+        else
+            n = replaceRight((MapNode) q);
+        return n.resize(maxSize, maxBlockSize);
     }
 }
