@@ -165,7 +165,8 @@ public interface VersionedMapNode extends Releasable {
      *
      * @return A complete, but shallow copy of the list.
      */
-    default VersionedListNode copyList(Comparable key) {
+    default VersionedListNode copyList(Comparable key)
+            throws IOException {
         return getList(key).copyList();
     }
 
@@ -176,7 +177,8 @@ public interface VersionedMapNode extends Releasable {
      * @param time The given time.
      * @return A shortened copy of the list without some historical values.
      */
-    default VersionedListNode copyList(Comparable key, long time) {
+    default VersionedListNode copyList(Comparable key, long time)
+            throws IOException {
         return getList(key).copyList(time);
     }
 

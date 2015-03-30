@@ -433,29 +433,16 @@ public class VersionedListNodeData implements Releasable {
      *
      * @return Revised root node.
      */
-    public VersionedListNode skew() {
+    public VersionedListNode skew()
+            throws IOException {
         if (isNil() || leftNode.isNil())
             return thisNode;
         VersionedListNodeData leftData = leftNode.getData();
         if (leftData.level == level) {
-            VersionedListNode t = new VersionedListNodeImpl(
-                    thisNode.getRegistry(),
-                    level,
+            VersionedListNode t = replaceLeft(
                     totalSize - leftData.totalSize + leftData.rightNode.totalSize(),
-                    created,
-                    deleted,
-                    leftData.rightNode,
-                    value,
-                    rightNode);
-            return new VersionedListNodeImpl(
-                    thisNode.getRegistry(),
-                    leftData.level,
-                    totalSize,
-                    leftData.created,
-                    leftData.deleted,
-                    leftData.leftNode,
-                    leftData.value,
-                    t);
+                    leftData.rightNode);
+            return leftData.replaceRight(totalSize, t);
         } else
             return thisNode;
     }
@@ -465,31 +452,21 @@ public class VersionedListNodeData implements Releasable {
      *
      * @return The revised root node.
      */
-    public VersionedListNode split() {
+    public VersionedListNode split()
+            throws IOException {
         if (isNil() || rightNode.isNil())
             return thisNode;
         VersionedListNodeData rightData = rightNode.getData();
         if (rightData.rightNode.isNil())
             return thisNode;
         if (level == rightData.rightNode.getData().level) {
-            VersionedListNode t = new VersionedListNodeImpl(
-                    thisNode.getRegistry(),
-                    level,
+            VersionedListNode t = replaceRight(
                     totalSize - rightData.totalSize + rightData.leftNode.totalSize(),
-                    created,
-                    deleted,
-                    leftNode,
-                    value,
                     rightData.leftNode);
-            VersionedListNode r = new VersionedListNodeImpl(
-                    thisNode.getRegistry(),
+            VersionedListNode r = rightData.replaceLeft(
                     rightData.level + 1,
                     totalSize,
-                    rightData.created,
-                    rightData.deleted,
-                    t,
-                    rightData.value,
-                    rightData.rightNode);
+                    t);
             return r;
         }
         return thisNode;
@@ -504,30 +481,19 @@ public class VersionedListNodeData implements Releasable {
      * @param deleted Deletion time, or MAX_VALUE.
      * @return The revised root node.
      */
-    public VersionedListNode add(int ndx, Object value, long created, long deleted) {
+    public VersionedListNode add(int ndx, Object value, long created, long deleted)
+            throws IOException {
         if (ndx == -1)
             ndx = totalSize;
         int leftSize = leftNode.totalSize();
         VersionedListNode t = thisNode;
         if (ndx <= leftSize) {
-            t = new VersionedListNodeImpl(
-                    thisNode.getRegistry(),
-                    level,
+            t = replaceLeft(
                     totalSize + 1,
-                    this.created,
-                    this.deleted,
-                    leftNode.add(ndx, value, created, deleted),
-                    this.value,
-                    rightNode);
+                    leftNode.add(ndx, value, created, deleted));
         } else {
-            t = new VersionedListNodeImpl(
-                    thisNode.getRegistry(),
-                    level,
+            t = replaceRight(
                     totalSize + 1,
-                    this.created,
-                    this.deleted,
-                    leftNode,
-                    this.value,
                     rightNode.add(ndx - leftSize - 1, value, created, deleted));
         }
         return t.getData().skew().getData().split();
@@ -540,49 +506,26 @@ public class VersionedListNodeData implements Releasable {
      * @param time The time of the deletion.
      * @return The revised node.
      */
-    public VersionedListNode remove(int ndx, long time) {
+    public VersionedListNode remove(int ndx, long time)
+            throws IOException {
         if (isNil())
             return thisNode;
         int leftSize = leftNode.totalSize();
         if (ndx == leftSize) {
             if (exists(time))
-                return new VersionedListNodeImpl(
-                        thisNode.getRegistry(),
-                        level,
-                        totalSize,
-                        created,
-                        time,
-                        leftNode,
-                        value,
-                        rightNode);
+                return replace(time);
             return thisNode;
         }
         if (ndx < leftSize) {
             VersionedListNode n = leftNode.remove(ndx, time);
             if (leftNode == n)
                 return thisNode;
-            return new VersionedListNodeImpl(
-                    thisNode.getRegistry(),
-                    level,
-                    totalSize,
-                    created,
-                    deleted,
-                    n,
-                    value,
-                    rightNode);
+            return replaceLeft(n);
         }
         VersionedListNode n = rightNode.remove(ndx - leftSize - 1, time);
         if (rightNode == n)
             return thisNode;
-        return new VersionedListNodeImpl(
-                thisNode.getRegistry(),
-                level,
-                totalSize,
-                created,
-                deleted,
-                leftNode,
-                value,
-                n);
+        return replaceRight(n);
     }
 
     /**
@@ -593,7 +536,8 @@ public class VersionedListNodeData implements Releasable {
      * @param time The given time.
      * @return A shortened copy of the list without some historical values.
      */
-    public VersionedListNode copyList(VersionedListNode n, long time) {
+    public VersionedListNode copyList(VersionedListNode n, long time)
+            throws IOException {
         if (isNil())
             return n;
         n = leftNode.getData().copyList(n, time);
@@ -608,22 +552,15 @@ public class VersionedListNodeData implements Releasable {
      * @param time The time of the deletion.
      * @return The currently empty versioned list.
      */
-    public VersionedListNode clearList(long time) {
+    public VersionedListNode clearList(long time)
+            throws IOException {
         if (isNil())
             return thisNode;
         VersionedListNode ln = leftNode.clearList(time);
         VersionedListNode rn = rightNode.clearList(time);
         if (ln == leftNode && rn == rightNode && !exists(time))
             return thisNode;
-        return new VersionedListNodeImpl(
-                thisNode.getRegistry(),
-                level,
-                totalSize,
-                created,
-                time,
-                ln,
-                value,
-                rn);
+        return replace(ln, rn);
     }
 
     @Override
@@ -635,5 +572,77 @@ public class VersionedListNodeData implements Releasable {
             ((Releasable) value).releaseAll();
         if (rightNode instanceof Releasable)
             ((Releasable) rightNode).releaseAll();
+    }
+
+    public VersionedListNode replace(long deleted)
+            throws IOException {
+        thisNode.releaseLocal();
+        return new VersionedListNodeImpl(thisNode.getRegistry(), level, totalSize, created, deleted, leftNode, value, rightNode);
+    }
+
+    public VersionedListNode replace(int level, int totalSize)
+            throws IOException {
+        thisNode.releaseLocal();
+        return new VersionedListNodeImpl(thisNode.getRegistry(), level, totalSize, created, deleted, leftNode, value, rightNode);
+    }
+
+    public VersionedListNode replace(int level, int totalSize, long created, long deleted, Object value)
+            throws IOException {
+        thisNode.releaseLocal();
+        return new VersionedListNodeImpl(thisNode.getRegistry(), level, totalSize, created, deleted, leftNode, value, rightNode);
+    }
+
+    public VersionedListNode replace(VersionedListNode leftNode, VersionedListNode rightNode)
+            throws IOException {
+        thisNode.releaseLocal();
+        return new VersionedListNodeImpl(thisNode.getRegistry(), level, totalSize, created, deleted, leftNode, value, rightNode);
+    }
+
+    public VersionedListNode replaceLeft(int totalSize, VersionedListNode leftNode, Object value)
+            throws IOException {
+        thisNode.releaseLocal();
+        return new VersionedListNodeImpl(thisNode.getRegistry(), level, totalSize, created, deleted, leftNode, value, rightNode);
+    }
+
+    public VersionedListNode replaceLeft(VersionedListNode leftNode)
+            throws IOException {
+        thisNode.releaseLocal();
+        return new VersionedListNodeImpl(thisNode.getRegistry(), level, totalSize, created, deleted, leftNode, value, rightNode);
+    }
+
+    public VersionedListNode replaceLeft(int totalSize, VersionedListNode leftNode)
+            throws IOException {
+        thisNode.releaseLocal();
+        return new VersionedListNodeImpl(thisNode.getRegistry(), level, totalSize, created, deleted, leftNode, value, rightNode);
+    }
+
+    public VersionedListNode replaceLeft(int level, int totalSize, VersionedListNode leftNode)
+            throws IOException {
+        thisNode.releaseLocal();
+        return new VersionedListNodeImpl(thisNode.getRegistry(), level, totalSize, created, deleted, leftNode, value, rightNode);
+    }
+
+    public VersionedListNode replaceRight(VersionedListNode rightNode)
+            throws IOException {
+        thisNode.releaseLocal();
+        return new VersionedListNodeImpl(thisNode.getRegistry(), level, totalSize, created, deleted, leftNode, value, rightNode);
+    }
+
+    public VersionedListNode replaceRight(int totalSize, VersionedListNode rightNode)
+            throws IOException {
+        thisNode.releaseLocal();
+        return new VersionedListNodeImpl(thisNode.getRegistry(), level, totalSize, created, deleted, leftNode, value, rightNode);
+    }
+
+    public VersionedListNode replaceRight(int totalSize, Object value, VersionedListNode rightNode)
+            throws IOException {
+        thisNode.releaseLocal();
+        return new VersionedListNodeImpl(thisNode.getRegistry(), level, totalSize, created, deleted, leftNode, value, rightNode);
+    }
+
+    public VersionedListNode replaceRight(int level, int totalSize, VersionedListNode rightNode)
+            throws IOException {
+        thisNode.releaseLocal();
+        return new VersionedListNodeImpl(thisNode.getRegistry(), level, totalSize, created, deleted, leftNode, value, rightNode);
     }
 }
