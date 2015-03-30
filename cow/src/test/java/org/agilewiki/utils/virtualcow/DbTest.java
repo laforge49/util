@@ -38,7 +38,7 @@ public class DbTest extends TestCase {
                 db.open();
                 System.out.println(db.mapNode.firstKey());
                 BlockReference br = (BlockReference) db.mapNode.listAccessor("y").get(0);
-                System.out.println(br.get());
+                System.out.println(br.getData());
             }
         } finally {
             Plant.close();

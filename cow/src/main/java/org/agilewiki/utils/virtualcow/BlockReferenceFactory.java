@@ -28,6 +28,22 @@ public class BlockReferenceFactory extends BaseFactory {
         cs256Factory = (CS256Factory) registry.getImmutableFactory(CS256.class);
     }
 
+    /**
+     * Create and register the factory.
+     *
+     * @param registry        The registry where the factory is registered.
+     * @param id              The char used to identify the factory.
+     */
+    protected BlockReferenceFactory(DbFactoryRegistry registry, char id) {
+        super(registry, id);
+        cs256Factory = (CS256Factory) registry.getImmutableFactory(CS256.class);
+    }
+
+    @Override
+    public char getId() {
+        return id;
+    }
+
     @Override
     public Class getImmutableClass() {
         return BlockReference.class;

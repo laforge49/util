@@ -87,7 +87,7 @@ public class BlockReference implements Releasable {
     @Override
     public void releaseAll()
             throws IOException {
-        Object immutable = get();
+        Object immutable = getData();
         if (immutable instanceof Releasable)
             ((Releasable) immutable).releaseAll();
         releaseLocal();
@@ -107,7 +107,7 @@ public class BlockReference implements Releasable {
      *
      * @return The contents of the block.
      */
-    public Object get()
+    public Object getData()
             throws IOException {
         if (softReference != null) {
             Object immutable = softReference.get();

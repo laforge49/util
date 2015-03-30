@@ -1,5 +1,6 @@
 package org.agilewiki.utils.virtualcow.collections;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableMap;
@@ -22,7 +23,8 @@ public interface MapAccessor extends Iterable<ListAccessor> {
      *
      * @return The current size of the map.
      */
-    int size();
+    int size()
+            throws IOException;
 
     /**
      * Returns a list accessor for the given time.
@@ -30,28 +32,32 @@ public interface MapAccessor extends Iterable<ListAccessor> {
      * @param key The key for the list.
      * @return A list accessor for the given time.
      */
-    ListAccessor listAccessor(Comparable key);
+    ListAccessor listAccessor(Comparable key)
+            throws IOException;
 
     /**
      * Returns a set of all keys with non-empty lists for the given time.
      *
      * @return A set of the keys with content at the time of the query.
      */
-    NavigableSet<Comparable> flatKeys();
+    NavigableSet<Comparable> flatKeys()
+            throws IOException;
 
     /**
      * Returns the smallest key of the non-empty lists for the given time.
      *
      * @return The smallest key, or null.
      */
-    Comparable firstKey();
+    Comparable firstKey()
+            throws IOException;
 
     /**
      * Returns the largest key of the non-empty lists for the given time.
      *
      * @return The largest key, or null.
      */
-    Comparable lastKey();
+    Comparable lastKey()
+            throws IOException;
 
     /**
      * Returns the next greater key, or null.
@@ -59,7 +65,8 @@ public interface MapAccessor extends Iterable<ListAccessor> {
      * @param key The given key.
      * @return The next greater key with content at the time of the query.
      */
-    Comparable higherKey(Comparable key);
+    Comparable higherKey(Comparable key)
+            throws IOException;
 
     /**
      * Returns the key with content that is greater than or equal to the given key.
@@ -67,7 +74,8 @@ public interface MapAccessor extends Iterable<ListAccessor> {
      * @param key The given key.
      * @return The key greater than or equal to the given key, or null.
      */
-    Comparable ceilingKey(Comparable key);
+    Comparable ceilingKey(Comparable key)
+            throws IOException;
 
     /**
      * Returns the next smaller key, or null.
@@ -75,7 +83,8 @@ public interface MapAccessor extends Iterable<ListAccessor> {
      * @param key The given key.
      * @return The next smaller key with content at the time of the query.
      */
-    Comparable lowerKey(Comparable key);
+    Comparable lowerKey(Comparable key)
+            throws IOException;
 
     /**
      * Returns the key with content that is smaller than or equal to the given key.
@@ -83,7 +92,8 @@ public interface MapAccessor extends Iterable<ListAccessor> {
      * @param key The given key.
      * @return The key smaller than or equal to the given key, or null.
      */
-    Comparable floorKey(Comparable key);
+    Comparable floorKey(Comparable key)
+            throws IOException;
 
     /**
      * Returns an iterator over the non-empty list accessors.
@@ -97,5 +107,6 @@ public interface MapAccessor extends Iterable<ListAccessor> {
      *
      * @return A map of lists.
      */
-    NavigableMap<Comparable, List> flatMap();
+    NavigableMap<Comparable, List> flatMap()
+            throws IOException;
 }

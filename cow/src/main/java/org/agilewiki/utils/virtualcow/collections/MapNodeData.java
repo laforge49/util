@@ -128,7 +128,8 @@ public class MapNodeData implements Releasable {
      * @param key The key for the node.
      * @return The list, or null.
      */
-    public ListNode getList(Comparable key) {
+    public ListNode getList(Comparable key)
+            throws IOException {
         if (isNil())
             return null;
         int c = key.compareTo(this.key);
@@ -197,21 +198,25 @@ public class MapNodeData implements Releasable {
         return t.getData().skew().getData().split();
     }
 
-    private MapNode successor() {
+    private MapNode successor()
+            throws IOException {
         return rightNode.getData().leftMost();
     }
 
-    private MapNode leftMost() {
+    private MapNode leftMost()
+            throws IOException {
         if (!leftNode.isNil())
             return leftNode.getData().leftMost();
         return thisNode;
     }
 
-    private MapNode predecessor() {
+    private MapNode predecessor()
+            throws IOException {
         return leftNode.getData().rightMost();
     }
 
-    private MapNode rightMost() {
+    private MapNode rightMost()
+            throws IOException {
         if (!rightNode.isNil())
             return rightNode.getData().rightMost();
         return thisNode;
@@ -348,7 +353,8 @@ public class MapNodeData implements Releasable {
      *
      * @param keys The set being built.
      */
-    public void flatKeys(NavigableSet<Comparable> keys) {
+    public void flatKeys(NavigableSet<Comparable> keys)
+            throws IOException {
         if (isNil())
             return;
         leftNode.getData().flatKeys(keys);
@@ -362,7 +368,8 @@ public class MapNodeData implements Releasable {
      *
      * @param map The map being built.
      */
-    public void flatMap(NavigableMap<Comparable, List> map) {
+    public void flatMap(NavigableMap<Comparable, List> map)
+            throws IOException {
         if (isNil())
             return;
         leftNode.getData().flatMap(map);
@@ -395,7 +402,8 @@ public class MapNodeData implements Releasable {
      *
      * @return The count of all the keys in the map.
      */
-    public int totalSize() {
+    public int totalSize()
+            throws IOException {
         if (isNil())
             return 0;
         return leftNode.totalSize() + 1 + rightNode.totalSize();
@@ -406,7 +414,8 @@ public class MapNodeData implements Releasable {
      *
      * @return The size of the map.
      */
-    public int size() {
+    public int size()
+            throws IOException {
         return totalSize();
     }
 
@@ -415,7 +424,8 @@ public class MapNodeData implements Releasable {
      *
      * @return The smallest key, or null.
      */
-    public Comparable firstKey() {
+    public Comparable firstKey()
+            throws IOException {
         if (isNil())
             return null;
         Comparable k = leftNode.firstKey();
@@ -429,7 +439,8 @@ public class MapNodeData implements Releasable {
      *
      * @return The largest key, or null.
      */
-    public Comparable lastKey() {
+    public Comparable lastKey()
+            throws IOException {
         if (isNil())
             return null;
         Comparable k = rightNode.lastKey();
@@ -444,7 +455,8 @@ public class MapNodeData implements Releasable {
      * @param key The given key.
      * @return The next greater key, or null.
      */
-    public Comparable higherKey(Comparable key) {
+    public Comparable higherKey(Comparable key)
+            throws IOException {
         if (isNil())
             return null;
         int c = key.compareTo(this.key);
@@ -464,7 +476,8 @@ public class MapNodeData implements Releasable {
      * @param key The given key.
      * @return The key greater than or equal to the given key, or null.
      */
-    public Comparable ceilingKey(Comparable key) {
+    public Comparable ceilingKey(Comparable key)
+            throws IOException {
         if (isNil())
             return null;
         int c = key.compareTo(this.key);
@@ -484,7 +497,8 @@ public class MapNodeData implements Releasable {
      * @param key The given key.
      * @return The next smaller key, or null.
      */
-    public Comparable lowerKey(Comparable key) {
+    public Comparable lowerKey(Comparable key)
+            throws IOException {
         if (isNil())
             return null;
         int c = key.compareTo(this.key);
@@ -504,7 +518,8 @@ public class MapNodeData implements Releasable {
      * @param key The given key.
      * @return The key smaller than or equal to the given key, or null.
      */
-    public Comparable floorKey(Comparable key) {
+    public Comparable floorKey(Comparable key)
+            throws IOException {
         if (isNil())
             return null;
         int c = key.compareTo(this.key);

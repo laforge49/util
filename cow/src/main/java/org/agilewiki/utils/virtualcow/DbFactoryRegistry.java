@@ -22,12 +22,16 @@ public class DbFactoryRegistry extends CascadingRegistry {
 
     public final char versionedListNodeImplId = 'l';
     public final char versionedNilListId = '1';
+    public final char versionedListReferenceId = '5';
     public final char versionedMapNodeImplId = 'm';
     public final char versionedNilMapId = '2';
+    public final char versionedMapReferenceId = '6';
     public final char listNodeImplId = 'n';
     public final char nilListId = '3';
+    public final char listReferenceId = '7';
     public final char mapNodeImplId = 'o';
     public final char nilMapId = '4';
+    public final char mapReferenceId = '8';
     public final char blockReferenceFactoryId = 'r';
 
     /**

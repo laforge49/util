@@ -7,7 +7,7 @@ import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 import java.nio.ByteBuffer;
 
 /**
- * Defines how true is serialized / deserialized.
+ * Defines how map is serialized / deserialized.
  */
 public class MapNodeFactory extends BaseFactory {
 
@@ -18,6 +18,7 @@ public class MapNodeFactory extends BaseFactory {
         super(registry, registry.mapNodeImplId);
         nilMapNodeFactory = new NilMapNodeFactory(registry);
         nilMap = new MapNodeImpl(registry);
+        new MapReferenceFactory(registry);
     }
 
     @Override
