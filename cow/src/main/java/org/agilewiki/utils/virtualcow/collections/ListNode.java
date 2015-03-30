@@ -408,4 +408,9 @@ public interface ListNode extends Releasable {
             throws IOException {
         getData().releaseAll();
     }
+
+    @Override
+    default Object resize(int maxSize) throws IOException {
+        return getData().resize(maxSize);
+    }
 }
