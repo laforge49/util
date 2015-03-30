@@ -64,6 +64,9 @@ public class BlockReference implements Releasable {
         this.db = db;
         ImmutableFactory factory = db.dbFactoryRegistry.getImmutableFactory(immutable);
         blockLength = factory.getDurableLength(immutable);
+        if (blockLength > db.maxBlockSize && immutable instanceof Releasable) {
+            immutable = ((Releasable) immutable).resize(db.maxBlockSize);
+        }
         if (blockLength > db.maxBlockSize) {
             db.getReactor().error("block size exceeds max block size");
             throw new IllegalStateException("block size exceeds max block size");
