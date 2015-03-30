@@ -117,7 +117,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     protected void _update(MapNode mapNode)
             throws IOException {
         if (mapNode == this.mapNode)
-            return;
+            return; // Query?
         ImmutableFactory factory = dbFactoryRegistry.getImmutableFactory(mapNode);
         dsm.commit();
         int dsmLength = dsm.durableLength();
