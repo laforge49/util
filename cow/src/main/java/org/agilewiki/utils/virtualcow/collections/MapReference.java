@@ -30,14 +30,4 @@ public class MapReference extends BlockReference implements MapNode {
     public MapNodeData getData() throws IOException {
         return (MapNodeData) super.getData();
     }
-
-    @Override
-    public int getDurableLength() {
-        return 2 + 4 + 4 + CS256Factory.DURABLE_LENGTH;
-    }
-
-    @Override
-    public void serialize(ByteBuffer byteBuffer) {
-
-    }
 }

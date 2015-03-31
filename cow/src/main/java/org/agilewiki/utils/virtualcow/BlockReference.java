@@ -3,6 +3,7 @@ package org.agilewiki.utils.virtualcow;
 import org.agilewiki.utils.immutable.ImmutableFactory;
 import org.agilewiki.utils.immutable.Releasable;
 import org.agilewiki.utils.immutable.scalars.CS256;
+import org.agilewiki.utils.immutable.scalars.CS256Factory;
 
 import java.io.IOException;
 import java.lang.ref.SoftReference;
@@ -35,6 +36,8 @@ public class BlockReference implements Releasable {
 
     protected SoftReference softReference;
 
+    protected final CS256Factory cs256Factory;
+
     /**
      * Create a reference to an existing block.
      *
@@ -51,6 +54,7 @@ public class BlockReference implements Releasable {
         this.blockNbr = blockNbr;
         this.blockLength = blockLength;
         this.cs256 = cs256;
+        cs256Factory = (CS256Factory) db.dbFactoryRegistry.getImmutableFactory(cs256);
     }
 
     /**
@@ -77,6 +81,7 @@ public class BlockReference implements Releasable {
         factory.writeDurable(immutable, byteBuffer);
         byteBuffer.flip();
         cs256 = new CS256(byteBuffer);
+        cs256Factory = (CS256Factory) db.dbFactoryRegistry.getImmutableFactory(cs256);
         blockNbr = db.allocate();
         db.writeBlock(byteBuffer, blockNbr);
     }
@@ -126,5 +131,26 @@ public class BlockReference implements Releasable {
         Object immutable = factory.deserialize(byteBuffer);
         softReference = new SoftReference(immutable);
         return immutable;
+    }
+
+    /**
+     * Serialize this object into a ByteBuffer.
+     *
+     * @param byteBuffer Where the serialized data is to be placed.
+     */
+    public void serialize(ByteBuffer byteBuffer) {
+        byteBuffer.putInt(blockNbr);
+        byteBuffer.putInt(blockLength);
+        cs256Factory.writeDurable(cs256, byteBuffer);
+    }
+
+    /**
+     * Returns the size of a byte array needed to serialize this object,
+     * including the space needed for the durable id.
+     *
+     * @return The size in bytes of the serialized data.
+     */
+    public int getDurableLength() {
+        return 2 + 4 + 4 + CS256Factory.DURABLE_LENGTH;
     }
 }
