@@ -27,7 +27,8 @@ public class DbTest extends TestCase {
                         System.out.println("block usage: " + db.usage());
                         mapNode = mapNode.add("x", "hi!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
-                        BlockReference blockReference = new BlockReference(db, "ho!");
+                        BlockReference blockReference =
+                                new BlockReference(db.dbFactoryRegistry, "ho!");
                         mapNode = mapNode.add("y", blockReference);
                         return mapNode;
                     }

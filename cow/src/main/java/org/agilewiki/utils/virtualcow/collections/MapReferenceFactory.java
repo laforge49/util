@@ -1,5 +1,7 @@
 package org.agilewiki.utils.virtualcow.collections;
 
+import org.agilewiki.utils.immutable.scalars.CS256;
+import org.agilewiki.utils.virtualcow.BlockReference;
 import org.agilewiki.utils.virtualcow.BlockReferenceFactory;
 import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 
@@ -22,5 +24,12 @@ public class MapReferenceFactory extends BlockReferenceFactory {
     @Override
     public Class getImmutableClass() {
         return MapReference.class;
+    }
+
+    protected BlockReference createReference(DbFactoryRegistry registry,
+                                             int blockNbr,
+                                             int blockLength,
+                                             CS256 cs256) {
+        return new MapReference(registry, blockNbr, blockLength, cs256);
     }
 }

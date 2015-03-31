@@ -14,10 +14,7 @@ import java.nio.ByteBuffer;
  */
 public class BlockReference implements Releasable {
 
-    /**
-     * The database this object is a part of.
-     */
-    final public Db db;
+    public final DbFactoryRegistry registry;
 
     /**
      * The number of the block being referenced.
@@ -41,32 +38,33 @@ public class BlockReference implements Releasable {
     /**
      * Create a reference to an existing block.
      *
-     * @param db          The database this object is a part of.
+     * @param registry          The registry for the database.
      * @param blockNbr    The number of the block being referenced.
      * @param blockLength The length of the durable data held by the block.
      * @param cs256       The checksum of the contents of the block.
      */
-    public BlockReference(Db db,
+    public BlockReference(DbFactoryRegistry registry,
                           int blockNbr,
                           int blockLength,
                           CS256 cs256) {
-        this.db = db;
+        this.registry = registry;
         this.blockNbr = blockNbr;
         this.blockLength = blockLength;
         this.cs256 = cs256;
-        cs256Factory = (CS256Factory) db.dbFactoryRegistry.getImmutableFactory(cs256);
+        cs256Factory = (CS256Factory) registry.getImmutableFactory(cs256);
     }
 
     /**
      * Creates a new block and a reference to it.
      *
-     * @param db        The database this object is a part of.
+     * @param registry          The registry for the database.
      * @param immutable The object to be saved in the new block.
      */
-    public BlockReference(Db db, Object immutable)
+    public BlockReference(DbFactoryRegistry registry, Object immutable)
             throws IOException {
-        this.db = db;
-        ImmutableFactory factory = db.dbFactoryRegistry.getImmutableFactory(immutable);
+        this.registry = registry;
+        ImmutableFactory factory = registry.getImmutableFactory(immutable);
+        Db db = registry.db;
         int bl = factory.getDurableLength(immutable);
         if (bl > db.maxBlockSize && immutable instanceof Releasable) {
             immutable = ((Releasable) immutable).resize(db.maxBlockSize, db.maxBlockSize);
@@ -84,6 +82,10 @@ public class BlockReference implements Releasable {
         cs256Factory = (CS256Factory) db.dbFactoryRegistry.getImmutableFactory(cs256);
         blockNbr = db.allocate();
         db.writeBlock(byteBuffer, blockNbr);
+    }
+
+    public DbFactoryRegistry getRegistry() {
+        return registry;
     }
 
     /**
@@ -104,7 +106,7 @@ public class BlockReference implements Releasable {
     @Override
     public void releaseLocal()
             throws IOException {
-        db.release(blockNbr);
+        registry.db.release(blockNbr);
     }
 
     /**
@@ -119,6 +121,7 @@ public class BlockReference implements Releasable {
             if (immutable != null)
                 return immutable;
         }
+        Db db = registry.db;
         ByteBuffer byteBuffer = ByteBuffer.allocate(blockLength);
         db.readBlock(byteBuffer, blockNbr);
         byteBuffer.flip();

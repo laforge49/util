@@ -65,6 +65,13 @@ public class BlockReferenceFactory extends BaseFactory {
         int blockLength = byteBuffer.getInt();
         ImmutableFactory factory = factoryRegistry.readId(byteBuffer);
         CS256 cs256 = (CS256) factory.deserialize(byteBuffer);
-        return new BlockReference(((DbFactoryRegistry) factoryRegistry).db, blockNbr, blockLength, cs256);
+        return createReference((DbFactoryRegistry) factoryRegistry, blockNbr, blockLength, cs256);
+    }
+
+    protected BlockReference createReference(DbFactoryRegistry registry,
+                                             int blockNbr,
+                                             int blockLength,
+                                             CS256 cs256) {
+        return new BlockReference(registry, blockNbr, blockLength, cs256);
     }
 }
