@@ -51,15 +51,12 @@ public class BlockReferenceFactory extends BaseFactory {
 
     @Override
     public int getDurableLength(Object immutable) {
-        return 2 + 4 + 4 + CS256Factory.DURABLE_LENGTH;
+        return ((BlockReference) immutable).getDurableLength();
     }
 
     @Override
     public void serialize(Object immutable, ByteBuffer byteBuffer) {
-        BlockReference blockReference = (BlockReference) immutable;
-        byteBuffer.putInt(blockReference.blockNbr);
-        byteBuffer.putInt(blockReference.blockLength);
-        cs256Factory.writeDurable(blockReference.cs256, byteBuffer);
+        ((BlockReference) immutable).serialize(byteBuffer);
     }
 
     @Override
