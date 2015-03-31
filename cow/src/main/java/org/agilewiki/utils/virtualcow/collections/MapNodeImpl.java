@@ -1,7 +1,8 @@
 package org.agilewiki.utils.virtualcow.collections;
 
-import org.agilewiki.utils.immutable.FactoryRegistry;
-import org.agilewiki.utils.immutable.Releasable;
+import org.agilewiki.utils.immutable.scalars.CS256;
+import org.agilewiki.utils.immutable.scalars.CS256Factory;
+import org.agilewiki.utils.virtualcow.Db;
 import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 
 import java.io.IOException;
@@ -83,5 +84,18 @@ public class MapNodeImpl implements MapNode {
         byteBuffer.put(this.byteBuffer.slice());
         this.byteBuffer = bb;
         dataReference.set(null); //limit memory footprint, plugs memory leak.
+    }
+
+    @Override
+    public Object shrink() throws IOException {
+        Db db = registry.db;
+        MapNodeData data = getData();
+        ByteBuffer byteBuffer = ByteBuffer.allocate(durableLength);
+        data.serialize(byteBuffer);
+        byteBuffer.flip();
+        CS256 cs256 = new CS256(byteBuffer);
+        int blockNbr = db.allocate();
+        db.writeBlock(byteBuffer, blockNbr);
+        return new MapReference(registry, blockNbr, durableLength, cs256);
     }
 }

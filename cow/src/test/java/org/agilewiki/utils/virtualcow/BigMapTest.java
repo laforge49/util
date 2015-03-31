@@ -16,7 +16,7 @@ public class BigMapTest extends TestCase {
         try {
             Path dbPath = Paths.get("vcow.db");
             Files.deleteIfExists(dbPath);
-            int maxBlockSize = 1000;
+            int maxBlockSize = 100000;
             try (Db db = new Db(new BaseRegistry(), dbPath, maxBlockSize)) {
                 Files.deleteIfExists(dbPath);
                 db.open(true);
@@ -24,10 +24,11 @@ public class BigMapTest extends TestCase {
                     @Override
                     public MapNode transform(MapNode mapNode)
                             throws IOException {
-                        for (int i = 0; i < 22; i++) {
+                        for (int i = 0; i < 100000; i++) {
                             mapNode = mapNode.add(i, "");
                         }
                         System.out.println(mapNode.getDurableLength());
+                        System.out.println(db.usage());
                         return mapNode;
                     }
                 };

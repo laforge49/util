@@ -2,6 +2,7 @@ package org.agilewiki.utils.virtualcow.collections;
 
 import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicReference;
 

@@ -62,8 +62,8 @@ public class BlockReference implements Releasable {
      */
     public BlockReference(DbFactoryRegistry registry, Object immutable)
             throws IOException {
-        this.registry = registry;
         ImmutableFactory factory = registry.getImmutableFactory(immutable);
+        this.registry = registry;
         Db db = registry.db;
         int bl = factory.getDurableLength(immutable);
         if (bl > db.maxBlockSize && immutable instanceof Releasable) {
@@ -79,7 +79,7 @@ public class BlockReference implements Releasable {
         factory.writeDurable(immutable, byteBuffer);
         byteBuffer.flip();
         cs256 = new CS256(byteBuffer);
-        cs256Factory = (CS256Factory) db.dbFactoryRegistry.getImmutableFactory(cs256);
+        cs256Factory = (CS256Factory) registry.getImmutableFactory(cs256);
         blockNbr = db.allocate();
         db.writeBlock(byteBuffer, blockNbr);
     }
@@ -130,10 +130,14 @@ public class BlockReference implements Releasable {
             db.getReactor().error("block has bad checksum");
             throw new IllegalStateException("block has bad checksum");
         }
-        ImmutableFactory factory = db.dbFactoryRegistry.readId(byteBuffer);
-        Object immutable = factory.deserialize(byteBuffer);
+        Object immutable = loadData(byteBuffer);
         softReference = new SoftReference(immutable);
         return immutable;
+    }
+
+    protected Object loadData(ByteBuffer byteBuffer) {
+        ImmutableFactory factory = registry.readId(byteBuffer);
+        return factory.deserialize(byteBuffer);
     }
 
     /**
