@@ -90,7 +90,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                                                  AsyncResponseProcessor<Void> _asyncResponseProcessor)
                     throws Exception {
                 try {
-                    _asyncRequestImpl.setMessageTimeoutMillis(100000000); //disable timeout
+                    _asyncRequestImpl.setMessageTimeoutMillis(transaction.timeoutMillis());
                     privilegedThread = Thread.currentThread();
                     try {
                         _update(transaction.transform(mapNode));

@@ -16,4 +16,14 @@ public interface Transaction {
      */
     MapNode transform(MapNode mapNode)
             throws IOException;
+
+    /**
+     * Transaction timeout in milliseconds.
+     * Set to Integer.MAX_VALUE by default.
+     *
+     * @return The max time in milliseconds the transaction can take.
+     */
+    default int timeoutMillis() {
+        return Integer.MAX_VALUE;
+    }
 }
