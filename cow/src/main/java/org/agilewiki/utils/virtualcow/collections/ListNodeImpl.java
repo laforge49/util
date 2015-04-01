@@ -68,8 +68,8 @@ public class ListNodeImpl implements ListNode {
 
     @Override
     public void serialize(ByteBuffer byteBuffer) {
+        byteBuffer.putInt(getDurableLength());
         if (this.byteBuffer == null) {
-            byteBuffer.putInt(getDurableLength());
             getData().serialize(byteBuffer);
             return;
         }

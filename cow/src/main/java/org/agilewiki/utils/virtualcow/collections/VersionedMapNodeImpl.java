@@ -69,13 +69,13 @@ public class VersionedMapNodeImpl implements VersionedMapNode {
 
     @Override
     public void serialize(ByteBuffer byteBuffer) {
+        byteBuffer.putInt(getDurableLength());
         if (this.byteBuffer == null) {
-            byteBuffer.putInt(getDurableLength());
             getData().serialize(byteBuffer);
             return;
         }
         ByteBuffer bb = byteBuffer.slice();
-        bb.limit(durableLength - 2);
+        bb.limit(durableLength - 6);
         byteBuffer.put(this.byteBuffer.slice());
         this.byteBuffer = bb;
         dataReference.set(null); //limit memory footprint, plugs memory leak.

@@ -53,6 +53,7 @@ public class DiskSpaceManager {
             throw new IllegalStateException("out of space");
         }
         bitSet.set(i);
+        System.err.println("allocate blk "+i);
         return i;
     }
 
@@ -72,6 +73,7 @@ public class DiskSpaceManager {
      * @param i The block to be released.
      */
     public void release(int i) {
+        System.err.println("release "+i);
         if (!bitSet.get(i)) {
             Logger logger = LoggerFactory.getLogger(getClass());
             logger.error("attempt to release an unallocated block");
@@ -104,6 +106,7 @@ public class DiskSpaceManager {
      * </p>
      */
     public void commit() {
+        System.err.println("commit");
         for (int i : freed) {
             bitSet.clear(i);
         }

@@ -20,19 +20,24 @@ public class BigMapTest extends TestCase {
             try (Db db = new Db(new BaseRegistry(), dbPath, maxBlockSize)) {
                 Files.deleteIfExists(dbPath);
                 db.open(true);
-                Transaction t2 = new Transaction() {
-                    @Override
-                    public MapNode transform(MapNode mapNode)
-                            throws IOException {
-                        for (int i = 0; i < 100000; i++) {
-                            mapNode = mapNode.add(i, "");
+                for (int j = 0; j < 10; ++j) {
+                    System.err.println("transaction set "+j);
+                    Transaction t2 = new Transaction() {
+                        int k = 0;
+                        @Override
+                        public MapNode transform(MapNode mapNode)
+                                throws IOException {
+                            for (int i = 0; i < 10; i++) {
+                                mapNode = mapNode.add(k * 100000 + i, "");
+                            }
+                            k += 1;
+                            System.out.println(mapNode.getDurableLength());
+                            System.out.println(db.usage());
+                            return mapNode;
                         }
-                        System.out.println(mapNode.getDurableLength());
-                        System.out.println(db.usage());
-                        return mapNode;
-                    }
-                };
-                db.update(t2).call();
+                    };
+                    db.update(t2).call();
+                }
                 db.close();
             }
         } finally {

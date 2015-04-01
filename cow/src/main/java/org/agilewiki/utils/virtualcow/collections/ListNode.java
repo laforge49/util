@@ -379,12 +379,15 @@ public interface ListNode extends Releasable {
      * @param byteBuffer The byte buffer.
      */
     default void writeDurable(ByteBuffer byteBuffer) {
+        int expected = byteBuffer.position() + getDurableLength();
         if (isNil()) {
             byteBuffer.putChar(getRegistry().nilListId);
-            return;
+        } else {
+            byteBuffer.putChar(getRegistry().listNodeImplId);
+            serialize(byteBuffer);
         }
-        byteBuffer.putChar(getRegistry().listNodeImplId);
-        serialize(byteBuffer);
+        if (expected != byteBuffer.position())
+            throw new IllegalStateException("serialize failure");
     }
 
     /**

@@ -90,6 +90,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                                                  AsyncResponseProcessor<Void> _asyncResponseProcessor)
                     throws Exception {
                 try {
+                    _asyncRequestImpl.setMessageTimeoutMillis(100000000); //disable timeout
                     privilegedThread = Thread.currentThread();
                     try {
                         _update(transaction.transform(mapNode));
@@ -119,7 +120,6 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         if (mapNode == this.mapNode)
             return; // Query?
         ImmutableFactory factory = dbFactoryRegistry.getImmutableFactory(mapNode);
-        dsm.commit();
         int dsmLength = dsm.durableLength();
         int maxDurableLength = maxBlockSize - 4 - 4 - 34 - 8 - dsmLength;
         int dl = mapNode.getDurableLength();
@@ -129,6 +129,9 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             maxDurableLength = maxBlockSize - 4 - 4 - 34 - 8 - dsmLength;
             dl = mapNode.getDurableLength();
         }
+        dsm.commit();
+        dsmLength = dsm.durableLength(); // may have shrunk
+        dl = mapNode.getDurableLength();
         int contentSize = 8 + dsmLength + dl;
         int blockSize = 4 + 4 + 34 + contentSize;
         if (blockSize > maxBlockSize) {
@@ -160,6 +163,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     public void readBlock(ByteBuffer byteBuffer, int blockNbr)
             throws IOException {
         long position = blockNbr * (long) maxBlockSize;
+        System.err.println("reading from "+position+" "+byteBuffer.remaining());
         while (byteBuffer.remaining() > 0) {
             position += fc.read(byteBuffer, position);
         }
@@ -169,6 +173,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             throws IOException {
         checkPrivilege();
         long position = blockNbr * (long) maxBlockSize;
+        System.err.println("writing to "+position+" "+byteBuffer.remaining());
         while (byteBuffer.remaining() > 0) {
             position += fc.write(byteBuffer, position);
         }

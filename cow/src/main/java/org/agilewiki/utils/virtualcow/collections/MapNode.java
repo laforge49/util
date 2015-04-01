@@ -383,12 +383,15 @@ public interface MapNode extends Releasable {
      * @param byteBuffer The byte buffer.
      */
     default void writeDurable(ByteBuffer byteBuffer) {
+        int expected = byteBuffer.position() + getDurableLength();
         if (isNil()) {
             byteBuffer.putChar(getRegistry().nilMapId);
-            return;
+        } else {
+            byteBuffer.putChar(getRegistry().mapNodeImplId);
+            serialize(byteBuffer);
         }
-        byteBuffer.putChar(getRegistry().mapNodeImplId);
-        serialize(byteBuffer);
+        if (expected != byteBuffer.position())
+            throw new IllegalStateException("serialize failure");
     }
 
     /**

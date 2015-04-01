@@ -50,6 +50,7 @@ public class BlockReference implements Releasable {
         this.registry = registry;
         this.blockNbr = blockNbr;
         this.blockLength = blockLength;
+        System.err.println("new br "+blockLength);
         this.cs256 = cs256;
         cs256Factory = (CS256Factory) registry.getImmutableFactory(cs256);
     }
@@ -66,6 +67,7 @@ public class BlockReference implements Releasable {
         this.registry = registry;
         Db db = registry.db;
         int bl = factory.getDurableLength(immutable);
+        System.err.println("new2 br "+bl);
         if (bl > db.maxBlockSize && immutable instanceof Releasable) {
             immutable = ((Releasable) immutable).resize(db.maxBlockSize, db.maxBlockSize);
             bl = factory.getDurableLength(immutable);
@@ -127,6 +129,8 @@ public class BlockReference implements Releasable {
         byteBuffer.flip();
         CS256 cs = new CS256(byteBuffer);
         if (!cs256.equals(cs)) {
+            System.err.println(""+cs256.toLongArray()[0]+" vs "+cs.toLongArray()[0]);
+            System.err.println("read "+byteBuffer.remaining());
             db.getReactor().error("block has bad checksum");
             throw new IllegalStateException("block has bad checksum");
         }

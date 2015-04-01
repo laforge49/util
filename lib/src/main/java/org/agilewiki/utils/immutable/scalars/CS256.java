@@ -22,6 +22,7 @@ public class CS256 {
         for (int i = 0; i < length; i++) {
             bitSet.flip((((int) byteBuffer.get(offset + i)) - (int) Byte.MIN_VALUE + i * 7) % 256);
         }
+        long[] a = toLongArray();
     }
 
     /**

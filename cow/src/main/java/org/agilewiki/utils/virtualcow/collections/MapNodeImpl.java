@@ -74,13 +74,13 @@ public class MapNodeImpl implements MapNode {
 
     @Override
     public void serialize(ByteBuffer byteBuffer) {
+        byteBuffer.putInt(getDurableLength());
         if (this.byteBuffer == null) {
-            byteBuffer.putInt(getDurableLength());
             getData().serialize(byteBuffer);
             return;
         }
         ByteBuffer bb = byteBuffer.slice();
-        bb.limit(durableLength - 2);
+        bb.limit(durableLength - 6);
         byteBuffer.put(this.byteBuffer.slice());
         this.byteBuffer = bb;
         dataReference.set(null); //limit memory footprint, plugs memory leak.
@@ -90,12 +90,15 @@ public class MapNodeImpl implements MapNode {
     public Object shrink() throws IOException {
         Db db = registry.db;
         MapNodeData data = getData();
-        ByteBuffer byteBuffer = ByteBuffer.allocate(durableLength);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(durableLength - 6);
+        System.err.println("shrink write "+(durableLength - 6));
+        System.err.println("but "+(data.getDurableLength() - 6));
         data.serialize(byteBuffer);
+        System.err.println("remaining "+byteBuffer.remaining());
         byteBuffer.flip();
         CS256 cs256 = new CS256(byteBuffer);
         int blockNbr = db.allocate();
         db.writeBlock(byteBuffer, blockNbr);
-        return new MapReference(registry, blockNbr, durableLength, cs256);
+        return new MapReference(registry, blockNbr, durableLength - 6, cs256);
     }
 }
