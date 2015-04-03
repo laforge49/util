@@ -68,6 +68,16 @@ public class VersionedMapNodeImpl implements VersionedMapNode {
     }
 
     @Override
+    public void writeDurable(ByteBuffer byteBuffer) {
+        if (isNil()) {
+            byteBuffer.putChar(getRegistry().versionedNilMapId);
+            return;
+        }
+        byteBuffer.putChar(getRegistry().versionedMapNodeImplId);
+        serialize(byteBuffer);
+    }
+
+    @Override
     public void serialize(ByteBuffer byteBuffer) {
         byteBuffer.putInt(getDurableLength());
         if (this.byteBuffer == null) {

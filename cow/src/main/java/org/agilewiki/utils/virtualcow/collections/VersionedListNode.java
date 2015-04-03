@@ -442,14 +442,7 @@ public interface VersionedListNode extends Releasable {
      *
      * @param byteBuffer The byte buffer.
      */
-    default void writeDurable(ByteBuffer byteBuffer) {
-        if (isNil()) {
-            byteBuffer.putChar(getRegistry().versionedNilListId);
-            return;
-        }
-        byteBuffer.putChar(getRegistry().versionedListNodeImplId);
-        serialize(byteBuffer);
-    }
+    void writeDurable(ByteBuffer byteBuffer);
 
     /**
      * Serialize this object into a ByteBuffer.

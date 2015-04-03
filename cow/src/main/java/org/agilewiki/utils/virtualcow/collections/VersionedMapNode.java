@@ -436,14 +436,7 @@ public interface VersionedMapNode extends Releasable {
      *
      * @param byteBuffer The byte buffer.
      */
-    default void writeDurable(ByteBuffer byteBuffer) {
-        if (isNil()) {
-            byteBuffer.putChar(getRegistry().versionedNilMapId);
-            return;
-        }
-        byteBuffer.putChar(getRegistry().versionedMapNodeImplId);
-        serialize(byteBuffer);
-    }
+    void writeDurable(ByteBuffer byteBuffer);
 
     /**
      * Serialize this object into a ByteBuffer.

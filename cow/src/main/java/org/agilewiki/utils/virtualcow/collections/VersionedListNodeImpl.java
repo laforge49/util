@@ -72,6 +72,16 @@ public class VersionedListNodeImpl implements VersionedListNode {
     }
 
     @Override
+    public void writeDurable(ByteBuffer byteBuffer) {
+        if (isNil()) {
+            byteBuffer.putChar(getRegistry().versionedNilListId);
+            return;
+        }
+        byteBuffer.putChar(getRegistry().versionedListNodeImplId);
+        serialize(byteBuffer);
+    }
+
+    @Override
     public void serialize(ByteBuffer byteBuffer) {
         byteBuffer.putInt(getDurableLength());
         if (this.byteBuffer == null) {

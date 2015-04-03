@@ -66,6 +66,21 @@ public class ListNodeImpl implements ListNode {
     }
 
     @Override
+    public void writeDurable(ByteBuffer byteBuffer) {
+        int expected = byteBuffer.position() + getDurableLength();
+        if (isNil()) {
+            byteBuffer.putChar(getRegistry().nilListId);
+        } else {
+            byteBuffer.putChar(getRegistry().listNodeImplId);
+            serialize(byteBuffer);
+        }
+        if (expected != byteBuffer.position()) {
+            getRegistry().db.close();
+            throw new SerializationException();
+        }
+    }
+
+    @Override
     public void serialize(ByteBuffer byteBuffer) {
         byteBuffer.putInt(getDurableLength());
         if (this.byteBuffer == null) {
