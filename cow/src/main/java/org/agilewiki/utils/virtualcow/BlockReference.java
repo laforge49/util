@@ -38,7 +38,7 @@ public class BlockReference implements Releasable {
     /**
      * Create a reference to an existing block.
      *
-     * @param registry          The registry for the database.
+     * @param registry    The registry for the database.
      * @param blockNbr    The number of the block being referenced.
      * @param blockLength The length of the durable data held by the block.
      * @param cs256       The checksum of the contents of the block.
@@ -50,7 +50,6 @@ public class BlockReference implements Releasable {
         this.registry = registry;
         this.blockNbr = blockNbr;
         this.blockLength = blockLength;
-        System.err.println("new br "+blockLength);
         this.cs256 = cs256;
         cs256Factory = (CS256Factory) registry.getImmutableFactory(cs256);
     }
@@ -58,23 +57,22 @@ public class BlockReference implements Releasable {
     /**
      * Creates a new block and a reference to it.
      *
-     * @param registry          The registry for the database.
+     * @param registry  The registry for the database.
      * @param immutable The object to be saved in the new block.
      */
-    public BlockReference(DbFactoryRegistry registry, Object immutable)
-            throws IOException {
+    public BlockReference(DbFactoryRegistry registry, Object immutable) {
         ImmutableFactory factory = registry.getImmutableFactory(immutable);
         this.registry = registry;
         Db db = registry.db;
         int bl = factory.getDurableLength(immutable);
-        System.err.println("new2 br "+bl);
         if (bl > db.maxBlockSize && immutable instanceof Releasable) {
             immutable = ((Releasable) immutable).resize(db.maxBlockSize, db.maxBlockSize);
             bl = factory.getDurableLength(immutable);
         }
         if (bl > db.maxBlockSize) {
+            db.close();
             db.getReactor().error("block size exceeds max block size");
-            throw new IllegalStateException("block size exceeds max block size");
+            throw new BlockSizeTooLarge();
         }
         blockLength = bl;
         ByteBuffer byteBuffer = ByteBuffer.allocate(blockLength);
@@ -94,8 +92,7 @@ public class BlockReference implements Releasable {
      * Releases the contents of the block as well as the block.
      */
     @Override
-    public void releaseAll()
-            throws IOException {
+    public void releaseAll() {
         Object immutable = getData();
         if (immutable instanceof Releasable)
             ((Releasable) immutable).releaseAll();
@@ -106,8 +103,7 @@ public class BlockReference implements Releasable {
      * Releases the block.
      */
     @Override
-    public void releaseLocal()
-            throws IOException {
+    public void releaseLocal() {
         registry.db.release(blockNbr);
     }
 
@@ -116,8 +112,7 @@ public class BlockReference implements Releasable {
      *
      * @return The contents of the block.
      */
-    public Object getData()
-            throws IOException {
+    public Object getData() {
         if (softReference != null) {
             Object immutable = softReference.get();
             if (immutable != null)
@@ -129,10 +124,10 @@ public class BlockReference implements Releasable {
         byteBuffer.flip();
         CS256 cs = new CS256(byteBuffer);
         if (!cs256.equals(cs)) {
-            System.err.println(""+cs256.toLongArray()[0]+" vs "+cs.toLongArray()[0]);
-            System.err.println("read "+byteBuffer.remaining());
+            if (db.isPrivileged())
+                db.close();
             db.getReactor().error("block has bad checksum");
-            throw new IllegalStateException("block has bad checksum");
+            throw new UnexpectedChecksumException();
         }
         Object immutable = loadData(byteBuffer);
         softReference = new SoftReference(immutable);

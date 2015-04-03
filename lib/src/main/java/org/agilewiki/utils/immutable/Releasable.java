@@ -9,14 +9,12 @@ public interface Releasable {
     /**
      * release all resources.
      */
-    void releaseAll()
-            throws IOException;
+    void releaseAll();
 
     /**
      * release the local resources.
      */
-    default void releaseLocal()
-            throws IOException {}
+    default void releaseLocal() {}
 
     /**
      * Resize immutables which are too large.
@@ -25,7 +23,7 @@ public interface Releasable {
      * @param maxBlockSize Maximum block size.
      * @return The revised structure.
      */
-    default Object resize(int maxSize, int maxBlockSize) throws IOException {
+    default Object resize(int maxSize, int maxBlockSize) {
         return this;
     }
 
@@ -36,7 +34,7 @@ public interface Releasable {
      *
      * @return A block reference.
      */
-    default Object shrink() throws IOException {
+    default Object shrink() {
         throw new UnsupportedOperationException("Unable to shrink");
     }
 }

@@ -14,8 +14,7 @@ public interface Transaction {
      * @param mapNode The map list to be transformed.
      * @return The replacement map list.
      */
-    MapNode transform(MapNode mapNode)
-            throws IOException;
+    MapNode transform(MapNode mapNode);
 
     /**
      * Transaction timeout in milliseconds.

@@ -11,28 +11,23 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class BigMapTest extends TestCase {
+    int k;
     public void test() throws Exception {
         new Plant();
         try {
             Path dbPath = Paths.get("vcow.db");
             Files.deleteIfExists(dbPath);
-            int maxBlockSize = 100000;
+            int maxBlockSize = 1000000;
             try (Db db = new Db(new BaseRegistry(), dbPath, maxBlockSize)) {
                 Files.deleteIfExists(dbPath);
                 db.open(true);
-                for (int j = 0; j < 10; ++j) {
-                    System.err.println("transaction set "+j);
+                for (k = 0; k < 10; ++k) {
                     Transaction t2 = new Transaction() {
-                        int k = 0;
                         @Override
-                        public MapNode transform(MapNode mapNode)
-                                throws IOException {
+                        public MapNode transform(MapNode mapNode) {
                             for (int i = 0; i < 10; i++) {
-                                mapNode = mapNode.add(k * 100000 + i, "");
+                                mapNode = mapNode.add(k * 10000000 + i, "");
                             }
-                            k += 1;
-                            System.out.println(mapNode.getDurableLength());
-                            System.out.println(db.usage());
                             return mapNode;
                         }
                     };

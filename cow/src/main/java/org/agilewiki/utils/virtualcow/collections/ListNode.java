@@ -340,8 +340,7 @@ public interface ListNode extends Releasable {
      * @param value The value to be added.
      * @return The revised root node.
      */
-    default ListNode add(Object value)
-            throws IOException {
+    default ListNode add(Object value) {
         return add(-1, value);
     }
 
@@ -352,14 +351,12 @@ public interface ListNode extends Releasable {
      * @param value The value to be added.
      * @return The revised root node.
      */
-    default ListNode add(int ndx, Object value)
-            throws IOException {
+    default ListNode add(int ndx, Object value) {
         if (value == null)
             throw new IllegalArgumentException("value may not be null");
         if (isNil()) {
             if (ndx != 0 && ndx != -1)
                 throw new IllegalArgumentException("index out of range");
-            DbFactoryRegistry registry = getRegistry();
             return getData().replace(1, 1, value);
         }
         return getData().add(ndx, value);
@@ -386,8 +383,10 @@ public interface ListNode extends Releasable {
             byteBuffer.putChar(getRegistry().listNodeImplId);
             serialize(byteBuffer);
         }
-        if (expected != byteBuffer.position())
-            throw new IllegalStateException("serialize failure");
+        if (expected != byteBuffer.position()) {
+            getRegistry().db.close();
+            throw new SerializationException();
+        }
     }
 
     /**
@@ -397,8 +396,7 @@ public interface ListNode extends Releasable {
      */
     void serialize(ByteBuffer byteBuffer);
 
-    default ListNode remove(int ndx)
-            throws IOException {
+    default ListNode remove(int ndx) {
         if (isNil())
             return this;
         if (ndx < 0)
@@ -407,14 +405,12 @@ public interface ListNode extends Releasable {
     }
 
     @Override
-    default void releaseAll()
-            throws IOException {
+    default void releaseAll() {
         getData().releaseAll();
     }
 
     @Override
-    default Object resize(int maxSize, int maxBlockSize)
-            throws IOException {
+    default Object resize(int maxSize, int maxBlockSize) {
         return getData().resize(maxSize, maxBlockSize);
     }
 }

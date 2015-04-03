@@ -50,10 +50,9 @@ public class DiskSpaceManager {
         if (i > 999999) {
             Logger logger = LoggerFactory.getLogger(getClass());
             logger.error("Out of space");
-            throw new IllegalStateException("out of space");
+            throw new OutOfSpaceException();
         }
         bitSet.set(i);
-        System.err.println("allocate blk "+i);
         return i;
     }
 
@@ -73,16 +72,15 @@ public class DiskSpaceManager {
      * @param i The block to be released.
      */
     public void release(int i) {
-        System.err.println("release "+i);
         if (!bitSet.get(i)) {
             Logger logger = LoggerFactory.getLogger(getClass());
             logger.error("attempt to release an unallocated block");
-            throw new IllegalStateException("attempt to release an unallocated block");
+            throw new ReleasingUnallocatedBlockException();
         }
         if (freed.contains(i)) {
             Logger logger = LoggerFactory.getLogger(getClass());
             logger.error("attempt to release a block a second time");
-            throw new IllegalStateException("attempt to release a block a second time");
+            throw new DuplicateReleaseException();
         }
         freed.add(i);
     }
@@ -106,7 +104,6 @@ public class DiskSpaceManager {
      * </p>
      */
     public void commit() {
-        System.err.println("commit");
         for (int i : freed) {
             bitSet.clear(i);
         }

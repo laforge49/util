@@ -72,6 +72,25 @@ public class MapNodeImpl implements MapNode {
         return durableLength;
     }
 
+    /**
+     * Write the durable to a byte buffer.
+     *
+     * @param byteBuffer The byte buffer.
+     */
+    public void writeDurable(ByteBuffer byteBuffer) {
+        int expected = byteBuffer.position() + getDurableLength();
+        if (isNil()) {
+            byteBuffer.putChar(getRegistry().nilMapId);
+        } else {
+            byteBuffer.putChar(getRegistry().mapNodeImplId);
+            serialize(byteBuffer);
+        }
+        if (expected != byteBuffer.position()) {
+            getRegistry().db.close();
+            throw new SerializationException();
+        }
+    }
+
     @Override
     public void serialize(ByteBuffer byteBuffer) {
         byteBuffer.putInt(getDurableLength());
@@ -87,18 +106,22 @@ public class MapNodeImpl implements MapNode {
     }
 
     @Override
-    public Object shrink() throws IOException {
+    public Object shrink() {
         Db db = registry.db;
         MapNodeData data = getData();
         ByteBuffer byteBuffer = ByteBuffer.allocate(durableLength - 6);
-        System.err.println("shrink write "+(durableLength - 6));
-        System.err.println("but "+(data.getDurableLength() - 6));
         data.serialize(byteBuffer);
-        System.err.println("remaining "+byteBuffer.remaining());
         byteBuffer.flip();
         CS256 cs256 = new CS256(byteBuffer);
         int blockNbr = db.allocate();
         db.writeBlock(byteBuffer, blockNbr);
         return new MapReference(registry, blockNbr, durableLength - 6, cs256);
+    }
+
+    @Override
+    public String toString() {
+        if (isNil())
+            return "";
+        return getData().toString();
     }
 }

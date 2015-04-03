@@ -23,8 +23,7 @@ public interface MapAccessor extends Iterable<ListAccessor> {
      *
      * @return The current size of the map.
      */
-    int size()
-            throws IOException;
+    int size();
 
     /**
      * Returns a list accessor for the given time.
@@ -32,32 +31,28 @@ public interface MapAccessor extends Iterable<ListAccessor> {
      * @param key The key for the list.
      * @return A list accessor for the given time.
      */
-    ListAccessor listAccessor(Comparable key)
-            throws IOException;
+    ListAccessor listAccessor(Comparable key);
 
     /**
      * Returns a set of all keys with non-empty lists for the given time.
      *
      * @return A set of the keys with content at the time of the query.
      */
-    NavigableSet<Comparable> flatKeys()
-            throws IOException;
+    NavigableSet<Comparable> flatKeys();
 
     /**
      * Returns the smallest key of the non-empty lists for the given time.
      *
      * @return The smallest key, or null.
      */
-    Comparable firstKey()
-            throws IOException;
+    Comparable firstKey();
 
     /**
      * Returns the largest key of the non-empty lists for the given time.
      *
      * @return The largest key, or null.
      */
-    Comparable lastKey()
-            throws IOException;
+    Comparable lastKey();
 
     /**
      * Returns the next greater key, or null.
@@ -65,8 +60,7 @@ public interface MapAccessor extends Iterable<ListAccessor> {
      * @param key The given key.
      * @return The next greater key with content at the time of the query.
      */
-    Comparable higherKey(Comparable key)
-            throws IOException;
+    Comparable higherKey(Comparable key);
 
     /**
      * Returns the key with content that is greater than or equal to the given key.
@@ -74,8 +68,7 @@ public interface MapAccessor extends Iterable<ListAccessor> {
      * @param key The given key.
      * @return The key greater than or equal to the given key, or null.
      */
-    Comparable ceilingKey(Comparable key)
-            throws IOException;
+    Comparable ceilingKey(Comparable key);
 
     /**
      * Returns the next smaller key, or null.
@@ -83,8 +76,7 @@ public interface MapAccessor extends Iterable<ListAccessor> {
      * @param key The given key.
      * @return The next smaller key with content at the time of the query.
      */
-    Comparable lowerKey(Comparable key)
-            throws IOException;
+    Comparable lowerKey(Comparable key);
 
     /**
      * Returns the key with content that is smaller than or equal to the given key.
@@ -92,8 +84,7 @@ public interface MapAccessor extends Iterable<ListAccessor> {
      * @param key The given key.
      * @return The key smaller than or equal to the given key, or null.
      */
-    Comparable floorKey(Comparable key)
-            throws IOException;
+    Comparable floorKey(Comparable key);
 
     /**
      * Returns an iterator over the non-empty list accessors.
@@ -107,6 +98,5 @@ public interface MapAccessor extends Iterable<ListAccessor> {
      *
      * @return A map of lists.
      */
-    NavigableMap<Comparable, List> flatMap()
-            throws IOException;
+    NavigableMap<Comparable, List> flatMap();
 }

@@ -4,7 +4,6 @@ import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.Releasable;
 import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.*;
 
@@ -15,15 +14,13 @@ public interface MapNode extends Releasable {
 
     DbFactoryRegistry getRegistry();
 
-    MapNodeData getData()
-            throws IOException;
+    MapNodeData getData();
 
     default boolean isNil() {
         return this == getRegistry().nilMap;
     }
 
-    default ListNode getList(Comparable key)
-            throws IOException {
+    default ListNode getList(Comparable key) {
         if (isNil())
             return getRegistry().nilList;
         return getData().getList(key);
@@ -36,8 +33,7 @@ public interface MapNode extends Releasable {
      * @param key The list identifier.
      * @return The count of all the values in the list.
      */
-    default int totalSize(Comparable key)
-            throws IOException {
+    default int totalSize(Comparable key) {
         return getList(key).totalSize();
     }
 
@@ -47,8 +43,7 @@ public interface MapNode extends Releasable {
      * @param key The key for the list.
      * @return A list accessor.
      */
-    default ListAccessor listAccessor(Comparable key)
-            throws IOException {
+    default ListAccessor listAccessor(Comparable key) {
         return getList(key).listAccessor(key);
     }
 
@@ -59,8 +54,7 @@ public interface MapNode extends Releasable {
      * @param value The value to be added.
      * @return The revised root node.
      */
-    default MapNode add(Comparable key, Object value)
-            throws IOException {
+    default MapNode add(Comparable key, Object value) {
         return add(key, -1, value);
     }
 
@@ -72,10 +66,10 @@ public interface MapNode extends Releasable {
      * @param value The value to be added.
      * @return The revised root node.
      */
-    default MapNode add(Comparable key, int ndx, Object value)
-            throws IOException {
-        if (key == null)
+    default MapNode add(Comparable key, int ndx, Object value) {
+        if (key == null) {
             throw new IllegalArgumentException("key may not be null");
+        }
         if (isNil()) {
             ListNode listNode = getRegistry().nilList.add(ndx, value);
             return getData().replace(1, listNode, key);
@@ -90,8 +84,7 @@ public interface MapNode extends Releasable {
      * @param ndx The index of the value.
      * @return The revised node.
      */
-    default MapNode remove(Comparable key, int ndx)
-            throws IOException {
+    default MapNode remove(Comparable key, int ndx) {
         if (isNil())
             return this;
         return getData().remove(key, ndx);
@@ -103,8 +96,7 @@ public interface MapNode extends Releasable {
      * @param key The key of the list.
      * @return The revised node.
      */
-    default MapNode remove(Comparable key)
-            throws IOException {
+    default MapNode remove(Comparable key) {
         if (isNil())
             return this;
         return getData().remove(key);
@@ -117,10 +109,10 @@ public interface MapNode extends Releasable {
      * @param value The new value.
      * @return The revised node.
      */
-    default MapNode set(Comparable key, Object value)
-            throws IOException {
-        if (value == null)
+    default MapNode set(Comparable key, Object value) {
+        if (value == null) {
             throw new IllegalArgumentException("value may not be null");
+        }
         if (isNil()) {
             ListNode listNode = getRegistry().nilList.add(value);
             return getData().replace(1, listNode, key);
@@ -133,8 +125,8 @@ public interface MapNode extends Releasable {
      *
      * @return A set of the keys.
      */
-    default NavigableSet flatKeys()
-            throws IOException {
+
+    default NavigableSet flatKeys() {
         NavigableSet keys = new TreeSet<>();
         getData().flatKeys(keys);
         return keys;
@@ -145,8 +137,7 @@ public interface MapNode extends Releasable {
      *
      * @return A map of lists.
      */
-    default NavigableMap<Comparable, List> flatMap()
-            throws IOException {
+    default NavigableMap<Comparable, List> flatMap() {
         NavigableMap<Comparable, List> map = new TreeMap<Comparable, List>();
         getData().flatMap(map);
         return map;
@@ -157,8 +148,7 @@ public interface MapNode extends Releasable {
      *
      * @return The count of all the keys in the map.
      */
-    default int totalSize()
-            throws IOException {
+    default int totalSize() {
         if (isNil())
             return 0;
         return getData().totalSize();
@@ -169,8 +159,7 @@ public interface MapNode extends Releasable {
      *
      * @return The current size of the map.
      */
-    default int size()
-            throws IOException {
+    default int size() {
         if (isNil())
             return 0;
         return getData().size();
@@ -181,8 +170,7 @@ public interface MapNode extends Releasable {
      *
      * @return The smallest key, or null.
      */
-    default Comparable firstKey()
-            throws IOException {
+    default Comparable firstKey() {
         if (isNil())
             return null;
         return getData().firstKey();
@@ -193,8 +181,7 @@ public interface MapNode extends Releasable {
      *
      * @return The largest key, or null.
      */
-    default Comparable lastKey()
-            throws IOException {
+    default Comparable lastKey() {
         if (isNil())
             return null;
         return getData().lastKey();
@@ -206,8 +193,7 @@ public interface MapNode extends Releasable {
      * @param key The given key.
      * @return The next greater key, or null.
      */
-    default Comparable higherKey(Comparable key)
-            throws IOException {
+    default Comparable higherKey(Comparable key) {
         if (isNil())
             return null;
         return getData().higherKey(key);
@@ -219,8 +205,7 @@ public interface MapNode extends Releasable {
      * @param key The given key.
      * @return The key greater than or equal to the given key, or null.
      */
-    default Comparable ceilingKey(Comparable key)
-            throws IOException {
+    default Comparable ceilingKey(Comparable key) {
         if (isNil())
             return null;
         return getData().ceilingKey(key);
@@ -232,8 +217,7 @@ public interface MapNode extends Releasable {
      * @param key The given key.
      * @return The next smaller key, or null.
      */
-    default Comparable lowerKey(Comparable key)
-            throws IOException {
+    default Comparable lowerKey(Comparable key) {
         if (isNil())
             return null;
         return getData().lowerKey(key);
@@ -245,8 +229,7 @@ public interface MapNode extends Releasable {
      * @param key The given key.
      * @return The key smaller than or equal to the given key, or null.
      */
-    default Comparable floorKey(Comparable key)
-            throws IOException {
+    default Comparable floorKey(Comparable key) {
         if (isNil())
             return null;
         return getData().floorKey(key);
@@ -254,8 +237,6 @@ public interface MapNode extends Releasable {
 
     /**
      * Returns an iterator over the list accessors.
-     * If an IOException is thrown, it is rethrown as an
-     * IORuntimeException.
      *
      * @return The iterator.
      */
@@ -265,26 +246,18 @@ public interface MapNode extends Releasable {
 
             @Override
             public boolean hasNext() {
-                try {
-                    if (last == null)
-                        return firstKey() != null;
-                    return higherKey(last) != null;
-                } catch (IOException ioe) {
-                    throw new IORuntimeException(ioe);
-                }
+                if (last == null)
+                    return firstKey() != null;
+                return higherKey(last) != null;
             }
 
             @Override
             public ListAccessor next() {
-                try {
-                    Comparable next = last == null ? firstKey() : higherKey(last);
-                    if (next == null)
-                        throw new NoSuchElementException();
-                    last = next;
-                    return listAccessor(last);
-                } catch (IOException ioe) {
-                    throw new IORuntimeException(ioe);
-                }
+                Comparable next = last == null ? firstKey() : higherKey(last);
+                if (next == null)
+                    throw new NoSuchElementException();
+                last = next;
+                return listAccessor(last);
             }
         };
     }
@@ -303,56 +276,47 @@ public interface MapNode extends Releasable {
             }
 
             @Override
-            public int size()
-                    throws IOException {
+            public int size() {
                 return MapNode.this.size();
             }
 
             @Override
-            public ListAccessor listAccessor(Comparable key)
-                    throws IOException {
+            public ListAccessor listAccessor(Comparable key) {
                 return MapNode.this.listAccessor(key);
             }
 
             @Override
-            public NavigableSet<Comparable> flatKeys()
-                    throws IOException {
+            public NavigableSet<Comparable> flatKeys() {
                 return MapNode.this.flatKeys();
             }
 
             @Override
-            public Comparable firstKey()
-                    throws IOException {
+            public Comparable firstKey() {
                 return MapNode.this.firstKey();
             }
 
             @Override
-            public Comparable lastKey()
-                    throws IOException {
+            public Comparable lastKey() {
                 return MapNode.this.lastKey();
             }
 
             @Override
-            public Comparable higherKey(Comparable key)
-                    throws IOException {
+            public Comparable higherKey(Comparable key) {
                 return MapNode.this.higherKey(key);
             }
 
             @Override
-            public Comparable ceilingKey(Comparable key)
-                    throws IOException {
+            public Comparable ceilingKey(Comparable key) {
                 return MapNode.this.ceilingKey(key);
             }
 
             @Override
-            public Comparable lowerKey(Comparable key)
-                    throws IOException {
+            public Comparable lowerKey(Comparable key) {
                 return MapNode.this.lowerKey(key);
             }
 
             @Override
-            public Comparable floorKey(Comparable key)
-                    throws IOException {
+            public Comparable floorKey(Comparable key) {
                 return MapNode.this.floorKey(key);
             }
 
@@ -362,8 +326,7 @@ public interface MapNode extends Releasable {
             }
 
             @Override
-            public NavigableMap<Comparable, List> flatMap()
-                    throws IOException {
+            public NavigableMap<Comparable, List> flatMap() {
                 return MapNode.this.flatMap();
             }
         };
@@ -382,17 +345,7 @@ public interface MapNode extends Releasable {
      *
      * @param byteBuffer The byte buffer.
      */
-    default void writeDurable(ByteBuffer byteBuffer) {
-        int expected = byteBuffer.position() + getDurableLength();
-        if (isNil()) {
-            byteBuffer.putChar(getRegistry().nilMapId);
-        } else {
-            byteBuffer.putChar(getRegistry().mapNodeImplId);
-            serialize(byteBuffer);
-        }
-        if (expected != byteBuffer.position())
-            throw new IllegalStateException("serialize failure");
-    }
+    void writeDurable(ByteBuffer byteBuffer);
 
     /**
      * Serialize this object into a ByteBuffer.
@@ -402,14 +355,12 @@ public interface MapNode extends Releasable {
     public void serialize(ByteBuffer byteBuffer);
 
     @Override
-    default void releaseAll()
-            throws IOException {
+    default void releaseAll() {
         getData().releaseAll();
     }
 
     @Override
-    default Object resize(int maxSize, int maxBlockSize)
-            throws IOException {
+    default Object resize(int maxSize, int maxBlockSize) {
         return getData().resize(maxSize, maxBlockSize);
     }
 }

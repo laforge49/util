@@ -143,8 +143,7 @@ public class VersionedMapNodeData implements Releasable {
      *
      * @return Revised root node.
      */
-    public VersionedMapNode skew()
-            throws IOException {
+    public VersionedMapNode skew() {
         if (isNil() || leftNode.isNil())
             return thisNode;
         VersionedMapNodeData leftData = leftNode.getData();
@@ -160,8 +159,7 @@ public class VersionedMapNodeData implements Releasable {
      *
      * @return The revised root node.
      */
-    public VersionedMapNode split()
-            throws IOException {
+    public VersionedMapNode split() {
         if (isNil() || rightNode.isNil())
             return thisNode;
         VersionedMapNodeData rightData = rightNode.getData();
@@ -185,8 +183,7 @@ public class VersionedMapNodeData implements Releasable {
      * @param deleted Deletion time, or MAX_VALUE.
      * @return The revised root node.
      */
-    public VersionedMapNode add(Comparable key, int ndx, Object value, long created, long deleted)
-            throws IOException {
+    public VersionedMapNode add(Comparable key, int ndx, Object value, long created, long deleted) {
         VersionedMapNode t;
         int c = key.compareTo(this.key);
         if (c < 0) {
@@ -207,8 +204,7 @@ public class VersionedMapNodeData implements Releasable {
      * @param time The time of the deletion.
      * @return The revised node.
      */
-    public VersionedMapNode remove(Comparable key, int ndx, long time)
-            throws IOException {
+    public VersionedMapNode remove(Comparable key, int ndx, long time) {
         if (key == null)
             throw new IllegalArgumentException("key may not be null");
         if (isNil())
@@ -239,8 +235,7 @@ public class VersionedMapNodeData implements Releasable {
      * @param time The time of the deletion.
      * @return The revised node.
      */
-    public VersionedMapNode clearList(Comparable key, long time)
-            throws IOException {
+    public VersionedMapNode clearList(Comparable key, long time) {
         if (key == null)
             throw new IllegalArgumentException("key may not be null");
         if (isNil())
@@ -272,8 +267,7 @@ public class VersionedMapNodeData implements Releasable {
      * @param time  The time of the replacement.
      * @return The revised node.
      */
-    public VersionedMapNode set(Comparable key, Object value, long time)
-            throws IOException {
+    public VersionedMapNode set(Comparable key, Object value, long time) {
         int c = key.compareTo(this.key);
         if (c < 0) {
             VersionedMapNode n = leftNode.set(key, value, time);
@@ -294,8 +288,7 @@ public class VersionedMapNodeData implements Releasable {
      * @param time The time of the deletion.
      * @return The currently empty versioned map.
      */
-    public VersionedMapNode clearMap(long time)
-            throws IOException {
+    public VersionedMapNode clearMap(long time) {
         if (isNil())
             return thisNode;
         VersionedMapNode ln = leftNode.clearMap(time);
@@ -343,8 +336,7 @@ public class VersionedMapNodeData implements Releasable {
      * @param time The time of the query.
      * @return The revised copy root.
      */
-    public VersionedMapNode copyMap(VersionedMapNode n, long time)
-            throws IOException {
+    public VersionedMapNode copyMap(VersionedMapNode n, long time) {
         if (isNil())
             return n;
         n = leftNode.getData().copyMap(n, time);
@@ -352,8 +344,7 @@ public class VersionedMapNodeData implements Releasable {
         return leftNode.getData().copyMap(n, time);
     }
 
-    protected VersionedMapNode addList(Comparable key, VersionedListNode listNode)
-            throws IOException {
+    protected VersionedMapNode addList(Comparable key, VersionedListNode listNode) {
         if (listNode.isNil())
             return thisNode;
         DbFactoryRegistry registry = thisNode.getRegistry();
@@ -545,8 +536,7 @@ public class VersionedMapNodeData implements Releasable {
     }
 
     @Override
-    public void releaseAll()
-            throws IOException {
+    public void releaseAll() {
         if (leftNode instanceof Releasable)
             ((Releasable) leftNode).releaseAll();
         if (listNode instanceof Releasable)
@@ -555,38 +545,32 @@ public class VersionedMapNodeData implements Releasable {
             ((Releasable) rightNode).releaseAll();
     }
 
-    public VersionedMapNode replace(VersionedListNode listNode)
-            throws IOException {
+    public VersionedMapNode replace(VersionedListNode listNode) {
         thisNode.releaseLocal();
         return new VersionedMapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
     }
 
-    public VersionedMapNode replace(int level, VersionedListNode listNode, Comparable key)
-            throws IOException {
+    public VersionedMapNode replace(int level, VersionedListNode listNode, Comparable key) {
         thisNode.releaseLocal();
         return new VersionedMapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
     }
 
-    public VersionedMapNode replace(VersionedMapNode leftNode, VersionedListNode listNode, VersionedMapNode rightNode)
-            throws IOException {
+    public VersionedMapNode replace(VersionedMapNode leftNode, VersionedListNode listNode, VersionedMapNode rightNode) {
         thisNode.releaseLocal();
         return new VersionedMapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
     }
 
-    public VersionedMapNode replaceLeft(VersionedMapNode leftNode)
-            throws IOException {
+    public VersionedMapNode replaceLeft(VersionedMapNode leftNode) {
         thisNode.releaseLocal();
         return new VersionedMapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
     }
 
-    public VersionedMapNode replaceLeft(int level, VersionedMapNode leftNode)
-            throws IOException {
+    public VersionedMapNode replaceLeft(int level, VersionedMapNode leftNode) {
         thisNode.releaseLocal();
         return new VersionedMapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
     }
 
-    public VersionedMapNode replaceRight(VersionedMapNode rightNode)
-            throws IOException {
+    public VersionedMapNode replaceRight(VersionedMapNode rightNode) {
         thisNode.releaseLocal();
         return new VersionedMapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
     }

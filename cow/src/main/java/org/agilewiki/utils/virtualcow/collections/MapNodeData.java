@@ -128,8 +128,7 @@ public class MapNodeData implements Releasable {
      * @param key The key for the node.
      * @return The list, or null.
      */
-    public ListNode getList(Comparable key)
-            throws IOException {
+    public ListNode getList(Comparable key) {
         if (isNil())
             return null;
         int c = key.compareTo(this.key);
@@ -145,8 +144,7 @@ public class MapNodeData implements Releasable {
      *
      * @return Revised root node.
      */
-    public MapNode skew()
-            throws IOException {
+    public MapNode skew() {
         if (isNil() || leftNode.isNil())
             return thisNode;
         MapNodeData leftData = leftNode.getData();
@@ -162,8 +160,7 @@ public class MapNodeData implements Releasable {
      *
      * @return The revised root node.
      */
-    public MapNode split()
-            throws IOException {
+    public MapNode split() {
         if (isNil() || rightNode.isNil())
             return thisNode;
         MapNodeData rightData = rightNode.getData();
@@ -184,8 +181,7 @@ public class MapNodeData implements Releasable {
      * @param value The value to be added.
      * @return The revised root node.
      */
-    public MapNode add(Comparable key, int ndx, Object value)
-            throws IOException {
+    public MapNode add(Comparable key, int ndx, Object value) {
         MapNode t;
         int c = key.compareTo(this.key);
         if (c < 0) {
@@ -198,32 +194,27 @@ public class MapNodeData implements Releasable {
         return t.getData().skew().getData().split();
     }
 
-    private MapNode successor()
-            throws IOException {
+    private MapNode successor() {
         return rightNode.getData().leftMost();
     }
 
-    private MapNode leftMost()
-            throws IOException {
+    private MapNode leftMost() {
         if (!leftNode.isNil())
             return leftNode.getData().leftMost();
         return thisNode;
     }
 
-    private MapNode predecessor()
-            throws IOException {
+    private MapNode predecessor() {
         return leftNode.getData().rightMost();
     }
 
-    private MapNode rightMost()
-            throws IOException {
+    private MapNode rightMost() {
         if (!rightNode.isNil())
             return rightNode.getData().rightMost();
         return thisNode;
     }
 
-    private MapNode decreaseLevel()
-            throws IOException {
+    private MapNode decreaseLevel() {
         MapNodeData rd = rightNode.getData();
         int shouldBe = min(leftNode.getData().level, rd.level) + 1;
         if (shouldBe < level) {
@@ -237,8 +228,7 @@ public class MapNodeData implements Releasable {
         return thisNode;
     }
 
-    public MapNode remove(Comparable key)
-            throws IOException {
+    public MapNode remove(Comparable key) {
         if (isNil())
             return thisNode;
         MapNodeFactory factory = thisNode.getRegistry().mapNodeFactory;
@@ -298,8 +288,7 @@ public class MapNodeData implements Releasable {
      * @param ndx The index of the value.
      * @return The revised node.
      */
-    public MapNode remove(Comparable key, int ndx)
-            throws IOException {
+    public MapNode remove(Comparable key, int ndx) {
         if (key == null)
             throw new IllegalArgumentException("key may not be null");
         if (isNil())
@@ -332,8 +321,7 @@ public class MapNodeData implements Releasable {
      * @param value The new value.
      * @return The revised node.
      */
-    public MapNode set(Comparable key, Object value)
-            throws IOException {
+    public MapNode set(Comparable key, Object value) {
         int c = key.compareTo(this.key);
         if (c < 0) {
             MapNode n = leftNode.set(key, value);
@@ -353,8 +341,7 @@ public class MapNodeData implements Releasable {
      *
      * @param keys The set being built.
      */
-    public void flatKeys(NavigableSet<Comparable> keys)
-            throws IOException {
+    public void flatKeys(NavigableSet<Comparable> keys) {
         if (isNil())
             return;
         leftNode.getData().flatKeys(keys);
@@ -368,8 +355,7 @@ public class MapNodeData implements Releasable {
      *
      * @param map The map being built.
      */
-    public void flatMap(NavigableMap<Comparable, List> map)
-            throws IOException {
+    public void flatMap(NavigableMap<Comparable, List> map) {
         if (isNil())
             return;
         leftNode.getData().flatMap(map);
@@ -378,8 +364,7 @@ public class MapNodeData implements Releasable {
         rightNode.getData().flatMap(map);
     }
 
-    protected MapNode addList(Comparable key, ListNode listNode)
-            throws IOException {
+    protected MapNode addList(Comparable key, ListNode listNode) {
         if (listNode.isNil())
             return thisNode;
         if (isNil()) {
@@ -402,8 +387,7 @@ public class MapNodeData implements Releasable {
      *
      * @return The count of all the keys in the map.
      */
-    public int totalSize()
-            throws IOException {
+    public int totalSize() {
         if (isNil())
             return 0;
         return leftNode.totalSize() + 1 + rightNode.totalSize();
@@ -414,8 +398,7 @@ public class MapNodeData implements Releasable {
      *
      * @return The size of the map.
      */
-    public int size()
-            throws IOException {
+    public int size() {
         return totalSize();
     }
 
@@ -424,8 +407,7 @@ public class MapNodeData implements Releasable {
      *
      * @return The smallest key, or null.
      */
-    public Comparable firstKey()
-            throws IOException {
+    public Comparable firstKey() {
         if (isNil())
             return null;
         Comparable k = leftNode.firstKey();
@@ -439,8 +421,7 @@ public class MapNodeData implements Releasable {
      *
      * @return The largest key, or null.
      */
-    public Comparable lastKey()
-            throws IOException {
+    public Comparable lastKey() {
         if (isNil())
             return null;
         Comparable k = rightNode.lastKey();
@@ -455,8 +436,7 @@ public class MapNodeData implements Releasable {
      * @param key The given key.
      * @return The next greater key, or null.
      */
-    public Comparable higherKey(Comparable key)
-            throws IOException {
+    public Comparable higherKey(Comparable key) {
         if (isNil())
             return null;
         int c = key.compareTo(this.key);
@@ -476,8 +456,7 @@ public class MapNodeData implements Releasable {
      * @param key The given key.
      * @return The key greater than or equal to the given key, or null.
      */
-    public Comparable ceilingKey(Comparable key)
-            throws IOException {
+    public Comparable ceilingKey(Comparable key) {
         if (isNil())
             return null;
         int c = key.compareTo(this.key);
@@ -497,8 +476,7 @@ public class MapNodeData implements Releasable {
      * @param key The given key.
      * @return The next smaller key, or null.
      */
-    public Comparable lowerKey(Comparable key)
-            throws IOException {
+    public Comparable lowerKey(Comparable key) {
         if (isNil())
             return null;
         int c = key.compareTo(this.key);
@@ -518,8 +496,7 @@ public class MapNodeData implements Releasable {
      * @param key The given key.
      * @return The key smaller than or equal to the given key, or null.
      */
-    public Comparable floorKey(Comparable key)
-            throws IOException {
+    public Comparable floorKey(Comparable key) {
         if (isNil())
             return null;
         int c = key.compareTo(this.key);
@@ -562,8 +539,7 @@ public class MapNodeData implements Releasable {
     }
 
     @Override
-    public void releaseAll()
-            throws IOException {
+    public void releaseAll() {
         if (isNil())
             return;
         if (leftNode instanceof Releasable)
@@ -574,62 +550,53 @@ public class MapNodeData implements Releasable {
             ((Releasable) rightNode).releaseAll();
     }
 
-    public MapNode replace(int level)
-            throws IOException {
+    public MapNode replace(int level) {
         thisNode.releaseLocal();
         return new MapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
     }
 
-    public MapNode replace(ListNode listNode)
-            throws IOException {
+    public MapNode replace(ListNode listNode) {
         thisNode.releaseLocal();
         return new MapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
     }
 
-    public MapNode replace(int level, ListNode listNode, Comparable key)
-            throws IOException {
+    public MapNode replace(int level, ListNode listNode, Comparable key) {
         thisNode.releaseLocal();
         return new MapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
     }
 
-    public MapNode replace(int level, MapNode leftNode, MapNode rightNode)
-            throws IOException {
+    public MapNode replace(int level, MapNode leftNode, MapNode rightNode) {
         thisNode.releaseLocal();
         return new MapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
     }
 
-    public MapNode replace(MapNode leftNode, ListNode listNode, MapNode rightNode)
-            throws IOException {
+    public MapNode replace(MapNode leftNode, ListNode listNode, MapNode rightNode) {
         thisNode.releaseLocal();
         return new MapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
     }
 
-    public MapNode replaceLeft(MapNode leftNode)
-            throws IOException {
+    public MapNode replaceLeft(MapNode leftNode) {
         thisNode.releaseLocal();
         return new MapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
     }
 
-    public MapNode replaceLeft(int level, MapNode leftNode)
-            throws IOException {
+    public MapNode replaceLeft(int level, MapNode leftNode) {
         thisNode.releaseLocal();
         return new MapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
     }
 
-    public MapNode replaceRight(MapNode rightNode)
-            throws IOException {
+    public MapNode replaceRight(MapNode rightNode) {
         thisNode.releaseLocal();
         return new MapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
     }
 
-    public MapNode replaceRight(int level, MapNode rightNode)
-            throws IOException {
+    public MapNode replaceRight(int level, MapNode rightNode) {
         thisNode.releaseLocal();
         return new MapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
     }
 
     @Override
-    public Object resize(int maxSize, int maxBlockSize) throws IOException {
+    public Object resize(int maxSize, int maxBlockSize) {
         if (thisNode.getDurableLength() <= maxSize) {
             return thisNode;
         }
@@ -668,5 +635,16 @@ public class MapNodeData implements Releasable {
         else
             n = replaceRight((MapNode) q);
         return n.resize(maxSize, maxBlockSize);
+    }
+
+    public String toString() {
+        try {
+            if (isNil())
+                return "";
+            return "(" + leftNode.getData().toString() + listNode + "-" + level + "-" + key + rightNode.getData().toString() + ")";
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return "?";
+        }
     }
 }

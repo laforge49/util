@@ -45,6 +45,7 @@ public class StringFactory extends BaseFactory {
     @Override
     public String deserialize(ByteBuffer byteBuffer) {
         int length = byteBuffer.getInt();
+        System.err.println("string "+length+" "+byteBuffer.remaining());
         char[] c = new char[length];
         CharBuffer charBuffer = byteBuffer.asCharBuffer();
         charBuffer.get(c);

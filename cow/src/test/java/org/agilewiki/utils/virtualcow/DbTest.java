@@ -22,8 +22,7 @@ public class DbTest extends TestCase {
                 db.open(true);
                 Transaction t2 = new Transaction() {
                     @Override
-                    public MapNode transform(MapNode mapNode)
-                            throws IOException {
+                    public MapNode transform(MapNode mapNode) {
                         System.out.println("block usage: " + db.usage());
                         mapNode = mapNode.add("x", "hi!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 

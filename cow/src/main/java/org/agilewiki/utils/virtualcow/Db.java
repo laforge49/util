@@ -3,6 +3,7 @@ package org.agilewiki.utils.virtualcow;
 import org.agilewiki.jactor2.core.blades.IsolationBladeBase;
 import org.agilewiki.jactor2.core.messages.AsyncResponseProcessor;
 import org.agilewiki.jactor2.core.messages.impl.AsyncRequestImpl;
+import org.agilewiki.utils.BlockIOException;
 import org.agilewiki.utils.dsm.DiskSpaceManager;
 import org.agilewiki.utils.immutable.CascadingRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
@@ -51,11 +52,11 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
      *
      * @param createNew True when a db file must not already exist.
      */
-    public void open(boolean createNew)
-            throws IOException {
+    public void open(boolean createNew) {
         if (fc != null) {
+            close();
             getReactor().error("open on already open db");
-            throw new IllegalStateException("already open");
+            throw new DulicateOpenException();
         }
         mapNode = null;
         try {
@@ -70,10 +71,10 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             _update(dbFactoryRegistry.nilMap);
             mapNode = null;
             _update(dbFactoryRegistry.nilMap);
-        } catch (Exception ex) {
-            fc = null;
+        } catch (IOException ex) {
+            close();
             getReactor().error("unable to open db to create a new file", ex);
-            throw ex;
+            throw new BlockIOException(ex);
         }
     }
 
@@ -87,8 +88,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         return new AReq<Void>("update") {
             @Override
             protected void processAsyncOperation(AsyncRequestImpl _asyncRequestImpl,
-                                                 AsyncResponseProcessor<Void> _asyncResponseProcessor)
-                    throws Exception {
+                                                 AsyncResponseProcessor<Void> _asyncResponseProcessor) {
                 try {
                     _asyncRequestImpl.setMessageTimeoutMillis(transaction.timeoutMillis());
                     privilegedThread = Thread.currentThread();
@@ -99,8 +99,9 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                     }
                     _asyncResponseProcessor.processAsyncResponse(null);
                 } catch (Exception ex) {
+                    close();
                     getReactor().error("unable to update db", ex);
-                    throw ex;
+                    throw new BlockIOException(ex);
                 }
             }
         };
@@ -111,12 +112,20 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
      * Otherwise an IllegalStateException is thrown.
      */
     public void checkPrivilege() {
-        if (Thread.currentThread() != privilegedThread)
-            throw new IllegalStateException("privileged operation");
+        if (!isPrivileged())
+            throw new PrivilegedOperationException();
     }
 
-    protected void _update(MapNode mapNode)
-            throws IOException {
+    /**
+     * Returns true if the thread is privileged.
+     *
+     * @return True if a transaction is being processed.
+     */
+    public boolean isPrivileged() {
+        return Thread.currentThread() == privilegedThread;
+    }
+
+    protected void _update(MapNode mapNode) {
         if (mapNode == this.mapNode)
             return; // Query?
         ImmutableFactory factory = dbFactoryRegistry.getImmutableFactory(mapNode);
@@ -135,8 +144,8 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         int contentSize = 8 + dsmLength + dl;
         int blockSize = 4 + 4 + 34 + contentSize;
         if (blockSize > maxBlockSize) {
-            throw new IllegalStateException("maxBlockSize is smaller than the block size " +
-                    blockSize);
+            close();
+            throw new MaxBlockSizeTooSmallException();
         }
         ByteBuffer contentBuffer = ByteBuffer.allocate(contentSize);
         contentBuffer.putLong(System.currentTimeMillis());
@@ -152,37 +161,52 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         byteBuffer.put(contentBuffer);
         byteBuffer.flip();
         long p = nextRootPosition;
-        while (byteBuffer.remaining() > 0) {
-            p += fc.write(byteBuffer, p);
+        try {
+            while (byteBuffer.remaining() > 0) {
+                p += fc.write(byteBuffer, p);
+            }
+        } catch (IOException ex) {
+            close();
+            throw new BlockIOException(ex);
         }
         nextRootPosition = (nextRootPosition + maxBlockSize) % (2 * maxBlockSize);
         this.mapNode = mapNode;
         return;
     }
 
-    public void readBlock(ByteBuffer byteBuffer, int blockNbr)
-            throws IOException {
+    public void readBlock(ByteBuffer byteBuffer, int blockNbr) {
         long position = blockNbr * (long) maxBlockSize;
-        System.err.println("reading from "+position+" "+byteBuffer.remaining());
-        while (byteBuffer.remaining() > 0) {
-            position += fc.read(byteBuffer, position);
+        try {
+            while (byteBuffer.remaining() > 0) {
+                position += fc.read(byteBuffer, position);
+            }
+        } catch (IOException ex) {
+            close();
+            throw new BlockIOException(ex);
         }
     }
 
-    public void writeBlock(ByteBuffer byteBuffer, int blockNbr)
-            throws IOException {
+    public void writeBlock(ByteBuffer byteBuffer, int blockNbr) {
         checkPrivilege();
         long position = blockNbr * (long) maxBlockSize;
-        System.err.println("writing to "+position+" "+byteBuffer.remaining());
-        while (byteBuffer.remaining() > 0) {
-            position += fc.write(byteBuffer, position);
+        try {
+            while (byteBuffer.remaining() > 0) {
+                position += fc.write(byteBuffer, position);
+            }
+        } catch (IOException ex) {
+            close();
+            throw new BlockIOException(ex);
         }
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         if (fc != null) {
-            fc.close();
+            try {
+                fc.close();
+            } catch (IOException ex) {
+                throw new BlockIOException(ex);
+            }
             fc = null;
         }
     }
@@ -190,27 +214,27 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     /**
      * Open an existing database.
      */
-    public void open()
-            throws IOException {
+    public void open() {
         if (fc != null) {
+            close();
             getReactor().error("open on already open db");
-            throw new IllegalStateException("already open");
+            throw new DulicateOpenException();
         }
         if (Files.notExists(dbPath)) {
             getReactor().error("file does not exist: " + dbPath);
-            throw new IllegalStateException("file does not exist: " + dbPath);
+            throw new FileDoesNotExistExcpetion();
         }
         if (!Files.isReadable(dbPath)) {
             getReactor().error("file is not readable: " + dbPath);
-            throw new IllegalStateException("file is not readable: " + dbPath);
+            throw new FileNotReadableException();
         }
         if (!Files.isWritable(dbPath)) {
             getReactor().error("file is not writable: " + dbPath);
-            throw new IllegalStateException("file is not writable: " + dbPath);
+            throw new FileNotWritableException();
         }
         if (!Files.isRegularFile(dbPath)) {
             getReactor().error("file is not a regular file: " + dbPath);
-            throw new IllegalStateException("file is not a regular file: " + dbPath);
+            throw new FileNotRegularExcpetion();
         }
         try {
             fc = FileChannel.open(dbPath, READ, WRITE, SYNC);
@@ -236,15 +260,14 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             dsm = new DiskSpaceManager(rb.serializedContent);
             ImmutableFactory factory = dbFactoryRegistry.readId(rb.serializedContent);
             mapNode = (MapNode) factory.deserialize(rb.serializedContent);
-        } catch (Exception ex) {
-            fc = null;
+        } catch (IOException ex) {
+            close();
             getReactor().error("Unable to open existing db file", ex);
-            throw ex;
+            throw new BlockIOException(ex);
         }
     }
 
-    protected RootBlock readRootBlock(long position)
-            throws IOException {
+    protected RootBlock readRootBlock(long position) {
         try {
             ByteBuffer header = ByteBuffer.allocate(4 + 4 + 34);
             while (header.remaining() > 0) {

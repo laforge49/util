@@ -355,8 +355,7 @@ public interface VersionedListNode extends Releasable {
      * @param time  The time the value is added.
      * @return The revised root node.
      */
-    default VersionedListNode add(Object value, long time)
-            throws IOException {
+    default VersionedListNode add(Object value, long time) {
         return add(-1, value, time);
     }
 
@@ -368,12 +367,11 @@ public interface VersionedListNode extends Releasable {
      * @param time  The time the value is added.
      * @return The revised root node.
      */
-    default VersionedListNode add(int ndx, Object value, long time)
-            throws IOException {
+    default VersionedListNode add(int ndx, Object value, long time) {
         return add(ndx, value, time, Long.MAX_VALUE);
     }
 
-    default VersionedListNode add(int ndx, Object value, long created, long deleted) throws IOException {
+    default VersionedListNode add(int ndx, Object value, long created, long deleted) {
         if (value == null)
             throw new IllegalArgumentException("value may not be null");
         if (isNil()) {
@@ -396,8 +394,7 @@ public interface VersionedListNode extends Releasable {
      * @param time The time of the deletion.
      * @return The revised node.
      */
-    default VersionedListNode remove(int ndx, long time)
-            throws IOException {
+    default VersionedListNode remove(int ndx, long time) {
         if (isNil())
             return this;
         return getData().remove(ndx, time);
@@ -408,8 +405,7 @@ public interface VersionedListNode extends Releasable {
      *
      * @return A complete, but shallow copy of the list.
      */
-    default VersionedListNode copyList()
-            throws IOException {
+    default VersionedListNode copyList() {
         return copyList(0L);
     }
 
@@ -420,8 +416,7 @@ public interface VersionedListNode extends Releasable {
      * @param time The given time.
      * @return A shortened copy of the list without some historical values.
      */
-    default VersionedListNode copyList(long time)
-            throws IOException {
+    default VersionedListNode copyList(long time) {
         return getData().copyList(getRegistry().versionedNilList, time);
     }
 
@@ -431,8 +426,7 @@ public interface VersionedListNode extends Releasable {
      * @param time The time of the deletion.
      * @return The currently empty versioned list.
      */
-    default VersionedListNode clearList(long time)
-            throws IOException {
+    default VersionedListNode clearList(long time) {
         return getData().clearList(time);
     }
 
@@ -466,14 +460,12 @@ public interface VersionedListNode extends Releasable {
     void serialize(ByteBuffer byteBuffer);
 
     @Override
-    default void releaseAll()
-            throws IOException {
+    default void releaseAll() {
         getData().releaseAll();
     }
 
     @Override
-    default Object resize(int maxSize, int maxBlockSize)
-            throws IOException {
+    default Object resize(int maxSize, int maxBlockSize) {
         return getData().resize(maxSize, maxBlockSize);
     }
 }
