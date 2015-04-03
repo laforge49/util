@@ -2,8 +2,6 @@ package org.agilewiki.utils.virtualcow;
 
 import org.agilewiki.utils.virtualcow.collections.MapNode;
 
-import java.io.IOException;
-
 /**
  * A transaction simply transforms a map list.
  */

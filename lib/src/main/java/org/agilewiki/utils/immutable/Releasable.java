@@ -1,7 +1,5 @@
 package org.agilewiki.utils.immutable;
 
-import java.io.IOException;
-
 /**
  * Immutables supporting the release and resize methods.
  */

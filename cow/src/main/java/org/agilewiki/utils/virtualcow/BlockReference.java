@@ -5,7 +5,6 @@ import org.agilewiki.utils.immutable.Releasable;
 import org.agilewiki.utils.immutable.scalars.CS256;
 import org.agilewiki.utils.immutable.scalars.CS256Factory;
 
-import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.nio.ByteBuffer;
 

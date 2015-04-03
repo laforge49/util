@@ -5,8 +5,6 @@ import org.agilewiki.utils.virtualcow.BlockReference;
 import org.agilewiki.utils.virtualcow.BlockReferenceFactory;
 import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 
-import java.nio.ByteBuffer;
-
 /**
  * Defines how a map reference is serialized / deserialized.
  */

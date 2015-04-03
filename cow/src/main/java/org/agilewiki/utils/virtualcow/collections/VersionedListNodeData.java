@@ -4,7 +4,6 @@ import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
 import org.agilewiki.utils.immutable.Releasable;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 

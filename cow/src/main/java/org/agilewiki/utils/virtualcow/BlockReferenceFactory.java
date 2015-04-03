@@ -1,7 +1,6 @@
 package org.agilewiki.utils.virtualcow;
 
 import org.agilewiki.utils.immutable.BaseFactory;
-import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
 import org.agilewiki.utils.immutable.scalars.CS256;
 import org.agilewiki.utils.immutable.scalars.CS256Factory;
