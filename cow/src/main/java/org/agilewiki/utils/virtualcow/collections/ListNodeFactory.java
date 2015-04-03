@@ -18,6 +18,7 @@ public class ListNodeFactory extends BaseFactory {
         super(registry, registry.listNodeImplId);
         nilListNodeFactory = new NilListNodeFactory(registry);
         nilList = new ListNodeImpl(registry);
+        new ListReferenceFactory(registry);
     }
 
     @Override

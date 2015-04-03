@@ -19,6 +19,7 @@ public class VersionedMapNodeFactory extends BaseFactory {
         super(registry, registry.versionedMapNodeImplId);
         versionedNilMapNodeFactory = new VersionedNilMapNodeFactory(registry);
         versionedNilMap = new VersionedMapNodeImpl(registry);
+        new VersionedMapReferenceFactory(registry);
     }
 
     @Override

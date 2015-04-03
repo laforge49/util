@@ -18,6 +18,7 @@ public class VersionedListNodeFactory extends BaseFactory {
         super(registry, registry.versionedListNodeImplId);
         versionedNilListNodeFactory = new VersionedNilListNodeFactory(registry);
         versionedNilList = new VersionedListNodeImpl(registry);
+        new VersionedListReferenceFactory(registry);
     }
 
     @Override
