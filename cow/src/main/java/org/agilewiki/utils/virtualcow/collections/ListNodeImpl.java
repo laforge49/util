@@ -1,5 +1,7 @@
 package org.agilewiki.utils.virtualcow.collections;
 
+import org.agilewiki.utils.immutable.scalars.CS256;
+import org.agilewiki.utils.virtualcow.Db;
 import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 
 import java.nio.ByteBuffer;
@@ -92,6 +94,19 @@ public class ListNodeImpl implements ListNode {
         byteBuffer.put(this.byteBuffer.slice());
         this.byteBuffer = bb;
         dataReference.set(null); //limit memory footprint, plugs memory leak.
+    }
+
+    @Override
+    public Object shrink() {
+        Db db = registry.db;
+        ListNodeData data = getData();
+        ByteBuffer byteBuffer = ByteBuffer.allocate(durableLength - 6);
+        data.serialize(byteBuffer);
+        byteBuffer.flip();
+        CS256 cs256 = new CS256(byteBuffer);
+        int blockNbr = db.allocate();
+        db.writeBlock(byteBuffer, blockNbr);
+        return new ListReference(registry, blockNbr, durableLength - 6, cs256);
     }
 
     @Override
