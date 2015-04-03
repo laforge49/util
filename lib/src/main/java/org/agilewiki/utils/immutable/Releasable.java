@@ -22,7 +22,7 @@ public interface Releasable {
      * @return The revised structure.
      */
     default Object resize(int maxSize, int maxBlockSize) {
-        return this;
+        throw new UnsupportedOperationException();
     }
 
     /**
