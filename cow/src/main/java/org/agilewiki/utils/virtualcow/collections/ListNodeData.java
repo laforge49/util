@@ -2,7 +2,6 @@ package org.agilewiki.utils.virtualcow.collections;
 
 import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
-import org.agilewiki.utils.immutable.Releasable;
 import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 
 import java.nio.ByteBuffer;
@@ -446,7 +445,27 @@ public class ListNodeData implements Releasable {
         return new ListNodeImpl(thisNode.getRegistry(), level, totalSize, leftNode, value, rightNode);
     }
 
+    public ListNode replace(Object value) {
+        thisNode.releaseLocal();
+        return new ListNodeImpl(thisNode.getRegistry(), level, totalSize, leftNode, value, rightNode);
+    }
+
+    public ListNode replace(ListNode leftNode, ListNode rightNode) {
+        thisNode.releaseLocal();
+        return new ListNodeImpl(thisNode.getRegistry(), level, totalSize, leftNode, value, rightNode);
+    }
+
+    public ListNode replace(ListNode leftNode, Object value, ListNode rightNode) {
+        thisNode.releaseLocal();
+        return new ListNodeImpl(thisNode.getRegistry(), level, totalSize, leftNode, value, rightNode);
+    }
+
     public ListNode replace(int level, int totalSize, Object value) {
+        thisNode.releaseLocal();
+        return new ListNodeImpl(thisNode.getRegistry(), level, totalSize, leftNode, value, rightNode);
+    }
+
+    public ListNode replaceLeft(ListNode leftNode) {
         thisNode.releaseLocal();
         return new ListNodeImpl(thisNode.getRegistry(), level, totalSize, leftNode, value, rightNode);
     }
@@ -484,5 +503,53 @@ public class ListNodeData implements Releasable {
     public ListNode replaceRight(int level, int totalSize, ListNode rightNode) {
         thisNode.releaseLocal();
         return new ListNodeImpl(thisNode.getRegistry(), level, totalSize, leftNode, value, rightNode);
+    }
+
+    @Override
+    public Object resize(int maxSize, int maxBlockSize) {
+        if (thisNode.getDurableLength() <= maxSize) {
+            return thisNode;
+        }
+
+        ListNode l = leftNode;
+        if (l.getDurableLength() > maxBlockSize)
+            l = (ListNode) l.resize(maxBlockSize, maxBlockSize);
+        ListNode r = rightNode;
+        if (r.getDurableLength() > maxBlockSize)
+            r = (ListNode) r.resize(maxBlockSize, maxBlockSize);
+        Releasable v = null;
+        if (value instanceof Releasable) {
+            v = (Releasable) value;
+            if (v.getDurableLength() > maxBlockSize)
+                v = (Releasable) v.resize(maxBlockSize, maxBlockSize);
+            if (l != leftNode || r != rightNode || v != value)
+                return replace(l, v, r).resize(maxSize, maxBlockSize);
+        } else {
+            if (l != leftNode || r != rightNode)
+                return replace(l, r).resize(maxSize, maxBlockSize);
+        }
+
+        int ldl = leftNode.getDurableLength();
+        int vdl = v != null ? v.getDurableLength() : -1;
+        int rdl = rightNode.getDurableLength();
+        Releasable s = leftNode;
+        int dl = ldl;
+        if (vdl > dl) {
+            dl = vdl;
+            s = v;
+        }
+        if (rdl > dl) {
+            dl = rdl;
+            s = rightNode;
+        }
+        Object q = s.shrink();
+        ListNode n;
+        if (v == s)
+            n = replaceLeft((ListNode) q);
+        else if (value == s)
+            n = replace(q);
+        else
+            n = replaceRight((ListNode) q);
+        return n.resize(maxSize, maxBlockSize);
     }
 }

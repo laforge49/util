@@ -1,9 +1,18 @@
-package org.agilewiki.utils.immutable;
+package org.agilewiki.utils.virtualcow.collections;
 
 /**
  * Immutables supporting the release and resize methods.
  */
 public interface Releasable {
+
+    /**
+     * Returns the size of a byte array needed to serialize this object,
+     * including the space needed for the durable id.
+     *
+     * @return The size in bytes of the serialized data.
+     */
+    int getDurableLength();
+
     /**
      * release all resources.
      */

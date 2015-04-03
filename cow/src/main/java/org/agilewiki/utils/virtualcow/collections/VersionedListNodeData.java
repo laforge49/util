@@ -2,7 +2,6 @@ package org.agilewiki.utils.virtualcow.collections;
 
 import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
-import org.agilewiki.utils.immutable.Releasable;
 
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -624,5 +623,37 @@ public class VersionedListNodeData implements Releasable {
     public VersionedListNode replaceRight(int level, int totalSize, VersionedListNode rightNode) {
         thisNode.releaseLocal();
         return new VersionedListNodeImpl(thisNode.getRegistry(), level, totalSize, created, deleted, leftNode, value, rightNode);
+    }
+
+    @Override
+    public Object resize(int maxSize, int maxBlockSize) {
+        if (thisNode.getDurableLength() <= maxSize) {
+            return thisNode;
+        }
+
+        VersionedListNode l = leftNode;
+        if (l.getDurableLength() > maxBlockSize)
+            l = (VersionedListNode) l.resize(maxBlockSize, maxBlockSize);
+        VersionedListNode r = rightNode;
+        if (r.getDurableLength() > maxBlockSize)
+            r = (VersionedListNode) r.resize(maxBlockSize, maxBlockSize);
+        if (l != leftNode || r != rightNode)
+            return replace(l, r).resize(maxSize, maxBlockSize);
+
+        int ldl = leftNode.getDurableLength();
+        int rdl = rightNode.getDurableLength();
+        Releasable s = leftNode;
+        int dl = ldl;
+        if (rdl > dl) {
+            dl = rdl;
+            s = rightNode;
+        }
+        Object q = s.shrink();
+        VersionedListNode n;
+        if (leftNode == s)
+            n = replaceLeft((VersionedListNode) q);
+        else
+            n = replaceRight((VersionedListNode) q);
+        return n.resize(maxSize, maxBlockSize);
     }
 }

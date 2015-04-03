@@ -1,7 +1,6 @@
 package org.agilewiki.utils.virtualcow.collections;
 
 import org.agilewiki.utils.immutable.ImmutableFactory;
-import org.agilewiki.utils.immutable.Releasable;
 import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 
 import java.nio.ByteBuffer;
@@ -571,5 +570,47 @@ public class VersionedMapNodeData implements Releasable {
     public VersionedMapNode replaceRight(VersionedMapNode rightNode) {
         thisNode.releaseLocal();
         return new VersionedMapNodeImpl(thisNode.getRegistry(), level, leftNode, listNode, rightNode, key);
+    }
+
+    @Override
+    public Object resize(int maxSize, int maxBlockSize) {
+        if (thisNode.getDurableLength() <= maxSize) {
+            return thisNode;
+        }
+
+        VersionedMapNode l = leftNode;
+        if (l.getDurableLength() > maxBlockSize)
+            l = (VersionedMapNode) l.resize(maxBlockSize, maxBlockSize);
+        VersionedMapNode r = rightNode;
+        if (r.getDurableLength() > maxBlockSize)
+            r = (VersionedMapNode) r.resize(maxBlockSize, maxBlockSize);
+        VersionedListNode v = listNode;
+        if (v.getDurableLength() > maxBlockSize)
+            v = (VersionedListNode) v.resize(maxBlockSize, maxBlockSize);
+        if (l != leftNode || r != rightNode || v != listNode)
+            return replace(l, v, r).resize(maxSize, maxBlockSize);
+
+        int ldl = leftNode.getDurableLength();
+        int vdl = listNode.getDurableLength();
+        int rdl = rightNode.getDurableLength();
+        Releasable s = leftNode;
+        int dl = ldl;
+        if (vdl > dl) {
+            dl = vdl;
+            s = listNode;
+        }
+        if (rdl > dl) {
+            dl = rdl;
+            s = rightNode;
+        }
+        Object q = s.shrink();
+        VersionedMapNode n;
+        if (leftNode == s)
+            n = replaceLeft((VersionedMapNode) q);
+        else if (listNode == s)
+            n = replace((VersionedListNode) q);
+        else
+            n = replaceRight((VersionedMapNode) q);
+        return n.resize(maxSize, maxBlockSize);
     }
 }

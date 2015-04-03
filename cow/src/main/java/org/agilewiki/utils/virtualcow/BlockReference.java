@@ -1,9 +1,9 @@
 package org.agilewiki.utils.virtualcow;
 
 import org.agilewiki.utils.immutable.ImmutableFactory;
-import org.agilewiki.utils.immutable.Releasable;
 import org.agilewiki.utils.immutable.scalars.CS256;
 import org.agilewiki.utils.immutable.scalars.CS256Factory;
+import org.agilewiki.utils.virtualcow.collections.Releasable;
 
 import java.lang.ref.SoftReference;
 import java.nio.ByteBuffer;
