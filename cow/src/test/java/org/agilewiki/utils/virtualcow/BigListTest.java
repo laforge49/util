@@ -24,7 +24,7 @@ public class BigListTest extends TestCase {
                     Transaction t2 = new Transaction() {
                         @Override
                         public MapNode transform(MapNode mapNode) {
-                            for (int i = 0; i < 10000; i++) {
+                            for (int i = 0; i < 1000; i++) {
                                 mapNode = mapNode.add(0, "");
                             }
                             return mapNode;
