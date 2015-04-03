@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 import java.util.*;
 
 /**
- * An immutable map of versioned lists.
+ * An immutable map of lists.
  */
 public interface MapNode extends Releasable {
 

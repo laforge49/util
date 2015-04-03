@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * An immutable map of versioned lists.
+ * An immutable map of lists.
  */
 public class MapNodeImpl implements MapNode {
 

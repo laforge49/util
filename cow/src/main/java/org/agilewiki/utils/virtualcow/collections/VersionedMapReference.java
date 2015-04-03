@@ -7,23 +7,23 @@ import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 import java.nio.ByteBuffer;
 
 /**
- * A reference to an immutable map of lists.
+ * A reference to an immutable map of versioned lists.
  */
-public class MapReference extends BlockReference implements MapNode {
-    public MapReference(DbFactoryRegistry registry,
-                        int blockNbr,
-                        int blockLength,
-                        CS256 cs256) {
+public class VersionedMapReference extends BlockReference implements VersionedMapNode {
+    public VersionedMapReference(DbFactoryRegistry registry,
+                                 int blockNbr,
+                                 int blockLength,
+                                 CS256 cs256) {
         super(registry, blockNbr, blockLength, cs256);
     }
 
     @Override
-    public MapNodeData getData() {
-        return (MapNodeData) super.getData();
+    public VersionedMapNodeData getData() {
+        return (VersionedMapNodeData) super.getData();
     }
 
     protected Object loadData(ByteBuffer byteBuffer) {
-        return new MapNodeData(this, byteBuffer);
+        return new VersionedMapNodeData(this, byteBuffer);
     }
 
     /**
@@ -33,7 +33,7 @@ public class MapReference extends BlockReference implements MapNode {
      */
     public void writeDurable(ByteBuffer byteBuffer) {
         int expected = byteBuffer.position() + getDurableLength();
-        byteBuffer.putChar(getRegistry().mapReferenceId);
+        byteBuffer.putChar(getRegistry().versionedMapReferenceId);
         serialize(byteBuffer);
         if (expected != byteBuffer.position()) {
             getRegistry().db.close();
