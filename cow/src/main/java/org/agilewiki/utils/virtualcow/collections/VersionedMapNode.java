@@ -87,11 +87,10 @@ public interface VersionedMapNode extends Releasable {
      *
      * @param key   The key of the list.
      * @param value The value to be added.
-     * @param time  The time the value is added.
      * @return The revised root node.
      */
-    default VersionedMapNode add(Comparable key, Object value, long time) {
-        return add(key, -1, value, time);
+    default VersionedMapNode add(Comparable key, Object value) {
+        return add(key, -1, value);
     }
 
     /**
@@ -100,11 +99,10 @@ public interface VersionedMapNode extends Releasable {
      * @param key   The key of the list.
      * @param ndx   Where to add the value.
      * @param value The value to be added.
-     * @param time  The time the value is added.
      * @return The revised root node.
      */
-    default VersionedMapNode add(Comparable key, int ndx, Object value, long time) {
-        return add(key, ndx, value, time, Long.MAX_VALUE);
+    default VersionedMapNode add(Comparable key, int ndx, Object value) {
+        return add(key, ndx, value, getTimestamp(), Long.MAX_VALUE);
     }
 
     default VersionedMapNode add(Comparable key, int ndx, Object value, long created, long deleted) {
@@ -123,26 +121,24 @@ public interface VersionedMapNode extends Releasable {
      *
      * @param key  The key of the list.
      * @param ndx  The index of the value.
-     * @param time The time of the deletion.
      * @return The revised node.
      */
-    default VersionedMapNode remove(Comparable key, int ndx, long time) {
+    default VersionedMapNode remove(Comparable key, int ndx) {
         if (isNil())
             return this;
-        return getData().remove(key, ndx, time);
+        return getData().remove(key, ndx);
     }
 
     /**
      * Empty the list by marking all the existing values as deleted.
      *
      * @param key  The key of the list.
-     * @param time The time of the deletion.
      * @return The revised node.
      */
-    default VersionedMapNode clearList(Comparable key, long time) {
+    default VersionedMapNode clearList(Comparable key) {
         if (isNil())
             return this;
-        return getData().clearList(key, time);
+        return getData().clearList(key);
     }
 
     /**
@@ -150,30 +146,28 @@ public interface VersionedMapNode extends Releasable {
      *
      * @param key   The key of the list.
      * @param value The new value.
-     * @param time  The time of the replacement.
      * @return The revised node.
      */
-    default VersionedMapNode set(Comparable key, Object value, long time) {
+    default VersionedMapNode set(Comparable key, Object value) {
         if (value == null)
             throw new IllegalArgumentException("value may not be null");
         if (isNil()) {
             DbFactoryRegistry registry = getRegistry();
-            VersionedListNode listNode = registry.versionedNilList.add(value, time);
+            VersionedListNode listNode = registry.versionedNilList.add(value);
             return getData().replace(1, listNode, key);
         }
-        return getData().set(key, value, time);
+        return getData().set(key, value);
     }
 
     /**
      * Empty the map by marking all the existing values as deleted.
      *
-     * @param time The time of the deletion.
      * @return The currently empty versioned map.
      */
-    default VersionedMapNode clearMap(long time) {
+    default VersionedMapNode clearMap() {
         if (isNil())
             return this;
-        return getData().clearMap(time);
+        return getData().clearMap();
     }
 
     /**

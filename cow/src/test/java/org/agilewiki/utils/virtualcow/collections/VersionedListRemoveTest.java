@@ -21,31 +21,51 @@ public class VersionedListRemoveTest extends TestCase {
 
             VersionedListNode l1 = registry.versionedNilList;
 
-            l1 = l1.remove(-1, 1);
-            l1 = l1.remove(0, 1);
-            l1 = l1.remove(1, 1);
+            db._setTimestamp(1);
+            l1 = l1.remove(-1);
+            l1 = l1.remove(0);
+            l1 = l1.remove(1);
 
-            VersionedListNode l2 = registry.versionedNilList.add("a", 2);
-            l2 = l2.add("b", 3);
-            l2 = l2.add("c", 4);
-            l2 = l2.add("d", 5);
-            l2 = l2.add("e", 6);
-            l2 = l2.add("f", 7);
-            l2 = l2.add("g", 8);
+            db._setTimestamp(2);
+            VersionedListNode l2 = registry.versionedNilList.add("a");
+            db._setTimestamp(3);
+            l2 = l2.add("b");
+            db._setTimestamp(4);
+            l2 = l2.add("c");
+            db._setTimestamp(5);
+            l2 = l2.add("d");
+            db._setTimestamp(6);
+            l2 = l2.add("e");
+            db._setTimestamp(7);
+            l2 = l2.add("f");
+            db._setTimestamp(8);
+            l2 = l2.add("g");
 
-            l2 = l2.remove(-3, 9);
-            l2 = l2.remove(-2, 10);
-            l2 = l2.remove(-1, 11);
+            db._setTimestamp(9);
+            l2 = l2.remove(-3);
+            db._setTimestamp(10);
+            l2 = l2.remove(-2);
+            db._setTimestamp(11);
+            l2 = l2.remove(-1);
             assertEquals(7, l2.totalSize());
-            l2 = l2.remove(0, 12);
-            l2 = l2.remove(1, 13);
-            l2 = l2.remove(2, 14);
-            l2 = l2.remove(3, 15);
-            l2 = l2.remove(4, 16);
-            l2 = l2.remove(5, 17);
-            l2 = l2.remove(6, 18);
-            l2 = l2.remove(7, 19);
-            l2 = l2.remove(8, 20);
+            db._setTimestamp(12);
+            l2 = l2.remove(0);
+            db._setTimestamp(13);
+            l2 = l2.remove(1);
+            db._setTimestamp(14);
+            l2 = l2.remove(2);
+            db._setTimestamp(15);
+            l2 = l2.remove(3);
+            db._setTimestamp(16);
+            l2 = l2.remove(4);
+            db._setTimestamp(17);
+            l2 = l2.remove(5);
+            db._setTimestamp(18);
+            l2 = l2.remove(6);
+            db._setTimestamp(19);
+            l2 = l2.remove(7);
+            db._setTimestamp(20);
+            l2 = l2.remove(8);
             assertEquals("abcdefg", String.join("", l2.flatList(8)));
             assertEquals("bcdefg", String.join("", l2.flatList(12)));
             assertEquals("cdefg", String.join("", l2.flatList(13)));
@@ -70,7 +90,8 @@ public class VersionedListRemoveTest extends TestCase {
             assertEquals("g", it.next());
             assertFalse(it.hasNext());
 
-            copy = copy.clearList(30);
+            db._setTimestamp(30);
+            copy = copy.clearList();
             assertEquals(0, copy.size(30));
         } finally {
             Plant.close();

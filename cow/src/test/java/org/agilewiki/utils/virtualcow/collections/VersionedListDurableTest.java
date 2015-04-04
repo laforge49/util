@@ -35,9 +35,9 @@ public class VersionedListDurableTest extends TestCase {
             assertTrue(object2.equals(registry.versionedNilList));
 
             VersionedListNode l2 = l1;
-            l2 = l2.add("1", 1);
-            l2 = l2.add("2", 2);
-            l2 = l2.add("3", 3);
+            l2 = l2.add("1");
+            l2 = l2.add("2");
+            l2 = l2.add("3");
             ImmutableFactory factory3 = registry.getImmutableFactory(l2);
             assertTrue(factory3 instanceof VersionedListNodeFactory);
             assertEquals(122, factory3.getDurableLength(l2));
@@ -49,7 +49,7 @@ public class VersionedListDurableTest extends TestCase {
             assertTrue(factory4 instanceof VersionedListNodeFactory);
             Object object4 = factory4.deserialize(byteBuffer2);
             assertEquals(122, byteBuffer2.position());
-            assertEquals("123", String.join("", ((VersionedListNode) object4).flatList(3)));
+            assertEquals("123", String.join("", ((VersionedListNode) object4).flatList(db.getTimestamp())));
         } finally {
             Plant.close();
         }

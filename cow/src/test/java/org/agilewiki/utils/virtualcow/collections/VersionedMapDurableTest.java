@@ -35,9 +35,9 @@ public class VersionedMapDurableTest extends TestCase {
             assertTrue(object2.equals(registry.versionedNilMap));
 
             VersionedMapNode m2 = m1;
-            m2 = m2.add("a", "1", 1);
-            m2 = m2.add("a", "2", 2);
-            m2 = m2.add("a", "3", 3);
+            m2 = m2.add("a", "1");
+            m2 = m2.add("a", "2");
+            m2 = m2.add("a", "3");
             ImmutableFactory factory3 = registry.getImmutableFactory(m2);
             assertTrue(factory3 instanceof VersionedMapNodeFactory);
             assertEquals(144, factory3.getDurableLength(m2));
@@ -49,7 +49,7 @@ public class VersionedMapDurableTest extends TestCase {
             assertTrue(factory4 instanceof VersionedMapNodeFactory);
             Object object4 = factory4.deserialize(byteBuffer2);
             assertEquals(144, byteBuffer2.position());
-            assertEquals("123", String.join("", ((VersionedMapNode) object4).getList("a").flatList(3)));
+            assertEquals("123", String.join("", ((VersionedMapNode) object4).getList("a").flatList(db.getTimestamp())));
         } finally {
             Plant.close();
         }

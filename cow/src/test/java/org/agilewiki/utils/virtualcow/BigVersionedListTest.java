@@ -26,7 +26,7 @@ public class BigVersionedListTest extends TestCase {
                         public MapNode transform(MapNode mapNode, long timestamp) {
                             VersionedMapNode vmn = db.dbFactoryRegistry.versionedNilMap;
                             for (int i = 0; i < 10; i++) {
-                                vmn = vmn.add(0, "", timestamp);
+                                vmn = vmn.add(0, "");
                             }
                             mapNode = mapNode.add(1, vmn);
                             return mapNode;

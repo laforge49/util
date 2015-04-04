@@ -498,12 +498,12 @@ public class VersionedListNodeData implements Releasable {
      * Mark a value as deleted.
      *
      * @param ndx  The index of the value.
-     * @param time The time of the deletion.
      * @return The revised node.
      */
-    public VersionedListNode remove(int ndx, long time) {
+    public VersionedListNode remove(int ndx) {
         if (isNil())
             return thisNode;
+        long time = thisNode.getTimestamp();
         int leftSize = leftNode.totalSize();
         if (ndx == leftSize) {
             if (exists(time))
@@ -511,12 +511,12 @@ public class VersionedListNodeData implements Releasable {
             return thisNode;
         }
         if (ndx < leftSize) {
-            VersionedListNode n = leftNode.remove(ndx, time);
+            VersionedListNode n = leftNode.remove(ndx);
             if (leftNode == n)
                 return thisNode;
             return replaceLeft(n);
         }
-        VersionedListNode n = rightNode.remove(ndx - leftSize - 1, time);
+        VersionedListNode n = rightNode.remove(ndx - leftSize - 1);
         if (rightNode == n)
             return thisNode;
         return replaceRight(n);
@@ -542,15 +542,14 @@ public class VersionedListNodeData implements Releasable {
     /**
      * Empty the list by marking all the existing values as deleted.
      *
-     * @param time The time of the deletion.
      * @return The currently empty versioned list.
      */
-    public VersionedListNode clearList(long time) {
+    public VersionedListNode clearList() {
         if (isNil())
             return thisNode;
-        VersionedListNode ln = leftNode.clearList(time);
-        VersionedListNode rn = rightNode.clearList(time);
-        if (ln == leftNode && rn == rightNode && !exists(time))
+        VersionedListNode ln = leftNode.clearList();
+        VersionedListNode rn = rightNode.clearList();
+        if (ln == leftNode && rn == rightNode && !exists(thisNode.getTimestamp()))
             return thisNode;
         return replace(ln, rn);
     }

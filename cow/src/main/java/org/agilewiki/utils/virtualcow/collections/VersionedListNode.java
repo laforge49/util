@@ -375,11 +375,10 @@ public interface VersionedListNode extends Releasable {
      * Add a non-null value to the end of the list.
      *
      * @param value The value to be added.
-     * @param time  The time the value is added.
      * @return The revised root node.
      */
-    default VersionedListNode add(Object value, long time) {
-        return add(-1, value, time);
+    default VersionedListNode add(Object value) {
+        return add(-1, value);
     }
 
     /**
@@ -387,11 +386,10 @@ public interface VersionedListNode extends Releasable {
      *
      * @param ndx   Where to add the value, or -1 to append to the end.
      * @param value The value to be added.
-     * @param time  The time the value is added.
      * @return The revised root node.
      */
-    default VersionedListNode add(int ndx, Object value, long time) {
-        return add(ndx, value, time, Long.MAX_VALUE);
+    default VersionedListNode add(int ndx, Object value) {
+        return add(ndx, value, getTimestamp(), Long.MAX_VALUE);
     }
 
     default VersionedListNode add(int ndx, Object value, long created, long deleted) {
@@ -414,13 +412,12 @@ public interface VersionedListNode extends Releasable {
      * Mark a value as deleted.
      *
      * @param ndx  The index of the value.
-     * @param time The time of the deletion.
      * @return The revised node.
      */
-    default VersionedListNode remove(int ndx, long time) {
+    default VersionedListNode remove(int ndx) {
         if (isNil())
             return this;
-        return getData().remove(ndx, time);
+        return getData().remove(ndx);
     }
 
     /**
@@ -446,11 +443,10 @@ public interface VersionedListNode extends Releasable {
     /**
      * Empty the list by marking all the existing values as deleted.
      *
-     * @param time The time of the deletion.
      * @return The currently empty versioned list.
      */
-    default VersionedListNode clearList(long time) {
-        return getData().clearList(time);
+    default VersionedListNode clearList() {
+        return getData().clearList();
     }
 
     /**

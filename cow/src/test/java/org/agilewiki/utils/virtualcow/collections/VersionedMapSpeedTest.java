@@ -24,7 +24,7 @@ public class VersionedMapSpeedTest extends TestCase {
             int c = 10;
             long t0 = System.currentTimeMillis();
             for (int i = 0; i < c; ++i) {
-                m1 = m1.add("k" + i, "v" + i, i);
+                m1 = m1.add("k" + i, "v" + i);
             }
             long t1 = System.currentTimeMillis();
             System.out.println("Created " + c + " entries in " + (t1 - t0) + " milliseconds");
@@ -43,7 +43,7 @@ public class VersionedMapSpeedTest extends TestCase {
             long t4 = System.currentTimeMillis();
             VersionedMapNode m2 = (VersionedMapNode) registry.readId(byteBuffer).deserialize(byteBuffer);
             String fk = (String) m2.firstKey(FactoryRegistry.MAX_TIME);
-            m2 = m2.set("k0", "upd", 2 * c);
+            m2 = m2.set("k0", "upd");
             ByteBuffer byteBuffer1 = ByteBuffer.allocate(m2.getDurableLength());
             m2.writeDurable(byteBuffer1);
             long t5 = System.currentTimeMillis();

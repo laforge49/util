@@ -62,6 +62,17 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     }
 
     /**
+     * Test method to set the timestamp when the file is not open.
+     *
+     * @param timestamp    The new timestamp.
+     */
+    public void _setTimestamp(long timestamp) {
+        if (fc != null)
+            throw new UnsupportedOperationException("not valid when db is open");
+        this.timestamp = timestamp;
+    }
+
+    /**
      * Open the db, creating a new db file.
      *
      * @param createNew True when a db file must not already exist.

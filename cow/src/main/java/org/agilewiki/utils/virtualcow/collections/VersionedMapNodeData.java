@@ -198,27 +198,26 @@ public class VersionedMapNodeData implements Releasable {
      *
      * @param key  The key of the list.
      * @param ndx  The index of the value.
-     * @param time The time of the deletion.
      * @return The revised node.
      */
-    public VersionedMapNode remove(Comparable key, int ndx, long time) {
+    public VersionedMapNode remove(Comparable key, int ndx) {
         if (key == null)
             throw new IllegalArgumentException("key may not be null");
         if (isNil())
             return thisNode;
         int c = key.compareTo(this.key);
         if (c < 0) {
-            VersionedMapNode n = leftNode.remove(key, ndx, time);
+            VersionedMapNode n = leftNode.remove(key, ndx);
             if (n == leftNode)
                 return thisNode;
             return replaceLeft(n);
         } else if (c == 0) {
-            VersionedListNode n = listNode.remove(ndx, time);
+            VersionedListNode n = listNode.remove(ndx);
             if (n == listNode)
                 return thisNode;
             return replace(n);
         } else {
-            VersionedMapNode n = rightNode.remove(key, ndx, time);
+            VersionedMapNode n = rightNode.remove(key, ndx);
             if (n == rightNode)
                 return thisNode;
             return replaceRight(n);
@@ -229,27 +228,26 @@ public class VersionedMapNodeData implements Releasable {
      * Empty the list by marking all the existing values as deleted.
      *
      * @param key  The key of the list.
-     * @param time The time of the deletion.
      * @return The revised node.
      */
-    public VersionedMapNode clearList(Comparable key, long time) {
+    public VersionedMapNode clearList(Comparable key) {
         if (key == null)
             throw new IllegalArgumentException("key may not be null");
         if (isNil())
             return thisNode;
         int c = key.compareTo(this.key);
         if (c < 0) {
-            VersionedMapNode n = leftNode.clearList(key, time);
+            VersionedMapNode n = leftNode.clearList(key);
             if (n == leftNode)
                 return thisNode;
             return replaceLeft(n);
         } else if (c == 0) {
-            VersionedListNode n = listNode.clearList(time);
+            VersionedListNode n = listNode.clearList();
             if (n == listNode)
                 return thisNode;
             return replace(n);
         } else {
-            VersionedMapNode n = rightNode.clearList(key, time);
+            VersionedMapNode n = rightNode.clearList(key);
             if (n == rightNode)
                 return thisNode;
             return replaceRight(n);
@@ -261,20 +259,19 @@ public class VersionedMapNodeData implements Releasable {
      *
      * @param key   The key of the list.
      * @param value The new value.
-     * @param time  The time of the replacement.
      * @return The revised node.
      */
-    public VersionedMapNode set(Comparable key, Object value, long time) {
+    public VersionedMapNode set(Comparable key, Object value) {
         int c = key.compareTo(this.key);
         if (c < 0) {
-            VersionedMapNode n = leftNode.set(key, value, time);
+            VersionedMapNode n = leftNode.set(key, value);
             return replaceLeft(n);
         } else if (c == 0) {
-            VersionedListNode n = listNode.clearList(time);
-            n = n.add(value, time);
+            VersionedListNode n = listNode.clearList();
+            n = n.add(value);
             return replace(n);
         } else {
-            VersionedMapNode n = rightNode.set(key, value, time);
+            VersionedMapNode n = rightNode.set(key, value);
             return replaceRight(n);
         }
     }
@@ -282,17 +279,16 @@ public class VersionedMapNodeData implements Releasable {
     /**
      * Empty the map by marking all the existing values as deleted.
      *
-     * @param time The time of the deletion.
      * @return The currently empty versioned map.
      */
-    public VersionedMapNode clearMap(long time) {
+    public VersionedMapNode clearMap() {
         if (isNil())
             return thisNode;
-        VersionedMapNode ln = leftNode.clearMap(time);
-        VersionedMapNode rn = rightNode.clearMap(time);
-        if (ln == leftNode && rn == rightNode && listNode.isEmpty(time))
+        VersionedMapNode ln = leftNode.clearMap();
+        VersionedMapNode rn = rightNode.clearMap();
+        if (ln == leftNode && rn == rightNode && listNode.isEmpty(thisNode.getTimestamp()))
             return thisNode;
-        return replace(ln, listNode.clearList(time), rn);
+        return replace(ln, listNode.clearList(), rn);
     }
 
     /**
