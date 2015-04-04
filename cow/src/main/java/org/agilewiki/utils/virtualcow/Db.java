@@ -50,7 +50,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     }
 
     /**
-     * In the form (currentTimeMillis() << 10) | index,
+     * In the form (currentTimeMillis() &lt;&lt; 10) | index,
      * the timestamp reflects the time this object was created
      * or the time of the last transaction.
      * (The index is added to make the timestamp unique.)
