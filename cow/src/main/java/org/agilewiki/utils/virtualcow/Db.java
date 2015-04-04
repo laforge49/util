@@ -30,7 +30,8 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     private long nextRootPosition;
     public MapNode mapNode;
     protected Thread privilegedThread;
-    DiskSpaceManager dsm;
+    private DiskSpaceManager dsm;
+    private long timestamp;
 
     /**
      * Create a Db actor.
@@ -45,6 +46,19 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         dbFactoryRegistry = new DbFactoryRegistry(this, parentRegistry);
         this.dbPath = dbPath;
         this.maxBlockSize = maxBlockSize;
+        timestamp = Timestamp.generate();
+    }
+
+    /**
+     * In the form (currentTimeMillis() << 10) | index,
+     * the timestamp reflects the time this object was created
+     * or the time of the last transaction.
+     * (The index is added to make the timestamp unique.)
+     *
+     * @return The latest timestamp.
+     */
+    public long getTimestamp() {
+        return timestamp;
     }
 
     /**
@@ -93,7 +107,8 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                     _asyncRequestImpl.setMessageTimeoutMillis(transaction.timeoutMillis());
                     privilegedThread = Thread.currentThread();
                     try {
-                        _update(transaction.transform(mapNode));
+                        timestamp = Timestamp.generate();
+                        _update(transaction.transform(mapNode, timestamp));
                     } finally {
                         privilegedThread = null;
                     }
@@ -148,7 +163,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             throw new MaxBlockSizeTooSmallException();
         }
         ByteBuffer contentBuffer = ByteBuffer.allocate(contentSize);
-        contentBuffer.putLong(System.currentTimeMillis());
+        contentBuffer.putLong(timestamp);
         dsm.write(contentBuffer);
         factory.writeDurable(mapNode, contentBuffer);
         contentBuffer.flip();

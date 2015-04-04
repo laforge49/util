@@ -23,10 +23,10 @@ public class BigVersionedListTest extends TestCase {
                 for (k = 0; k < 2; ++k) {
                     Transaction t2 = new Transaction() {
                         @Override
-                        public MapNode transform(MapNode mapNode) {
+                        public MapNode transform(MapNode mapNode, long timestamp) {
                             VersionedMapNode vmn = db.dbFactoryRegistry.versionedNilMap;
                             for (int i = 0; i < 10; i++) {
-                                vmn = vmn.add(0, "", 123);
+                                vmn = vmn.add(0, "", timestamp);
                             }
                             mapNode = mapNode.add(1, vmn);
                             return mapNode;

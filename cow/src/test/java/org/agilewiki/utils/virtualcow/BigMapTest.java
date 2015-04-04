@@ -23,7 +23,7 @@ public class BigMapTest extends TestCase {
                 for (k = 0; k < 10; ++k) {
                     Transaction t2 = new Transaction() {
                         @Override
-                        public MapNode transform(MapNode mapNode) {
+                        public MapNode transform(MapNode mapNode, long timestamp) {
                             for (int i = 0; i < 10; i++) {
                                 mapNode = mapNode.add(k * 10000000 + i, "");
                             }

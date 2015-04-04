@@ -21,7 +21,7 @@ public class DbTest extends TestCase {
                 db.open(true);
                 Transaction t2 = new Transaction() {
                     @Override
-                    public MapNode transform(MapNode mapNode) {
+                    public MapNode transform(MapNode mapNode, long timestamp) {
                         System.out.println("block usage: " + db.usage());
                         mapNode = mapNode.add("x", "hi!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
