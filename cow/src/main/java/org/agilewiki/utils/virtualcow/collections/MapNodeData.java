@@ -639,7 +639,7 @@ public class MapNodeData implements Releasable {
         try {
             if (isNil())
                 return "";
-            return "(" + leftNode.getData().toString() + listNode + "-" + level + "-" + key + rightNode.getData().toString() + ")";
+            return "(" + leftNode.getData().toString() + listNode.getData().toString() + "-" + level + "-" + key + rightNode.getData().toString() + ")";
         } catch (Exception ex) {
             ex.printStackTrace();
             return "?";

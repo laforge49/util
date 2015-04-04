@@ -424,10 +424,6 @@ public class ListNodeData implements Releasable {
         return t;
     }
 
-    public String toString() {
-        return "(" + leftNode.toString() + value + "-" + level + "-" + totalSize + rightNode.toString() + ")";
-    }
-
     @Override
     public void releaseAll() {
         if (isNil())
@@ -544,12 +540,18 @@ public class ListNodeData implements Releasable {
         }
         Object q = s.shrink();
         ListNode n;
-        if (v == s)
+        if (leftNode == s)
             n = replaceLeft((ListNode) q);
         else if (value == s)
             n = replace(q);
         else
             n = replaceRight((ListNode) q);
         return n.resize(maxSize, maxBlockSize);
+    }
+
+    public String toString() {
+        if (isNil())
+            return "";
+        return "(" + leftNode.getData().toString() + value + "-" + level + "-" + totalSize + rightNode.getData().toString() + ")";
     }
 }

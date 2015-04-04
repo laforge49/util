@@ -354,7 +354,7 @@ public interface ListNode extends Releasable {
             throw new IllegalArgumentException("value may not be null");
         if (isNil()) {
             if (ndx != 0 && ndx != -1)
-                throw new IllegalArgumentException("index out of range");
+                throw new IllegalArgumentException("index out of range " + ndx);
             return getData().replace(1, 1, value);
         }
         return getData().add(ndx, value);
