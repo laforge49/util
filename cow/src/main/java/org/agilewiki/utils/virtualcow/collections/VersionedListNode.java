@@ -1,6 +1,7 @@
 package org.agilewiki.utils.virtualcow.collections;
 
 import org.agilewiki.utils.immutable.FactoryRegistry;
+import org.agilewiki.utils.virtualcow.Db;
 import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 
 import java.nio.ByteBuffer;
@@ -14,7 +15,31 @@ import java.util.NoSuchElementException;
  */
 public interface VersionedListNode extends Releasable {
 
+    /**
+     * Returns the database factory registry.
+     *
+     * @return The registry.
+     */
     DbFactoryRegistry getRegistry();
+
+    /**
+     * Returns the database.
+     *
+     * @return The database.
+     */
+    default Db getDb() {
+        return getRegistry().db;
+    }
+
+    /**
+     * Returns the current timestamp, a unique
+     * identifier for the current transaction.
+     *
+     * @return The current transaction's timestamp
+     */
+    default long getTimestamp() {
+        return getDb().getTimestamp();
+    }
 
     VersionedListNodeData getData();
 
