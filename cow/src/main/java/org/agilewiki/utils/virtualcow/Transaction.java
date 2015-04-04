@@ -1,6 +1,6 @@
 package org.agilewiki.utils.virtualcow;
 
-import org.agilewiki.utils.virtualcow.collections.MapNode;
+import org.agilewiki.utils.immutable.collections.MapNode;
 
 /**
  * A transaction simply transforms a map list.

@@ -3,8 +3,8 @@ package org.agilewiki.utils.virtualcow;
 import junit.framework.TestCase;
 import org.agilewiki.jactor2.core.impl.Plant;
 import org.agilewiki.utils.immutable.BaseRegistry;
-import org.agilewiki.utils.virtualcow.collections.MapNode;
-import org.agilewiki.utils.virtualcow.collections.VersionedMapNode;
+import org.agilewiki.utils.immutable.collections.MapNode;
+import org.agilewiki.utils.immutable.collections.VersionedMapNode;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

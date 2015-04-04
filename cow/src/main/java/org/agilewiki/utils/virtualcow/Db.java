@@ -7,9 +7,9 @@ import org.agilewiki.utils.BlockIOException;
 import org.agilewiki.utils.dsm.DiskSpaceManager;
 import org.agilewiki.utils.immutable.CascadingRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
+import org.agilewiki.utils.immutable.collections.MapNode;
 import org.agilewiki.utils.immutable.scalars.CS256;
 import org.agilewiki.utils.immutable.scalars.CS256Factory;
-import org.agilewiki.utils.virtualcow.collections.MapNode;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

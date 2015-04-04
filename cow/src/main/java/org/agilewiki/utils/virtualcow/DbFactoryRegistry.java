@@ -1,7 +1,7 @@
 package org.agilewiki.utils.virtualcow;
 
 import org.agilewiki.utils.immutable.CascadingRegistry;
-import org.agilewiki.utils.virtualcow.collections.*;
+import org.agilewiki.utils.immutable.collections.*;
 
 /**
  * Initialize the factory registry.
