@@ -257,22 +257,22 @@ public interface VersionedListNode extends Releasable {
     }
 
     /**
-     * Returns a list accessor for the latest time.
+     * Returns a list accessor for the time of the current transaction.
      *
-     * @return A list accessor for the latest time.
+     * @return A list accessor for the current time.
      */
     default ListAccessor listAccessor() {
-        return listAccessor(null, FactoryRegistry.MAX_TIME);
+        return listAccessor(null, getTimestamp());
     }
 
     /**
-     * Returns a list accessor for the latest time.
+     * Returns a list accessor for the time of the current transaction.
      *
      * @param key The key for the list.
      * @return A list accessor for the latest time.
      */
     default ListAccessor listAccessor(Comparable key) {
-        return listAccessor(key, FactoryRegistry.MAX_TIME);
+        return listAccessor(key, getTimestamp());
     }
 
     /**

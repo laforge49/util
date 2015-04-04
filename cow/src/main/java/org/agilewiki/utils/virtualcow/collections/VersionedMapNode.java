@@ -368,12 +368,12 @@ public interface VersionedMapNode extends Releasable {
     }
 
     /**
-     * Returns a map accessor for the latest time.
+     * Returns a map accessor for the time of the current transaction.
      *
      * @return A map accessor for the latest time.
      */
     default MapAccessor mapAccessor() {
-        return mapAccessor(FactoryRegistry.MAX_TIME);
+        return mapAccessor(getTimestamp());
     }
 
     /**
