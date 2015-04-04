@@ -37,11 +37,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>lib</artifactId>
-            <version>${utils.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.agilewiki.jactor2</groupId>
             <artifactId>jactor2-core</artifactId>
             <version>${jactor2.version}</version>
