@@ -9,13 +9,11 @@ public interface Transaction {
     /**
      * Transforms a map list.
      *
-     * @param dbMapNode The map list to be transformed.
-     * @param timestamp A unique timestamp identifying the transaction,
-     *                  usable as the time in the versioned API.
+     * @param db        The database to be updated.
      * @param tMapNode  The durable content of the transaction.
      * @return The replacement dbMapNode.
      */
-    MapNode transform(MapNode dbMapNode, long timestamp, MapNode tMapNode);
+    MapNode transform(Db db, MapNode tMapNode);
 
     /**
      * Transaction timeout in milliseconds.

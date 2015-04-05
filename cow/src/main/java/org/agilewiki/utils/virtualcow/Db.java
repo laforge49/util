@@ -36,7 +36,8 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     private FileChannel fc;
     public final int maxBlockSize;
     private long nextRootPosition;
-    public MapNode mapNode;
+    private MapNode mapNode;
+    private MapNode dbMapNode;
     protected Thread privilegedThread;
     private DiskSpaceManager dsm;
     private long timestamp;
@@ -58,8 +59,23 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         timestamp = Timestamp.generate();
     }
 
+    /**
+     * Register a transaction class.
+     *
+     * @param transactionName     The transaction name.
+     * @param transactionClass    The transaction class.
+     */
     public void registerTransaction(String transactionName, Class transactionClass) {
         transactionRegistry.put(transactionName, transactionClass);
+    }
+
+    /**
+     * Returns the contents of the database.
+     *
+     * @return A virtual map node tree.
+     */
+    public MapNode getDbMapNode() {
+        return isPrivileged() ? dbMapNode : mapNode;
     }
 
     /**
@@ -164,7 +180,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                     privilegedThread = Thread.currentThread();
                     try {
                         timestamp = Timestamp.generate();
-                        MapNode dbMapNode = mapNode;
+                        dbMapNode = mapNode;
                         VersionedMapNode je = dbFactoryRegistry.versionedNilMap;
                         String JEName = Timestamp.timestampId(timestamp);
                         MapAccessor ma = tMapNode.mapAccessor();
@@ -175,7 +191,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                             }
                         }
                         dbMapNode = dbMapNode.add(JEName, je);
-                        dbMapNode = transaction.transform(dbMapNode, timestamp, tMapNode);
+                        dbMapNode = transaction.transform(Db.this, tMapNode);
                         _update(dbMapNode);
                     } finally {
                         privilegedThread = null;

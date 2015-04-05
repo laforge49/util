@@ -6,17 +6,16 @@ public class DbTran implements Transaction {
     /**
      * Transforms a map list.
      *
-     * @param dbMapNode The map list to be transformed.
-     * @param timestamp A unique timestamp identifying the transaction,
-     *                  usable as the time in the versioned API.
+     * @param db        The database to be updated.
      * @param tMapNode  The durable content of the transaction.
      * @return The replacement dbMapNode.
      */
     @Override
-    public MapNode transform(MapNode dbMapNode, long timestamp, MapNode tMapNode) {
+    public MapNode transform(Db db, MapNode tMapNode) {
+        MapNode dbMapNode = db.getDbMapNode();
         dbMapNode = dbMapNode.add("x", "hi!");
         BlockReference blockReference =
-                new BlockReference(dbMapNode.getRegistry(), "ho!");
+                new BlockReference(db.dbFactoryRegistry, "ho!");
         dbMapNode = dbMapNode.add("y", blockReference);
         return dbMapNode;
     }
