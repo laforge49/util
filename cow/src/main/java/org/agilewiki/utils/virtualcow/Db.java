@@ -163,7 +163,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                         timestamp = Timestamp.generate();
                         MapNode dbMapNode = mapNode;
                         VersionedMapNode je = dbFactoryRegistry.versionedNilMap;
-                        String JEName = "je"+Long.toHexString(timestamp);
+                        String JEName = Timestamp.toString(timestamp);
                         MapAccessor ma = tMapNode.mapAccessor();
                         for (ListAccessor la: ma) {
                             String key = (String) la.key();
