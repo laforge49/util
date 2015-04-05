@@ -18,7 +18,7 @@ public class Timestamp {
      * @return The timestamp in hex, prefaced by $t.
      */
     public static String timestampId(long timestamp) {
-        return PREFIX + Long.toHexString(timestamp);
+        return PREFIX + Long.toHexString(Long.MAX_VALUE - timestamp);
     }
 
     /**
@@ -40,7 +40,7 @@ public class Timestamp {
     public static long timestamp(String timestampId) {
         if (!timestampId.startsWith(PREFIX))
             throw new IllegalArgumentException("does not start with " + PREFIX);
-        return Long.parseUnsignedLong(timestampId.substring(2), 16);
+        return Long.MAX_VALUE - Long.parseUnsignedLong(timestampId.substring(2), 16);
     }
 
     /**
