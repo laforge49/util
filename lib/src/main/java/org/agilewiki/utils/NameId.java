@@ -10,12 +10,15 @@ public class NameId {
     /**
      * Generate an id by prefixing a name with $n.
      *
-     * @param name    A string that does not contain $.
+     * @param name    A string that does not contain a space, ! , quote, #, $
+     *                or lessor character.
      * @return The string $n + name.
      */
     public String generate(String name) {
-        if (name.contains("$"))
-            throw new IllegalArgumentException("may not contain $");
+        for (char c: name.toCharArray()) {
+            if (c <= '$')
+                throw new IllegalArgumentException("may not contain char <= $");
+        }
         return PREFIX + name;
     }
 }
