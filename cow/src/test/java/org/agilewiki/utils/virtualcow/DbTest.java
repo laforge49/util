@@ -23,7 +23,7 @@ public class DbTest extends TestCase {
                 db.open(true);
                 db.update("dbTran").call();
                 db.close();
-                
+
                 System.out.println("db file size: "+Files.size(dbPath));
 
                 System.out.println();
