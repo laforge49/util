@@ -8,16 +8,16 @@ import java.util.concurrent.atomic.AtomicLong;
  * This code is thread safe.
  */
 public class Timestamp {
-    public static final String PREFIX = "$j";
+    public static final String PREFIX = "$t";
     static private AtomicLong aLong = new AtomicLong(System.currentTimeMillis() << 10);
 
     /**
-     * Returns a journal entry name for the given timestamp.
+     * Returns an id for the given timestamp.
      *
      * @param timestamp
-     * @return The timestamp in hex, prefaced by $j.
+     * @return The timestamp in hex, prefaced by $t.
      */
-    public static String toString(long timestamp) {
+    public static String timestampId(long timestamp) {
         return PREFIX + Long.toHexString(timestamp);
     }
 
@@ -32,24 +32,24 @@ public class Timestamp {
     }
 
     /**
-     * Converts a timestamp in string form to a timestamp in long form.
+     * Converts a timestampId to a timestamp in long form.
      *
-     * @param timestamp    A timestamp prefixed by $j.
+     * @param timestampId    A timestamp prefixed by $t.
      * @return The equivalent timestamp as a long.
      */
-    public static long toLong(String timestamp) {
-        if (!timestamp.startsWith(PREFIX))
+    public static long timestamp(String timestampId) {
+        if (!timestampId.startsWith(PREFIX))
             throw new IllegalArgumentException("does not start with " + PREFIX);
-        return Long.parseUnsignedLong(timestamp.substring(2), 16);
+        return Long.parseUnsignedLong(timestampId.substring(2), 16);
     }
 
     /**
-     * Extracts the time from a timestamp.
-     * @param timestamp    A timestamp prefixed by $j.
+     * Extracts the time from a timestampId.
+     * @param timestampId    A timestamp prefixed by $t.
      * @return The time in milliseconds.
      */
-    public static long time(String timestamp) {
-        return time(toLong(timestamp));
+    public static long time(String timestampId) {
+        return time(timestamp(timestampId));
     }
 
     public static long generate() {
