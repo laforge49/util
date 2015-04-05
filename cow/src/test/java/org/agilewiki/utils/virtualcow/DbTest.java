@@ -18,8 +18,9 @@ public class DbTest extends TestCase {
             int maxRootBlockSize = 1000;
             try (Db db = new Db(new BaseRegistry(), dbPath, maxRootBlockSize)) {
                 Files.deleteIfExists(dbPath);
+                db.registerTransaction("dbTran", DbTran.class);
                 db.open(true);
-                db.update(DbTran.class).call();
+                db.update("dbTran").call();
                 db.close();
                 System.out.println(Files.size(dbPath));
 

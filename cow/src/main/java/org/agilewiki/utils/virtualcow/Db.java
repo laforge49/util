@@ -16,6 +16,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.nio.file.StandardOpenOption.*;
 
@@ -23,8 +24,10 @@ import static java.nio.file.StandardOpenOption.*;
  * A database that supports multiple blocks.
  */
 public class Db extends IsolationBladeBase implements AutoCloseable {
-    public final static String transactionClassName = "transaction_class_name";
+    public final static String transactionName = "transaction_name";
 
+    protected final ConcurrentHashMap<String, Class> transactionRegistry =
+            new ConcurrentHashMap<>(16, 0.75f, 1);
     public final DbFactoryRegistry dbFactoryRegistry;
     public final Path dbPath;
     private FileChannel fc;
@@ -50,6 +53,10 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         this.dbPath = dbPath;
         this.maxBlockSize = maxBlockSize;
         timestamp = Timestamp.generate();
+    }
+
+    public void registerTransaction(String transactionName, Class transactionClass) {
+        transactionRegistry.put(transactionName, transactionClass);
     }
 
     /**
@@ -109,23 +116,23 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     /**
      * Update the database with a parameter-free transaction.
      *
-     * @param transactionClass The class which will transform the database.
+     * @param transactionName The registered name of the transaction class.
      * @return The request to perform the update.
      */
-    public AReq<Void> update(Class transactionClass) {
+    public AReq<Void> update(String transactionName) {
         MapNode tMapNode = dbFactoryRegistry.nilMap;
-        return update(transactionClass, dbFactoryRegistry.nilMap);
+        return update(transactionName, dbFactoryRegistry.nilMap);
     }
 
     /**
      * Update the database.
      *
-     * @param transactionClass The class which will transform the database.
+     * @param transactionName The registered name of the transaction class.
      * @param tMapNode         The map holding the transaction parameters.
      * @return The request to perform the update.
      */
-    public AReq<Void> update(Class transactionClass, MapNode tMapNode) {
-        tMapNode = tMapNode.add(transactionClassName, transactionClass.getName());
+    public AReq<Void> update(String transactionName, MapNode tMapNode) {
+        tMapNode = tMapNode.add(Db.transactionName, transactionName);
         return update(tMapNode.toByteBuffer());
     }
 
@@ -147,9 +154,8 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                 try {
                     ImmutableFactory f = dbFactoryRegistry.readId(tByteBuffer);
                     MapNode tMapNode = (MapNode) f.deserialize(tByteBuffer);
-                    String tClassName = (String) tMapNode.getList(transactionClassName).get(0);
-                    ClassLoader cl = ClassLoader.getSystemClassLoader();
-                    Class tClass = cl.loadClass(tClassName);
+                    String transactionName = (String) tMapNode.getList(Db.transactionName).get(0);
+                    Class tClass = transactionRegistry.get(transactionName);
                     Transaction transaction = (Transaction) tClass.newInstance();
                     _asyncRequestImpl.setMessageTimeoutMillis(transaction.timeoutMillis());
                     privilegedThread = Thread.currentThread();

@@ -19,12 +19,13 @@ public class BigVersionedListTest extends TestCase {
             Files.deleteIfExists(dbPath);
             int maxBlockSize = 1000000;
             try (Db db = new Db(new BaseRegistry(), dbPath, maxBlockSize)) {
+                db.registerTransaction("bigVersionedListTran", BigVersionedListTran.class);
                 db.open(true);
                 for (k = 0; k < 2; ++k) {
                     MapNode tMapNode = db.dbFactoryRegistry.nilMap;
                     tMapNode = tMapNode.add("k", k);
                     tMapNode = tMapNode.add("I", 10);
-                    db.update(BigVersionedListTran.class, tMapNode).call();
+                    db.update("bigVersionedListTran", tMapNode).call();
                 }
                 db.close();
             }

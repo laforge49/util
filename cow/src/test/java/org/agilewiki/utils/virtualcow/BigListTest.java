@@ -18,13 +18,14 @@ public class BigListTest extends TestCase {
             Files.deleteIfExists(dbPath);
             int maxBlockSize = 1000000;
             try (Db db = new Db(new BaseRegistry(), dbPath, maxBlockSize)) {
+                db.registerTransaction("bigListTran", BigListTran.class);
                 Files.deleteIfExists(dbPath);
                 db.open(true);
                 for (k = 0; k < 2; ++k) {
                     MapNode tMapNode = db.dbFactoryRegistry.nilMap;
                     tMapNode = tMapNode.add("k", k);
                     tMapNode = tMapNode.add("I", 10);
-                    db.update(BigListTran.class, tMapNode).call();
+                    db.update("bigListTran", tMapNode).call();
                 }
                 db.close();
             }
