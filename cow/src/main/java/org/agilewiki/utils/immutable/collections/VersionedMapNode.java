@@ -362,6 +362,56 @@ public interface VersionedMapNode extends Releasable {
     }
 
     /**
+     * Returns an iterator over the list accessors
+     * with keys whose toString start with the given prefix.
+     *
+     * @param prefix The qualifying prefix.
+     * @param time The time of the query.
+     * @return The iterator.
+     */
+    default Iterator<ListAccessor> iterator(String prefix, long time) {
+        return iterable(prefix, time).iterator();
+    }
+
+    /**
+     * Returns an iterable over the list accessors
+     * with keys whose toString start with the given prefix.
+     *
+     * @param prefix The qualifying prefix.
+     * @param time The time of the query.
+     * @return The iterator.
+     */
+    default Iterable<ListAccessor> iterable(String prefix, long time) {
+        return new Iterable<ListAccessor>() {
+            @Override
+            public Iterator<ListAccessor> iterator() {
+                return new Iterator<ListAccessor>() {
+                    Comparable last = null;
+
+                    @Override
+                    public boolean hasNext() {
+                        if (last == null)
+                            return ceilingKey(prefix, time) != null;
+                        Comparable hk = higherKey(last, time);
+                        if (hk == null)
+                            return false;
+                        return hk.toString().startsWith(prefix);
+                    }
+
+                    @Override
+                    public ListAccessor next() {
+                        Comparable next = last == null ? ceilingKey(prefix, time) : higherKey(last, time);
+                        if (next == null || !next.toString().startsWith(prefix))
+                            throw new NoSuchElementException();
+                        last = next;
+                        return listAccessor(last);
+                    }
+                };
+            }
+        };
+    }
+
+    /**
      * Returns a map accessor for the time of the current transaction.
      *
      * @return A map accessor for the latest time.
@@ -432,6 +482,16 @@ public interface VersionedMapNode extends Releasable {
             @Override
             public Iterator<ListAccessor> iterator() {
                 return VersionedMapNode.this.iterator(time);
+            }
+
+            @Override
+            public Iterator<ListAccessor> iterator(final String prefix) {
+                return VersionedMapNode.this.iterator(prefix, time);
+            }
+
+            @Override
+            public Iterable<ListAccessor> iterable(final String prefix) {
+                return VersionedMapNode.this.iterable(prefix, time);
             }
 
             @Override

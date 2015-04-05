@@ -93,6 +93,24 @@ public interface MapAccessor extends Iterable<ListAccessor> {
     Iterator<ListAccessor> iterator();
 
     /**
+     * Returns an iterator over the list accessors
+     * with keys whose toString start with the given prefix.
+     *
+     * @param prefix    The qualifying prefix.
+     * @return The iterator.
+     */
+    Iterator<ListAccessor> iterator(final String prefix);
+
+    /**
+     * Returns an iterable over the list accessors
+     * with keys whose toString start with the given prefix.
+     *
+     * @param prefix    The qualifying prefix.
+     * @return The iterator.
+     */
+    Iterable<ListAccessor> iterable(final String prefix);
+
+    /**
      * Returns a map of all the keys and values present at the given time.
      *
      * @return A map of lists.

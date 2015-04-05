@@ -288,6 +288,54 @@ public interface MapNode extends Releasable {
     }
 
     /**
+     * Returns an iterator over the list accessors
+     * with keys whose toString start with the given prefix.
+     *
+     * @param prefix The qualifying prefix.
+     * @return The iterator.
+     */
+    default Iterator<ListAccessor> iterator(String prefix) {
+        return iterable(prefix).iterator();
+    }
+
+    /**
+     * Returns an iterable over the list accessors
+     * with keys whose toString start with the given prefix.
+     *
+     * @param prefix The qualifying prefix.
+     * @return The iterator.
+     */
+    default Iterable<ListAccessor> iterable(String prefix) {
+        return new Iterable<ListAccessor>() {
+            @Override
+            public Iterator<ListAccessor> iterator() {
+                return new Iterator<ListAccessor>() {
+                    Comparable last = null;
+
+                    @Override
+                    public boolean hasNext() {
+                        if (last == null)
+                            return ceilingKey(prefix) != null;
+                        Comparable hk = higherKey(last);
+                        if (hk == null)
+                            return false;
+                        return hk.toString().startsWith(prefix);
+                    }
+
+                    @Override
+                    public ListAccessor next() {
+                        Comparable next = last == null ? ceilingKey(prefix) : higherKey(last);
+                        if (next == null || !next.toString().startsWith(prefix))
+                            throw new NoSuchElementException();
+                        last = next;
+                        return listAccessor(last);
+                    }
+                };
+            }
+        };
+    }
+
+    /**
      * Returns a map accessor.
      *
      * @return A map accessor.
@@ -348,6 +396,16 @@ public interface MapNode extends Releasable {
             @Override
             public Iterator<ListAccessor> iterator() {
                 return MapNode.this.iterator();
+            }
+
+            @Override
+            public Iterator<ListAccessor> iterator(final String prefix) {
+                return MapNode.this.iterator(prefix);
+            }
+
+            @Override
+            public Iterable<ListAccessor> iterable(final String prefix) {
+                return MapNode.this.iterable(prefix);
             }
 
             @Override
