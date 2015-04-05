@@ -1,5 +1,6 @@
 package org.agilewiki.utils.virtualcow;
 
+import org.agilewiki.utils.NameId;
 import org.agilewiki.utils.immutable.collections.MapNode;
 
 public class DbTran implements Transaction {
@@ -11,9 +12,9 @@ public class DbTran implements Transaction {
      */
     @Override
     public void transform(Db db, MapNode tMapNode) {
-        db.set("x", "hi!");
+        db.set(NameId.generate("x"), "hi!");
         BlockReference blockReference =
                 new BlockReference(db.dbFactoryRegistry, "ho!");
-        db.set("y", blockReference);
+        db.set(NameId.generate("y"), blockReference);
     }
 }

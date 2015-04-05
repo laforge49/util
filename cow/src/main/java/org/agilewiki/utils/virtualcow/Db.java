@@ -216,6 +216,8 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
      */
     public void set(String key, Object value) {
         checkPrivilege();
+        if (!key.startsWith("$"))
+            throw new IllegalArgumentException("key must be an id: " + key);
         dbMapNode = dbMapNode.set(key, value);
     }
 

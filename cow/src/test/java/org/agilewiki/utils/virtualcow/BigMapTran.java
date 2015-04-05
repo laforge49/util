@@ -1,5 +1,6 @@
 package org.agilewiki.utils.virtualcow;
 
+import org.agilewiki.utils.NameId;
 import org.agilewiki.utils.immutable.collections.MapNode;
 
 public class BigMapTran implements Transaction {
@@ -14,7 +15,7 @@ public class BigMapTran implements Transaction {
         int k = (Integer) tMapNode.getList("k").get(0);
         int I = (Integer) tMapNode.getList("I").get(0);
         for (int i = 0; i < I; i++) {
-            db.set(""+(k * 10000000 + i), "");
+            db.set(NameId.generate("" + (k * 10000000 + i)), "");
         }
     }
 }

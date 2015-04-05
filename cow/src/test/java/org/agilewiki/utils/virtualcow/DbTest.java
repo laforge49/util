@@ -2,6 +2,7 @@ package org.agilewiki.utils.virtualcow;
 
 import junit.framework.TestCase;
 import org.agilewiki.jactor2.core.impl.Plant;
+import org.agilewiki.utils.NameId;
 import org.agilewiki.utils.immutable.BaseRegistry;
 import org.agilewiki.utils.immutable.collections.ListAccessor;
 import org.agilewiki.utils.immutable.collections.MapNode;
@@ -24,7 +25,7 @@ public class DbTest extends TestCase {
                 db.update("dbTran").call();
                 db.close();
 
-                System.out.println("db file size: "+Files.size(dbPath));
+                System.out.println("db file size: " + Files.size(dbPath));
 
                 System.out.println();
                 MapNode dbMapNode = db.getDbMapNode();
@@ -33,7 +34,7 @@ public class DbTest extends TestCase {
                 }
 
                 db.open();
-                BlockReference br = (BlockReference) dbMapNode.listAccessor("y").get(0);
+                BlockReference br = (BlockReference) dbMapNode.listAccessor(NameId.generate("y")).get(0);
                 System.out.println("\n"+br.getData());
                 db.close();
             }

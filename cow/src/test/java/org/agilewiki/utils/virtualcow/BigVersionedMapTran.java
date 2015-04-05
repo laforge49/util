@@ -1,5 +1,6 @@
 package org.agilewiki.utils.virtualcow;
 
+import org.agilewiki.utils.NameId;
 import org.agilewiki.utils.immutable.collections.MapNode;
 import org.agilewiki.utils.immutable.collections.VersionedMapNode;
 
@@ -19,6 +20,6 @@ public class BigVersionedMapTran implements Transaction {
         for (int i = 0; i < I; i++) {
             vmn = vmn.add(""+(k * 10000000 + i), "");
         }
-        db.set("1", vmn);
+        db.set(NameId.generate("1"), vmn);
     }
 }
