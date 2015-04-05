@@ -7,8 +7,7 @@ import org.agilewiki.utils.BlockIOException;
 import org.agilewiki.utils.dsm.DiskSpaceManager;
 import org.agilewiki.utils.immutable.CascadingRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
-import org.agilewiki.utils.immutable.collections.MapNode;
-import org.agilewiki.utils.immutable.collections.VersionedMapNode;
+import org.agilewiki.utils.immutable.collections.*;
 import org.agilewiki.utils.immutable.scalars.CS256;
 import org.agilewiki.utils.immutable.scalars.CS256Factory;
 
@@ -156,9 +155,17 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                     privilegedThread = Thread.currentThread();
                     try {
                         timestamp = Timestamp.generate();
+                        MapNode dbMapNode = mapNode;
                         VersionedMapNode je = dbFactoryRegistry.versionedNilMap;
                         String JEName = "je"+Long.toHexString(timestamp);
-                        MapNode dbMapNode = mapNode.add(JEName, je);
+                        MapAccessor ma = tMapNode.mapAccessor();
+                        for (ListAccessor la: ma) {
+                            String key = (String) la.key();
+                            for (Object v: la) {
+                                je.add(key, v);
+                            }
+                        }
+                        dbMapNode = dbMapNode.add(JEName, je);
                         dbMapNode = transaction.transform(dbMapNode, timestamp, tMapNode);
                         _update(dbMapNode);
                     } finally {
