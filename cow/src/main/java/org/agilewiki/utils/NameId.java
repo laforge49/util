@@ -15,10 +15,30 @@ public class NameId {
      * @return The string $n + name.
      */
     public static String generate(String name) {
+        validate(name);
+        return PREFIX + name;
+    }
+
+    /**
+     * Validate a name.
+     *
+     * @param name    The name to be validated.
+     */
+    public static void validate(String name) {
         for (char c: name.toCharArray()) {
             if (c <= '$')
                 throw new IllegalArgumentException("may not contain char <= $");
         }
-        return PREFIX + name;
+    }
+
+    /**
+     * Validate an id.
+     *
+     * @param id    The id to be validated.
+     */
+    public static void validateId(String id) {
+        if (!id.startsWith("$") || id.length() < 2)
+            throw new IllegalArgumentException("not a valid id: " + id);
+        validate(id.substring(1));
     }
 }

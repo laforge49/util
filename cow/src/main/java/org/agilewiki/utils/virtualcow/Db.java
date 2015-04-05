@@ -4,6 +4,7 @@ import org.agilewiki.jactor2.core.blades.IsolationBladeBase;
 import org.agilewiki.jactor2.core.messages.AsyncResponseProcessor;
 import org.agilewiki.jactor2.core.messages.impl.AsyncRequestImpl;
 import org.agilewiki.utils.BlockIOException;
+import org.agilewiki.utils.NameId;
 import org.agilewiki.utils.dsm.DiskSpaceManager;
 import org.agilewiki.utils.immutable.CascadingRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
@@ -211,13 +212,12 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     /**
      * Update dbMapNode.
      *
-     * @param key   The key of the list.
+     * @param key   The key of the list. Must be a valid id.
      * @param value The new value.
      */
     public void set(String key, Object value) {
         checkPrivilege();
-        if (!key.startsWith("$"))
-            throw new IllegalArgumentException("key must be an id: " + key);
+        NameId.validateId(key);
         dbMapNode = dbMapNode.set(key, value);
     }
 
