@@ -8,15 +8,12 @@ public class DbTran implements Transaction {
      *
      * @param db        The database to be updated.
      * @param tMapNode  The durable content of the transaction.
-     * @return The replacement dbMapNode.
      */
     @Override
-    public MapNode transform(Db db, MapNode tMapNode) {
-        MapNode dbMapNode = db.getDbMapNode();
-        dbMapNode = dbMapNode.add("x", "hi!");
+    public void transform(Db db, MapNode tMapNode) {
+        db.set("x", "hi!");
         BlockReference blockReference =
                 new BlockReference(db.dbFactoryRegistry, "ho!");
-        dbMapNode = dbMapNode.add("y", blockReference);
-        return dbMapNode;
+        db.set("y", blockReference);
     }
 }

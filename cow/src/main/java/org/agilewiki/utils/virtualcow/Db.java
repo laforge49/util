@@ -122,9 +122,11 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             dsm.allocate();
             dsm.allocate();
             mapNode = null;
-            _update(dbFactoryRegistry.nilMap);
+            dbMapNode = dbFactoryRegistry.nilMap;
+            _update();
             mapNode = null;
-            _update(dbFactoryRegistry.nilMap);
+            dbMapNode = dbFactoryRegistry.nilMap;
+            _update();
         } catch (IOException ex) {
             close();
             getReactor().error("unable to open db to create a new file", ex);
@@ -182,7 +184,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                         timestamp = Timestamp.generate();
                         dbMapNode = mapNode;
                         VersionedMapNode je = dbFactoryRegistry.versionedNilMap;
-                        String JEName = Timestamp.timestampId(timestamp);
+                        jeName = Timestamp.timestampId(timestamp);
                         MapAccessor ma = tMapNode.mapAccessor();
                         for (ListAccessor la: ma) {
                             String key = (String) la.key();
@@ -190,9 +192,9 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                                 je.add(key, v);
                             }
                         }
-                        dbMapNode = dbMapNode.add(JEName, je);
-                        dbMapNode = transaction.transform(Db.this, tMapNode);
-                        _update(dbMapNode);
+                        dbMapNode = dbMapNode.add(jeName, je);
+                        transaction.transform(Db.this, tMapNode);
+                        _update();
                     } finally {
                         privilegedThread = null;
                     }
@@ -204,6 +206,17 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                 }
             }
         };
+    }
+
+    /**
+     * Update dbMapNode.
+     *
+     * @param key   The key of the list.
+     * @param value The new value.
+     */
+    public void set(String key, Object value) {
+        checkPrivilege();
+        dbMapNode = dbMapNode.set(key, value);
     }
 
     /**
@@ -233,22 +246,22 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         return Thread.currentThread() == privilegedThread;
     }
 
-    protected void _update(MapNode mapNode) {
-        if (mapNode == this.mapNode)
+    protected void _update() {
+        if (dbMapNode == mapNode)
             return; // Query?
-        ImmutableFactory factory = dbFactoryRegistry.getImmutableFactory(mapNode);
+        ImmutableFactory factory = dbFactoryRegistry.getImmutableFactory(dbMapNode);
         int dsmLength = dsm.durableLength();
         int maxDurableLength = maxBlockSize - 4 - 4 - 34 - 8 - dsmLength;
-        int dl = mapNode.getDurableLength();
+        int dl = dbMapNode.getDurableLength();
         while (dl > maxDurableLength) {
-            mapNode = (MapNode) mapNode.resize(maxDurableLength, maxBlockSize);
+            dbMapNode = (MapNode) dbMapNode.resize(maxDurableLength, maxBlockSize);
             dsmLength = dsm.durableLength(); // may have grown
             maxDurableLength = maxBlockSize - 4 - 4 - 34 - 8 - dsmLength;
-            dl = mapNode.getDurableLength();
+            dl = dbMapNode.getDurableLength();
         }
         dsm.commit();
         dsmLength = dsm.durableLength(); // may have shrunk
-        dl = mapNode.getDurableLength();
+        dl = dbMapNode.getDurableLength();
         int contentSize = 8 + dsmLength + dl;
         int blockSize = 4 + 4 + 34 + contentSize;
         if (blockSize > maxBlockSize) {
@@ -258,7 +271,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         ByteBuffer contentBuffer = ByteBuffer.allocate(contentSize);
         contentBuffer.putLong(timestamp);
         dsm.write(contentBuffer);
-        factory.writeDurable(mapNode, contentBuffer);
+        factory.writeDurable(dbMapNode, contentBuffer);
         contentBuffer.flip();
         CS256 cs256 = new CS256(contentBuffer);
         ByteBuffer byteBuffer = ByteBuffer.allocate(blockSize);
@@ -278,7 +291,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             throw new BlockIOException(ex);
         }
         nextRootPosition = (nextRootPosition + maxBlockSize) % (2 * maxBlockSize);
-        this.mapNode = mapNode;
+        mapNode = dbMapNode;
         return;
     }
 

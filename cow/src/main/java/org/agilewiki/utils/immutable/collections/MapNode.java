@@ -439,6 +439,8 @@ public interface MapNode extends Releasable {
 
     @Override
     default void releaseAll() {
+        if (isNil())
+            return;
         getData().releaseAll();
     }
 

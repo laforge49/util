@@ -13,7 +13,7 @@ public interface Transaction {
      * @param tMapNode  The durable content of the transaction.
      * @return The replacement dbMapNode.
      */
-    MapNode transform(Db db, MapNode tMapNode);
+    void transform(Db db, MapNode tMapNode);
 
     /**
      * Transaction timeout in milliseconds.
