@@ -25,6 +25,8 @@ public class DbTest extends TestCase {
 
                 db.open();
                 System.out.println(db.mapNode.firstKey());
+                System.out.println(db.mapNode.higherKey("w"));
+                System.out.println(db.mapNode.lastKey());
                 BlockReference br = (BlockReference) db.mapNode.listAccessor("y").get(0);
                 System.out.println(br.getData());
                 db.close();

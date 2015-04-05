@@ -17,7 +17,7 @@ public class BigListTran implements Transaction {
         int k = (Integer) tMapNode.getList("k").get(0);
         int I = (Integer) tMapNode.getList("I").get(0);
         for (int i = 0; i < I; i++) {
-            dbMapNode = dbMapNode.add(0, k*1000000+i);
+            dbMapNode = dbMapNode.add("0", k*1000000+i);
         }
         return dbMapNode;
     }

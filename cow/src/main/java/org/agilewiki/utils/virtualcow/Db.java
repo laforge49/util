@@ -8,6 +8,7 @@ import org.agilewiki.utils.dsm.DiskSpaceManager;
 import org.agilewiki.utils.immutable.CascadingRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
 import org.agilewiki.utils.immutable.collections.MapNode;
+import org.agilewiki.utils.immutable.collections.VersionedMapNode;
 import org.agilewiki.utils.immutable.scalars.CS256;
 import org.agilewiki.utils.immutable.scalars.CS256Factory;
 
@@ -34,6 +35,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     protected Thread privilegedThread;
     private DiskSpaceManager dsm;
     private long timestamp;
+    private String jeName;
 
     /**
      * Create a Db actor.
@@ -154,7 +156,11 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                     privilegedThread = Thread.currentThread();
                     try {
                         timestamp = Timestamp.generate();
-                        _update(transaction.transform(mapNode, timestamp, tMapNode));
+                        VersionedMapNode je = dbFactoryRegistry.versionedNilMap;
+                        String JEName = "je"+Long.toHexString(timestamp);
+                        MapNode dbMapNode = mapNode.add(JEName, je);
+                        dbMapNode = transaction.transform(dbMapNode, timestamp, tMapNode);
+                        _update(dbMapNode);
                     } finally {
                         privilegedThread = null;
                     }
@@ -166,6 +172,15 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                 }
             }
         };
+    }
+
+    /**
+     * Returns the name of the journal entry being processed.
+     *
+     * @return The current journal entry name.
+     */
+    public String getJEName() {
+        return jeName;
     }
 
     /**

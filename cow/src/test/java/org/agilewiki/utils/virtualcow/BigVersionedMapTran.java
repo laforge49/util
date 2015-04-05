@@ -19,8 +19,8 @@ public class BigVersionedMapTran implements Transaction {
         int I = (Integer) tMapNode.getList("I").get(0);
         VersionedMapNode vmn = dbMapNode.getRegistry().versionedNilMap;
         for (int i = 0; i < I; i++) {
-            vmn = vmn.add(k * 10000000 + i, "");
+            vmn = vmn.add(""+(k * 10000000 + i), "");
         }
-        return dbMapNode.add(1, vmn);
+        return dbMapNode.add("1", vmn);
     }
 }
