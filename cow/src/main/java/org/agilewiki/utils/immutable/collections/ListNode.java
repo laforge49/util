@@ -1,6 +1,7 @@
 package org.agilewiki.utils.immutable.collections;
 
 import org.agilewiki.utils.immutable.FactoryRegistry;
+import org.agilewiki.utils.immutable.ImmutableFactory;
 import org.agilewiki.utils.virtualcow.Db;
 import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 
@@ -423,5 +424,15 @@ public interface ListNode extends Releasable {
     @Override
     default Object resize(int maxSize, int maxBlockSize) {
         return getData().resize(maxSize, maxBlockSize);
+    }
+
+    /**
+     * Returns a ByteBuffer loaded with the serialized contents of the immutable.
+     *
+     * @return The loaded ByteBuffer.
+     */
+    default ByteBuffer toByteBuffer() {
+        ImmutableFactory factory = getRegistry().getImmutableFactory(this);
+        return factory.toByteBuffer(this);
     }
 }

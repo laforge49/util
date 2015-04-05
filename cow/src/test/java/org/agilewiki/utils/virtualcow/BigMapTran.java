@@ -2,10 +2,7 @@ package org.agilewiki.utils.virtualcow;
 
 import org.agilewiki.utils.immutable.collections.MapNode;
 
-/**
- * A transaction simply transforms a map list.
- */
-public interface Transaction {
+public class BigMapTran implements Transaction {
     /**
      * Transforms a map list.
      *
@@ -15,15 +12,13 @@ public interface Transaction {
      * @param tMapNode  The durable content of the transaction.
      * @return The replacement dbMapNode.
      */
-    MapNode transform(MapNode dbMapNode, long timestamp, MapNode tMapNode);
-
-    /**
-     * Transaction timeout in milliseconds.
-     * Set to Integer.MAX_VALUE by default.
-     *
-     * @return The max time in milliseconds the transaction can take.
-     */
-    default int timeoutMillis() {
-        return Integer.MAX_VALUE;
+    @Override
+    public MapNode transform(MapNode dbMapNode, long timestamp, MapNode tMapNode) {
+        int k = (Integer) tMapNode.getList("k").get(0);
+        int I = (Integer) tMapNode.getList("I").get(0);
+        for (int i = 0; i < I; i++) {
+            dbMapNode = dbMapNode.add(k * 10000000 + i, "");
+        }
+        return dbMapNode;
     }
 }

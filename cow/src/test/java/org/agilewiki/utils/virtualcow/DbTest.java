@@ -19,25 +19,15 @@ public class DbTest extends TestCase {
             try (Db db = new Db(new BaseRegistry(), dbPath, maxRootBlockSize)) {
                 Files.deleteIfExists(dbPath);
                 db.open(true);
-                Transaction t2 = new Transaction() {
-                    @Override
-                    public MapNode transform(MapNode mapNode, long timestamp) {
-                        System.out.println("block usage: " + db.usage());
-                        mapNode = mapNode.add("x", "hi!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
-                        BlockReference blockReference =
-                                new BlockReference(db.dbFactoryRegistry, "ho!");
-                        mapNode = mapNode.add("y", blockReference);
-                        return mapNode;
-                    }
-                };
-                db.update(t2).call();
+                db.update(DbTran.class).call();
                 db.close();
                 System.out.println(Files.size(dbPath));
+
                 db.open();
                 System.out.println(db.mapNode.firstKey());
                 BlockReference br = (BlockReference) db.mapNode.listAccessor("y").get(0);
                 System.out.println(br.getData());
+                db.close();
             }
         } finally {
             Plant.close();

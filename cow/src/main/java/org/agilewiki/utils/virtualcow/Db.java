@@ -23,6 +23,8 @@ import static java.nio.file.StandardOpenOption.*;
  * A database that supports multiple blocks.
  */
 public class Db extends IsolationBladeBase implements AutoCloseable {
+    public final static String transactionClassName = "transaction_class_name";
+
     public final DbFactoryRegistry dbFactoryRegistry;
     public final Path dbPath;
     private FileChannel fc;
@@ -104,22 +106,55 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     }
 
     /**
-     * Update the database.
+     * Update the database with a parameter-free transaction.
      *
-     * @param transaction The transaction which will transform the db contents.
+     * @param transactionClass The class which will transform the database.
      * @return The request to perform the update.
      */
-    public AReq<Void> update(Transaction transaction) {
+    public AReq<Void> update(Class transactionClass) {
+        MapNode tMapNode = dbFactoryRegistry.nilMap;
+        return update(transactionClass, dbFactoryRegistry.nilMap);
+    }
+
+    /**
+     * Update the database.
+     *
+     * @param transactionClass The class which will transform the database.
+     * @param tMapNode         The map holding the transaction parameters.
+     * @return The request to perform the update.
+     */
+    public AReq<Void> update(Class transactionClass, MapNode tMapNode) {
+        tMapNode = tMapNode.add(transactionClassName, transactionClass.getName());
+        return update(tMapNode.toByteBuffer());
+    }
+
+    /**
+     * Update the database.
+     * First deserialize the map list held by the byte buffer, then fetch the name of the
+     * transaction class assigned to the key transaction_class_name.
+     * Then instantiate the transaction and call the transform method.
+     * The database is updated on successful completion of the transaction.
+     *
+     * @param tByteBuffer       Holds the serialized transaction which will transform the db contents.
+     * @return The request to perform the update.
+     */
+    public AReq<Void> update(ByteBuffer tByteBuffer) {
         return new AReq<Void>("update") {
             @Override
             protected void processAsyncOperation(AsyncRequestImpl _asyncRequestImpl,
                                                  AsyncResponseProcessor<Void> _asyncResponseProcessor) {
                 try {
+                    ImmutableFactory f = dbFactoryRegistry.readId(tByteBuffer);
+                    MapNode tMapNode = (MapNode) f.deserialize(tByteBuffer);
+                    String tClassName = (String) tMapNode.getList(transactionClassName).get(0);
+                    ClassLoader cl = ClassLoader.getSystemClassLoader();
+                    Class tClass = cl.loadClass(tClassName);
+                    Transaction transaction = (Transaction) tClass.newInstance();
                     _asyncRequestImpl.setMessageTimeoutMillis(transaction.timeoutMillis());
                     privilegedThread = Thread.currentThread();
                     try {
                         timestamp = Timestamp.generate();
-                        _update(transaction.transform(mapNode, timestamp));
+                        _update(transaction.transform(mapNode, timestamp, tMapNode));
                     } finally {
                         privilegedThread = null;
                     }

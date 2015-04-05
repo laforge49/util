@@ -91,4 +91,17 @@ public interface ImmutableFactory {
      * @return The deserialized object.
      */
     Object deserialize(ByteBuffer byteBuffer);
+
+    /**
+     * Returns a ByteBuffer loaded with the serialized contents of the immutable.
+     *
+     * @param immutable    The immutable to be serialized.
+     * @return The loaded ByteBuffer.
+     */
+    default ByteBuffer toByteBuffer(Object immutable) {
+        ByteBuffer bb = ByteBuffer.allocate(getDurableLength(immutable));
+        writeDurable(immutable, bb);
+        bb.flip();
+        return bb;
+    }
 }

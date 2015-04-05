@@ -20,17 +20,11 @@ public class BigListTest extends TestCase {
             try (Db db = new Db(new BaseRegistry(), dbPath, maxBlockSize)) {
                 Files.deleteIfExists(dbPath);
                 db.open(true);
-                for (k = 0; k < 4; ++k) {
-                    Transaction t2 = new Transaction() {
-                        @Override
-                        public MapNode transform(MapNode mapNode, long timestamp) {
-                            for (int i = 0; i < 10; i++) {
-                                mapNode = mapNode.add(0, k*100+i);
-                            }
-                            return mapNode;
-                        }
-                    };
-                    db.update(t2).call();
+                for (k = 0; k < 2; ++k) {
+                    MapNode tMapNode = db.dbFactoryRegistry.nilMap;
+                    tMapNode = tMapNode.add("k", k);
+                    tMapNode = tMapNode.add("I", 10);
+                    db.update(BigListTran.class, tMapNode).call();
                 }
                 db.close();
             }
