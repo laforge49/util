@@ -42,11 +42,6 @@ public class DbTest extends TestCase {
                 for (String id: Journal.modifies(db, timestampId)) {
                     System.out.println(id);
                 }
-
-                db.open();
-                BlockReference br = (BlockReference) dbMapNode.listAccessor(NameId.generate("y")).get(0);
-                System.out.println("\n"+br.getData());
-                db.close();
             }
         } finally {
             Plant.close();

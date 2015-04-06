@@ -214,9 +214,9 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
      * Update dbMapNode.
      *
      * @param key   The key of the list. Must be a valid id.
-     * @param value The new value.
+     * @param value The new versioned map.
      */
-    public void set(String key, Object value) {
+    public void set(String key, VersionedMapNode value) {
         checkPrivilege();
         NameId.validateId(key);
         dbMapNode = dbMapNode.set(key, value);

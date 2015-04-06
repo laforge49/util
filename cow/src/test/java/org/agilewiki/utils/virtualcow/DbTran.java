@@ -12,9 +12,6 @@ public class DbTran implements Transaction {
      */
     @Override
     public void transform(Db db, MapNode tMapNode) {
-        db.set(NameId.generate("x"), "hi!");
-        BlockReference blockReference =
-                new BlockReference(db.dbFactoryRegistry, "ho!");
-        db.set(NameId.generate("y"), blockReference);
+        db.set(NameId.generate("x"), db.dbFactoryRegistry.versionedNilMap);
     }
 }
