@@ -2,7 +2,6 @@ package org.agilewiki.utils.virtualcow;
 
 import org.agilewiki.utils.NameId;
 import org.agilewiki.utils.immutable.collections.MapNode;
-import org.agilewiki.utils.immutable.collections.VersionedMapNode;
 
 public class BigVersionedMapTran implements Transaction {
     /**

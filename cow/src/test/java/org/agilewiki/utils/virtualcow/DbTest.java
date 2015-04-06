@@ -5,7 +5,7 @@ import org.agilewiki.jactor2.core.impl.Plant;
 import org.agilewiki.utils.NameId;
 import org.agilewiki.utils.immutable.BaseRegistry;
 import org.agilewiki.utils.immutable.collections.ListAccessor;
-import org.agilewiki.utils.immutable.collections.MapNode;
+import org.agilewiki.utils.immutable.collections.MapAccessor;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,8 +28,8 @@ public class DbTest extends TestCase {
                 System.out.println("db file size: " + Files.size(dbPath));
 
                 System.out.println("\nAll keys:");
-                MapNode dbMapNode = db.getDbMapNode();
-                for (ListAccessor la: dbMapNode.mapAccessor()) {
+                MapAccessor dbMapAccessor = db.mapAccessor();
+                for (ListAccessor la: dbMapAccessor) {
                     System.out.println(la.key());
                 }
 
@@ -38,7 +38,7 @@ public class DbTest extends TestCase {
                     System.out.println(tid);
                 }
 
-                System.out.println("\nAll items modified by "+timestampId+":");
+                System.out.println("\nAll items modified by " + timestampId + ":");
                 for (String id: Journal.modifies(db, timestampId)) {
                     System.out.println(id);
                 }

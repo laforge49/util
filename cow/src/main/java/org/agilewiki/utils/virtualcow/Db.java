@@ -70,39 +70,10 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     /**
      * Returns the contents of the database.
      *
-     * @return A virtual map node tree.
+     * @return A MapAccessor.
      */
-    public MapNode getDbMapNode() {
-        return isPrivileged() ? dbMapNode : mapNode;
-    }
-
-    /**
-     * Return the versioned map node assigned to the given key.
-     *
-     * @param id The id for the versioned map node.
-     * @return A versioned map node, or null.
-     */
-    public VersionedMapNode get(String id) {
-        if (!id.startsWith("$"))
-            throw new IllegalArgumentException("not an id or composite id: " + id);
-        MapNode mapNode = getDbMapNode();
-        ListNode listNode = mapNode.getList(id);
-        if (listNode == null)
-            return null;
-        return (VersionedMapNode) listNode.get(0);
-    }
-
-    /**
-     * Return the versioned map node assigned to the given key.
-     *
-     * @param id The id for the versioned map node.
-     * @return A versioned map node, or nil.
-     */
-    public VersionedMapNode getNil(String id) {
-        VersionedMapNode versionedMapNode = get(id);
-        if (versionedMapNode != null)
-            return versionedMapNode;
-        return dbFactoryRegistry.versionedNilMap;
+    public MapAccessor mapAccessor() {
+        return (isPrivileged() ? dbMapNode : mapNode).mapAccessor();
     }
 
     private void updateJournal(String id) {

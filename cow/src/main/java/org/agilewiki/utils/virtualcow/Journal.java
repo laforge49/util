@@ -59,7 +59,7 @@ public class Journal {
 
     public static Iterable<String> modifies(Db db, String timestampId) {
         Timestamp.validateId(timestampId);
-        MapAccessor ma = db.getDbMapNode().mapAccessor();
+        MapAccessor ma = db.mapAccessor();
         Iterator<ListAccessor> it = ma.iterator(MODIFIES_ID + timestampId);
         return new Iterable<String>() {
             @Override
@@ -81,7 +81,7 @@ public class Journal {
 
     public static Iterable<String> journal(Db db, String id) {
         NameId.validateId(id);
-        MapAccessor ma = db.getDbMapNode().mapAccessor();
+        MapAccessor ma = db.mapAccessor();
         Iterator<ListAccessor> it = ma.iterator(JOURNAL_ID + id);
         return new Iterable<String>() {
             @Override
