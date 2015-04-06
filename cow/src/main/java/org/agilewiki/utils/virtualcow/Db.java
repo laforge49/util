@@ -93,6 +93,18 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     }
 
     /**
+     * Return the versioned map node assigned to the given key.
+     * @param key    The key for the versioned map node.
+     * @return A versioned map node, or nil.
+     */
+    public VersionedMapNode getNil(String key) {
+        VersionedMapNode versionedMapNode = get(key);
+        if (versionedMapNode != null)
+            return versionedMapNode;
+        return dbFactoryRegistry.versionedNilMap;
+    }
+
+    /**
      * Update dbMapNode.
      *
      * @param key   The key of the list. Must be a valid id or composite id.
