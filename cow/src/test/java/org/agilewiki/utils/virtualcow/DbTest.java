@@ -22,7 +22,7 @@ public class DbTest extends TestCase {
                 Files.deleteIfExists(dbPath);
                 db.registerTransaction("dbTran", DbTran.class);
                 db.open(true);
-                db.update("dbTran").call();
+                String timestampId = db.update("dbTran").call();
                 db.close();
 
                 System.out.println("db file size: " + Files.size(dbPath));
@@ -33,10 +33,8 @@ public class DbTest extends TestCase {
                     System.out.println(la.key());
                 }
 
-                String timestampId = null;
                 System.out.println("\nJournal of x:");
                 for (String tid: Journal.journal(db, NameId.generate("x"))) {
-                    timestampId = tid;
                     System.out.println(tid);
                 }
 

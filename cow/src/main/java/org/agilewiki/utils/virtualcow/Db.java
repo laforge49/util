@@ -142,7 +142,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
      * @param transactionName The registered name of the transaction class.
      * @return The request to perform the update.
      */
-    public AReq<Void> update(String transactionName) {
+    public AReq<String> update(String transactionName) {
         MapNode tMapNode = dbFactoryRegistry.nilMap;
         return update(transactionName, dbFactoryRegistry.nilMap);
     }
@@ -154,7 +154,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
      * @param tMapNode         The map holding the transaction parameters.
      * @return The request to perform the update.
      */
-    public AReq<Void> update(String transactionName, MapNode tMapNode) {
+    public AReq<String> update(String transactionName, MapNode tMapNode) {
         tMapNode = tMapNode.add(Db.transactionName, transactionName);
         return update(tMapNode.toByteBuffer());
     }
@@ -169,11 +169,11 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
      * @param tByteBuffer       Holds the serialized transaction which will transform the db contents.
      * @return The request to perform the update.
      */
-    public AReq<Void> update(ByteBuffer tByteBuffer) {
-        return new AReq<Void>("update") {
+    public AReq<String> update(ByteBuffer tByteBuffer) {
+        return new AReq<String>("update") {
             @Override
             protected void processAsyncOperation(AsyncRequestImpl _asyncRequestImpl,
-                                                 AsyncResponseProcessor<Void> _asyncResponseProcessor) {
+                                                 AsyncResponseProcessor<String> _asyncResponseProcessor) {
                 try {
                     ImmutableFactory f = dbFactoryRegistry.readId(tByteBuffer);
                     MapNode tMapNode = (MapNode) f.deserialize(tByteBuffer);
@@ -200,7 +200,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                     } finally {
                         privilegedThread = null;
                     }
-                    _asyncResponseProcessor.processAsyncResponse(null);
+                    _asyncResponseProcessor.processAsyncResponse(jeName);
                 } catch (Exception ex) {
                     close();
                     getReactor().error("unable to update db", ex);
