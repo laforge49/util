@@ -4,7 +4,6 @@ import org.agilewiki.jactor2.core.blades.IsolationBladeBase;
 import org.agilewiki.jactor2.core.messages.AsyncResponseProcessor;
 import org.agilewiki.jactor2.core.messages.impl.AsyncRequestImpl;
 import org.agilewiki.utils.BlockIOException;
-import org.agilewiki.utils.NameId;
 import org.agilewiki.utils.Timestamp;
 import org.agilewiki.utils.dsm.DiskSpaceManager;
 import org.agilewiki.utils.immutable.CascadingRegistry;
@@ -61,8 +60,8 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     /**
      * Register a transaction class.
      *
-     * @param transactionName     The transaction name.
-     * @param transactionClass    The transaction class.
+     * @param transactionName  The transaction name.
+     * @param transactionClass The transaction class.
      */
     public void registerTransaction(String transactionName, Class transactionClass) {
         transactionRegistry.put(transactionName, transactionClass);
@@ -79,7 +78,8 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
 
     /**
      * Return the versioned map node assigned to the given key.
-     * @param id    The id for the versioned map node.
+     *
+     * @param id The id for the versioned map node.
      * @return A versioned map node, or null.
      */
     public VersionedMapNode get(String id) {
@@ -95,7 +95,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     /**
      * Return the versioned map node assigned to the given key.
      *
-     * @param id    The id for the versioned map node.
+     * @param id The id for the versioned map node.
      * @return A versioned map node, or nil.
      */
     public VersionedMapNode getNil(String id) {
@@ -113,7 +113,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     /**
      * Update dbMapNode.
      *
-     * @param id   The id of the list. Must be a valid id or composite id.
+     * @param id    The id of the list. Must be a valid id or composite id.
      * @param value The new versioned map.
      */
     public void set(String id, VersionedMapNode value) {
@@ -127,7 +127,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     /**
      * Clear the versioned map.
      *
-     * @param id     The id for the VersionedMapNode.
+     * @param id The id for the VersionedMapNode.
      */
     public void clearMap(String id) {
         checkPrivilege();
@@ -145,8 +145,8 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     /**
      * Clear the versioned list.
      *
-     * @param id     The id for the VersionedMapNode.
-     * @param key    The key for the VersionedListNode in the VersionedMapNode.
+     * @param id  The id for the VersionedMapNode.
+     * @param key The key for the VersionedListNode in the VersionedMapNode.
      */
     public void clearList(String id, String key) {
         checkPrivilege();
@@ -164,9 +164,9 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     /**
      * Remove an item from a versioned list.
      *
-     * @param id     The id for the VersionedMapNode.
-     * @param key    The key for the VersionedListNode in the VersionedMapNode.
-     * @param ndx    The index of the item to be deleted.
+     * @param id  The id for the VersionedMapNode.
+     * @param key The key for the VersionedListNode in the VersionedMapNode.
+     * @param ndx The index of the item to be deleted.
      */
     public void remove(String id, String key, int ndx) {
         checkPrivilege();
@@ -184,9 +184,9 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     /**
      * Set an item in a versioned list.
      *
-     * @param id     The id for the VersionedMapNode.
-     * @param key    The key for the VersionedListNode in the VersionedMapNode.
-     * @param value  The new value.
+     * @param id    The id for the VersionedMapNode.
+     * @param key   The key for the VersionedListNode in the VersionedMapNode.
+     * @param value The new value.
      */
     public void set(String id, String key, Object value) {
         checkPrivilege();
@@ -197,6 +197,47 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                 dbFactoryRegistry.versionedNilMap :
                 (VersionedMapNode) listNode.get(0);
         versionedMapNode = versionedMapNode.set(key, value);
+        dbMapNode = dbMapNode.set(id, versionedMapNode);
+        updateJournal(id);
+    }
+
+    /**
+     * Add an item to the end of a versioned list.
+     *
+     * @param id    The id for the VersionedMapNode.
+     * @param key   The key for the VersionedListNode in the VersionedMapNode.
+     * @param value The value to be added to the list.
+     */
+    public void add(String id, String key, Object value) {
+        checkPrivilege();
+        if (!id.startsWith("$"))
+            throw new IllegalArgumentException("not an id or composite id: " + id);
+        ListNode listNode = dbMapNode.getList(id);
+        VersionedMapNode versionedMapNode = listNode == null ?
+                dbFactoryRegistry.versionedNilMap :
+                (VersionedMapNode) listNode.get(0);
+        versionedMapNode = versionedMapNode.add(key, value);
+        dbMapNode = dbMapNode.set(id, versionedMapNode);
+        updateJournal(id);
+    }
+
+    /**
+     * Add an item to the end of a versioned list.
+     *
+     * @param id    The id for the VersionedMapNode.
+     * @param key   The key for the VersionedListNode in the VersionedMapNode.
+     * @param ndx   Where to add the value.
+     * @param value The value to be added to the list.
+     */
+    public void add(String id, String key, int ndx, Object value) {
+        checkPrivilege();
+        if (!id.startsWith("$"))
+            throw new IllegalArgumentException("not an id or composite id: " + id);
+        ListNode listNode = dbMapNode.getList(id);
+        VersionedMapNode versionedMapNode = listNode == null ?
+                dbFactoryRegistry.versionedNilMap :
+                (VersionedMapNode) listNode.get(0);
+        versionedMapNode = versionedMapNode.add(key, ndx, value);
         dbMapNode = dbMapNode.set(id, versionedMapNode);
         updateJournal(id);
     }
@@ -216,7 +257,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     /**
      * Test method to set the timestamp when the file is not open.
      *
-     * @param timestamp    The new timestamp.
+     * @param timestamp The new timestamp.
      */
     public void _setTimestamp(long timestamp) {
         if (fc != null)
@@ -272,7 +313,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
      * Update the database.
      *
      * @param transactionName The registered name of the transaction class.
-     * @param tMapNode         The map holding the transaction parameters.
+     * @param tMapNode        The map holding the transaction parameters.
      * @return The request to perform the update.
      */
     public AReq<String> update(String transactionName, MapNode tMapNode) {
@@ -287,7 +328,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
      * Then instantiate the transaction and call the transform method.
      * The database is updated on successful completion of the transaction.
      *
-     * @param tByteBuffer       Holds the serialized transaction which will transform the db contents.
+     * @param tByteBuffer Holds the serialized transaction which will transform the db contents.
      * @return The request to perform the update.
      */
     public AReq<String> update(ByteBuffer tByteBuffer) {
@@ -309,9 +350,9 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                         VersionedMapNode je = dbFactoryRegistry.versionedNilMap;
                         jeName = Timestamp.timestampId(timestamp);
                         MapAccessor ma = tMapNode.mapAccessor();
-                        for (ListAccessor la: ma) {
+                        for (ListAccessor la : ma) {
                             String key = (String) la.key();
-                            for (Object v: la) {
+                            for (Object v : la) {
                                 je.add(key, v);
                             }
                         }
