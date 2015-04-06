@@ -219,6 +219,8 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         checkPrivilege();
         NameId.validateId(key);
         dbMapNode = dbMapNode.set(key, value);
+        dbMapNode = dbMapNode.set(Journal.modifiesKey(jeName, key), true);
+        dbMapNode = dbMapNode.set(Journal.journalEntryKey(key, jeName), true);
     }
 
     /**
