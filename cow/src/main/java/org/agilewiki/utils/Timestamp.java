@@ -1,4 +1,4 @@
-package org.agilewiki.utils.virtualcow;
+package org.agilewiki.utils;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -52,6 +52,11 @@ public class Timestamp {
         return time(timestamp(timestampId));
     }
 
+    /**
+     * Returns a timestamp.
+     *
+     * @return A unique timestamp.
+     */
     public static long generate() {
         while (true) {
             long ts = aLong.get();
@@ -72,5 +77,11 @@ public class Timestamp {
                 }
             }
         }
+    }
+
+    public static void validateId(String timestampId) {
+        NameId.validateId(timestampId);
+        if (!timestampId.startsWith(Timestamp.PREFIX))
+            throw new IllegalArgumentException("not a timestamp id: " + timestampId);
     }
 }

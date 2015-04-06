@@ -27,10 +27,15 @@ public class DbTest extends TestCase {
 
                 System.out.println("db file size: " + Files.size(dbPath));
 
-                System.out.println();
+                System.out.println("\nAll keys:");
                 MapNode dbMapNode = db.getDbMapNode();
                 for (ListAccessor la: dbMapNode.mapAccessor()) {
                     System.out.println(la.key());
+                }
+
+                System.out.println("\nJournal of x:");
+                for (String timestampId: Journal.journal(db, NameId.generate("x"))) {
+                    System.out.println(timestampId);
                 }
 
                 db.open();
