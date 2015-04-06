@@ -162,7 +162,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     }
 
     /**
-     * Remove an item from the a versioned list.
+     * Remove an item from a versioned list.
      *
      * @param id     The id for the VersionedMapNode.
      * @param key    The key for the VersionedListNode in the VersionedMapNode.
@@ -177,6 +177,26 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             return;
         VersionedMapNode versionedMapNode = (VersionedMapNode) listNode.get(0);
         versionedMapNode = versionedMapNode.remove(key, ndx);
+        dbMapNode = dbMapNode.set(id, versionedMapNode);
+        updateJournal(id);
+    }
+
+    /**
+     * Set an item in a versioned list.
+     *
+     * @param id     The id for the VersionedMapNode.
+     * @param key    The key for the VersionedListNode in the VersionedMapNode.
+     * @param value  The new value.
+     */
+    public void set(String id, String key, Object value) {
+        checkPrivilege();
+        if (!id.startsWith("$"))
+            throw new IllegalArgumentException("not an id or composite id: " + id);
+        ListNode listNode = dbMapNode.getList(id);
+        VersionedMapNode versionedMapNode = listNode == null ?
+                dbFactoryRegistry.versionedNilMap :
+                (VersionedMapNode) listNode.get(0);
+        versionedMapNode = versionedMapNode.set(key, value);
         dbMapNode = dbMapNode.set(id, versionedMapNode);
         updateJournal(id);
     }
