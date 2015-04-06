@@ -23,7 +23,7 @@ public class MapEmptyTest extends TestCase {
             assertEquals(0, registry.nilMap.flatKeys().size());
 
             ListAccessor la = registry.nilMap.listAccessor("");
-            assertNull(la.get(0));
+            assertNull(la);
 
             MapAccessor ma = registry.nilMap.mapAccessor();
             assertNull(ma.firstKey());

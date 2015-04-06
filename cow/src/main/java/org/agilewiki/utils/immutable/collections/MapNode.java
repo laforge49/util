@@ -41,13 +41,24 @@ public interface MapNode extends Releasable {
 
     MapNodeData getData();
 
+    /**
+     * Returns true if this is the nil node.
+     *
+     * @return True if nil node.
+     */
     default boolean isNil() {
         return this == getRegistry().nilMap;
     }
 
+    /**
+     * Returns the list for the node.
+     *
+     * @param key The key for the node.
+     * @return The list, or null.
+     */
     default ListNode getList(Comparable key) {
         if (isNil())
-            return getRegistry().nilList;
+            return null;
         return getData().getList(key);
     }
 
@@ -59,17 +70,23 @@ public interface MapNode extends Releasable {
      * @return The count of all the values in the list.
      */
     default int totalSize(Comparable key) {
-        return getList(key).totalSize();
+        ListNode listNode = getList(key);
+        if (listNode == null)
+            return 0;
+        return listNode.totalSize();
     }
 
     /**
      * Returns a list accessor.
      *
      * @param key The key for the list.
-     * @return A list accessor.
+     * @return A list accessor or null.
      */
     default ListAccessor listAccessor(Comparable key) {
-        return getList(key).listAccessor(key);
+        ListNode listNode = getList(key);
+        if (listNode == null)
+            return null;
+        return listNode.listAccessor(key);
     }
 
     /**

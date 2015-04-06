@@ -9,10 +9,7 @@ import org.agilewiki.utils.Timestamp;
 import org.agilewiki.utils.dsm.DiskSpaceManager;
 import org.agilewiki.utils.immutable.CascadingRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
-import org.agilewiki.utils.immutable.collections.ListAccessor;
-import org.agilewiki.utils.immutable.collections.MapAccessor;
-import org.agilewiki.utils.immutable.collections.MapNode;
-import org.agilewiki.utils.immutable.collections.VersionedMapNode;
+import org.agilewiki.utils.immutable.collections.*;
 import org.agilewiki.utils.immutable.scalars.CS256;
 import org.agilewiki.utils.immutable.scalars.CS256Factory;
 
@@ -78,6 +75,36 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
      */
     public MapNode getDbMapNode() {
         return isPrivileged() ? dbMapNode : mapNode;
+    }
+
+    /**
+     * Return the versioned map node assigned to the given key.
+     * @param key    The key for the versioned map node.
+     * @return A versioned map node, or null.
+     */
+    public VersionedMapNode get(String key) {
+        if (!key.startsWith("$"))
+            throw new IllegalArgumentException("not an id or composite id: " + key);
+        MapNode mapNode = getDbMapNode();
+        ListNode listNode = mapNode.getList(key);
+        if (listNode == null)
+            return null;
+        return (VersionedMapNode) listNode.get(0);
+    }
+
+    /**
+     * Update dbMapNode.
+     *
+     * @param key   The key of the list. Must be a valid id or composite id.
+     * @param value The new versioned map.
+     */
+    public void set(String key, VersionedMapNode value) {
+        checkPrivilege();
+        if (!key.startsWith("$"))
+            throw new IllegalArgumentException("not an id or composite id: " + key);
+        dbMapNode = dbMapNode.set(key, value);
+        dbMapNode = dbMapNode.set(Journal.modifiesKey(jeName, key), true);
+        dbMapNode = dbMapNode.set(Journal.journalEntryKey(key, jeName), true);
     }
 
     /**
@@ -208,20 +235,6 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                 }
             }
         };
-    }
-
-    /**
-     * Update dbMapNode.
-     *
-     * @param key   The key of the list. Must be a valid id.
-     * @param value The new versioned map.
-     */
-    public void set(String key, VersionedMapNode value) {
-        checkPrivilege();
-        NameId.validateId(key);
-        dbMapNode = dbMapNode.set(key, value);
-        dbMapNode = dbMapNode.set(Journal.modifiesKey(jeName, key), true);
-        dbMapNode = dbMapNode.set(Journal.journalEntryKey(key, jeName), true);
     }
 
     /**
