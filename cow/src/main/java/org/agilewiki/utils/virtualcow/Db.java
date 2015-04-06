@@ -111,20 +111,6 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     }
 
     /**
-     * Update dbMapNode.
-     *
-     * @param id    The id of the list. Must be a valid id or composite id.
-     * @param value The new versioned map.
-     */
-    public void set(String id, VersionedMapNode value) {
-        checkPrivilege();
-        if (!id.startsWith("$"))
-            throw new IllegalArgumentException("not an id or composite id: " + id);
-        dbMapNode = dbMapNode.set(id, value);
-        updateJournal(id);
-    }
-
-    /**
      * Clear the versioned map.
      *
      * @param id The id for the VersionedMapNode.

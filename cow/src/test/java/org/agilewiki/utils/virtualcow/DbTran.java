@@ -12,6 +12,6 @@ public class DbTran implements Transaction {
      */
     @Override
     public void transform(Db db, MapNode tMapNode) {
-        db.set(NameId.generate("x"), db.dbFactoryRegistry.versionedNilMap);
+        db.set(NameId.generate("x"), "y", 3);
     }
 }
