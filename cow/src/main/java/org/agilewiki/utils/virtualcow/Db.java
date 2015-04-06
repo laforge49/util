@@ -79,14 +79,14 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
 
     /**
      * Return the versioned map node assigned to the given key.
-     * @param key    The key for the versioned map node.
+     * @param id    The id for the versioned map node.
      * @return A versioned map node, or null.
      */
-    public VersionedMapNode get(String key) {
-        if (!key.startsWith("$"))
-            throw new IllegalArgumentException("not an id or composite id: " + key);
+    public VersionedMapNode get(String id) {
+        if (!id.startsWith("$"))
+            throw new IllegalArgumentException("not an id or composite id: " + id);
         MapNode mapNode = getDbMapNode();
-        ListNode listNode = mapNode.getList(key);
+        ListNode listNode = mapNode.getList(id);
         if (listNode == null)
             return null;
         return (VersionedMapNode) listNode.get(0);
@@ -94,29 +94,53 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
 
     /**
      * Return the versioned map node assigned to the given key.
-     * @param key    The key for the versioned map node.
+     *
+     * @param id    The id for the versioned map node.
      * @return A versioned map node, or nil.
      */
-    public VersionedMapNode getNil(String key) {
-        VersionedMapNode versionedMapNode = get(key);
+    public VersionedMapNode getNil(String id) {
+        VersionedMapNode versionedMapNode = get(id);
         if (versionedMapNode != null)
             return versionedMapNode;
         return dbFactoryRegistry.versionedNilMap;
     }
 
+    private void updateJournal(String id) {
+        dbMapNode = dbMapNode.set(Journal.modifiesKey(jeName, id), true);
+        dbMapNode = dbMapNode.set(Journal.journalEntryKey(id, jeName), true);
+    }
+
     /**
      * Update dbMapNode.
      *
-     * @param key   The key of the list. Must be a valid id or composite id.
+     * @param id   The id of the list. Must be a valid id or composite id.
      * @param value The new versioned map.
      */
-    public void set(String key, VersionedMapNode value) {
+    public void set(String id, VersionedMapNode value) {
         checkPrivilege();
-        if (!key.startsWith("$"))
-            throw new IllegalArgumentException("not an id or composite id: " + key);
-        dbMapNode = dbMapNode.set(key, value);
-        dbMapNode = dbMapNode.set(Journal.modifiesKey(jeName, key), true);
-        dbMapNode = dbMapNode.set(Journal.journalEntryKey(key, jeName), true);
+        if (!id.startsWith("$"))
+            throw new IllegalArgumentException("not an id or composite id: " + id);
+        dbMapNode = dbMapNode.set(id, value);
+        updateJournal(id);
+    }
+
+    /**
+     * Clear the list.
+     *
+     * @param id     The id for the VersionedMapNode.
+     * @param key    The key for the list in the VersionedMapNode.
+     */
+    public void clearList(String id, String key) {
+        checkPrivilege();
+        if (!id.startsWith("$"))
+            throw new IllegalArgumentException("not an id or composite id: " + id);
+        ListNode listNode = dbMapNode.getList(id);
+        if (listNode == null)
+            return;
+        VersionedMapNode versionedMapNode = (VersionedMapNode) listNode.get(0);
+        versionedMapNode = versionedMapNode.clearList(key);
+        dbMapNode = dbMapNode.set(id, versionedMapNode);
+        updateJournal(id);
     }
 
     /**
