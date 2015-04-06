@@ -33,9 +33,16 @@ public class DbTest extends TestCase {
                     System.out.println(la.key());
                 }
 
+                String timestampId = null;
                 System.out.println("\nJournal of x:");
-                for (String timestampId: Journal.journal(db, NameId.generate("x"))) {
-                    System.out.println(timestampId);
+                for (String tid: Journal.journal(db, NameId.generate("x"))) {
+                    timestampId = tid;
+                    System.out.println(tid);
+                }
+
+                System.out.println("\nAll items modified by "+timestampId+":");
+                for (String id: Journal.modifies(db, timestampId)) {
+                    System.out.println(id);
                 }
 
                 db.open();
