@@ -77,8 +77,8 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     }
 
     private void updateJournal(String id) {
-        dbMapNode = dbMapNode.set(Journal.modifiesKey(jeName, id), true);
-        dbMapNode = dbMapNode.set(Journal.journalEntryKey(id, jeName), true);
+        dbMapNode = dbMapNode.set(Journal.modifiesKey(jeName, id), dbFactoryRegistry.versionedNilMap);
+        dbMapNode = dbMapNode.set(Journal.journalEntryKey(id, jeName), dbFactoryRegistry.versionedNilMap);
     }
 
     /**
