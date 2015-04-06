@@ -11,7 +11,6 @@ public interface Transaction {
      *
      * @param db        The database to be updated.
      * @param tMapNode  The durable content of the transaction.
-     * @return The replacement dbMapNode.
      */
     void transform(Db db, MapNode tMapNode);
 

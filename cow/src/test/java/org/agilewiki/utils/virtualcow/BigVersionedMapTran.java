@@ -10,7 +10,6 @@ public class BigVersionedMapTran implements Transaction {
      *
      * @param db        The database to be updated.
      * @param tMapNode  The durable content of the transaction.
-     * @return The replacement dbMapNode.
      */
     @Override
     public void transform(Db db, MapNode tMapNode) {
