@@ -125,7 +125,25 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     }
 
     /**
-     * Clear the list.
+     * Clear the versioned map.
+     *
+     * @param id     The id for the VersionedMapNode.
+     */
+    public void clearMap(String id) {
+        checkPrivilege();
+        if (!id.startsWith("$"))
+            throw new IllegalArgumentException("not an id or composite id: " + id);
+        ListNode listNode = dbMapNode.getList(id);
+        if (listNode == null)
+            return;
+        VersionedMapNode versionedMapNode = (VersionedMapNode) listNode.get(0);
+        versionedMapNode = versionedMapNode.clearMap();
+        dbMapNode = dbMapNode.set(id, versionedMapNode);
+        updateJournal(id);
+    }
+
+    /**
+     * Clear the versioned list.
      *
      * @param id     The id for the VersionedMapNode.
      * @param key    The key for the list in the VersionedMapNode.
