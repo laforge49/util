@@ -6,6 +6,7 @@ import org.agilewiki.jactor2.core.messages.impl.AsyncRequestImpl;
 import org.agilewiki.utils.BlockIOException;
 import org.agilewiki.utils.ids.Timestamp;
 import org.agilewiki.utils.dsm.DiskSpaceManager;
+import org.agilewiki.utils.ids.composites.Journal;
 import org.agilewiki.utils.immutable.CascadingRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
 import org.agilewiki.utils.immutable.collections.*;
