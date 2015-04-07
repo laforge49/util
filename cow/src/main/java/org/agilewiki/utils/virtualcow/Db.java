@@ -77,8 +77,22 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     }
 
     private void updateJournal(String id) {
-        dbMapNode = dbMapNode.set(Journal.modifiesKey(jeName, id), dbFactoryRegistry.versionedNilMap);
-        dbMapNode = dbMapNode.set(Journal.journalEntryKey(id, jeName), dbFactoryRegistry.versionedNilMap);
+        create(Journal.modifiesKey(jeName, id));
+        create(Journal.journalEntryKey(id, jeName));
+    }
+
+    /**
+     * Set the list of id to versionedNilMap if the list is not present.
+     * @param id    The key for the list in dbMapNode.
+     */
+    public void create(String id) {
+        checkPrivilege();
+        if (!id.startsWith("$"))
+            throw new IllegalArgumentException("not an id or composite id: " + id);
+        ListNode listNode = dbMapNode.getList(id);
+        if (listNode != null)
+            return;
+        dbMapNode = dbMapNode.set(id, dbFactoryRegistry.versionedNilMap);
     }
 
     /**
