@@ -23,11 +23,11 @@ public class Journal {
     public static final String JOURNAL_ID = "$B";
 
     /**
-     * Returns a key used to connect a journal entry to what it modifies.
+     * Returns a composite id used to connect a journal entry to what it modifies.
      *
      * @param timestampId    The id of the journal entry.
-     * @param id           The id of the modified item.
-     * @return A key with 3 ids.
+     * @param id           The id of the modified versioned map list.
+     * @return A composite of 3 ids.
      */
     public static String modifiesKey(String timestampId, String id) {
         Timestamp.validateId(timestampId);
@@ -36,11 +36,11 @@ public class Journal {
     }
 
     /**
-     * Returns a key used to connect an item with the journal entries which modified it.
+     * Returns a composite id used to connect an item with the journal entries which modified it.
      *
      * @param timestampId    The id of the journal entry.
-     * @param id           The id of the modified item.
-     * @return A key with 3 ids.
+     * @param id           The id of the modified versioned map list.
+     * @return A composite of 3 ids.
      */
     public static String journalEntryKey(String id, String timestampId) {
         Timestamp.validateId(timestampId);
@@ -49,13 +49,13 @@ public class Journal {
     }
 
     /**
-     * Returns the last id in a composite key.
+     * Returns the last id in a composite.
      *
-     * @param key    A composite of several ids.
-     * @return The last id in the string.
+     * @param composite    A composite of several ids.
+     * @return The last id in the composite.
      */
-    public static String lastId(String key) {
-        return key.substring(key.lastIndexOf('$'));
+    public static String lastId(String composite) {
+        return composite.substring(composite.lastIndexOf('$'));
     }
 
     /**
