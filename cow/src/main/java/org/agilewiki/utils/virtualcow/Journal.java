@@ -1,7 +1,7 @@
 package org.agilewiki.utils.virtualcow;
 
-import org.agilewiki.utils.NameId;
-import org.agilewiki.utils.Timestamp;
+import org.agilewiki.utils.ids.NameId;
+import org.agilewiki.utils.ids.Timestamp;
 import org.agilewiki.utils.immutable.collections.ListAccessor;
 import org.agilewiki.utils.immutable.collections.MapAccessor;
 

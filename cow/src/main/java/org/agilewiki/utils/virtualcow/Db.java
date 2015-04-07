@@ -4,7 +4,7 @@ import org.agilewiki.jactor2.core.blades.IsolationBladeBase;
 import org.agilewiki.jactor2.core.messages.AsyncResponseProcessor;
 import org.agilewiki.jactor2.core.messages.impl.AsyncRequestImpl;
 import org.agilewiki.utils.BlockIOException;
-import org.agilewiki.utils.Timestamp;
+import org.agilewiki.utils.ids.Timestamp;
 import org.agilewiki.utils.dsm.DiskSpaceManager;
 import org.agilewiki.utils.immutable.CascadingRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;

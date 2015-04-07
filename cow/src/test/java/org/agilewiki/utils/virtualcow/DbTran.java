@@ -1,6 +1,6 @@
 package org.agilewiki.utils.virtualcow;
 
-import org.agilewiki.utils.NameId;
+import org.agilewiki.utils.ids.NameId;
 import org.agilewiki.utils.immutable.collections.MapNode;
 
 public class DbTran implements Transaction {

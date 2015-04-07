@@ -2,7 +2,7 @@ package org.agilewiki.utils.virtualcow;
 
 import junit.framework.TestCase;
 import org.agilewiki.jactor2.core.impl.Plant;
-import org.agilewiki.utils.NameId;
+import org.agilewiki.utils.ids.NameId;
 import org.agilewiki.utils.immutable.BaseRegistry;
 import org.agilewiki.utils.immutable.collections.ListAccessor;
 import org.agilewiki.utils.immutable.collections.MapAccessor;
