@@ -3,7 +3,11 @@ package org.agilewiki.utils.ids.composites;
 import org.agilewiki.utils.ids.NameId;
 import org.agilewiki.utils.ids.ValueId;
 import org.agilewiki.utils.immutable.collections.ListAccessor;
+import org.agilewiki.utils.immutable.collections.MapAccessor;
 import org.agilewiki.utils.immutable.collections.VersionedMapNode;
+import org.agilewiki.utils.virtualcow.Db;
+
+import java.util.Iterator;
 
 /**
  * An implementation of secondary ids for a Versioned Map List (VML).
@@ -41,6 +45,16 @@ public class SecondaryId {
         NameId.validateId(typeId);
         ValueId.validateId(valueId);
         return SECONDARY_ID + typeId + valueId;
+    }
+
+    public static void validateSecondaryId(String secondaryId) {
+        if (!secondaryId.startsWith(SECONDARY_ID + NameId.PREFIX))
+            throw new IllegalArgumentException("not a secondary id: " + secondaryId);
+        int i = secondaryId.indexOf('$', 4);
+        if (i < 0)
+            throw new IllegalArgumentException("not a secondary id: " + secondaryId);
+        if (!secondaryId.substring(i).startsWith(ValueId.PREFIX))
+            throw new IllegalArgumentException("not a secondary id: " + secondaryId);
     }
 
     /**
@@ -110,5 +124,45 @@ public class SecondaryId {
      */
     public static Iterable<ListAccessor> secondaryKeyListAccessors(VersionedMapNode vmn, long timestamp) {
         return vmn.iterable(SECONDARY_KEY, timestamp);
+    }
+
+    /**
+     * Iterates over the ids of the VMLs referenced by a secondary id.
+     *
+     * @param db             The database.
+     * @param secondaryId    The secondary id.
+     * @return The Iterable.
+     */
+    public static Iterable<String> secondaryIdIterable(Db db, String secondaryId) {
+        return secondaryIdIterable(db, secondaryId, db.getTimestamp());
+    }
+
+    /**
+     * Iterates over the ids of the VMLs referenced by a secondary id.
+     *
+     * @param db             The database.
+     * @param secondaryId    The secondary id.
+     * @param timestamp      The time of the query.
+     * @return The Iterable.
+     */
+    public static Iterable<String> secondaryIdIterable(Db db, String secondaryId, long timestamp) {
+        validateSecondaryId(secondaryId);
+        Iterator<ListAccessor> it = ((VersionedMapNode) db.mapAccessor().listAccessor(secondaryId).get(0)).mapAccessor().iterator();
+        return new Iterable<String>() {
+            @Override
+            public Iterator<String> iterator() {
+                return new Iterator<String>() {
+                    @Override
+                    public boolean hasNext() {
+                        return it.hasNext();
+                    }
+
+                    @Override
+                    public String next() {
+                        return (String) it.next().key();
+                    }
+                };
+            }
+        };
     }
 }
