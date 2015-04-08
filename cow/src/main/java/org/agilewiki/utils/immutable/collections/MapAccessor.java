@@ -28,7 +28,7 @@ public interface MapAccessor extends Iterable<ListAccessor> {
      * Returns a list accessor for the given time.
      *
      * @param key The key for the list.
-     * @return A list accessor for the given time.
+     * @return A list accessor for the given time, or null.
      */
     ListAccessor listAccessor(Comparable key);
 

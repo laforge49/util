@@ -4,6 +4,7 @@ import org.agilewiki.utils.ids.NameId;
 import org.agilewiki.utils.ids.ValueId;
 import org.agilewiki.utils.immutable.collections.ListAccessor;
 import org.agilewiki.utils.immutable.collections.MapAccessor;
+import org.agilewiki.utils.immutable.collections.VersionedListNode;
 import org.agilewiki.utils.immutable.collections.VersionedMapNode;
 import org.agilewiki.utils.virtualcow.Db;
 
@@ -164,5 +165,24 @@ public class SecondaryId {
                 };
             }
         };
+    }
+
+    public static boolean hasSecondaryId(Db db, String vmnId, String secondaryId, long timestamp) {
+        NameId.validateAnId(vmnId);
+        String typeId = secondaryIdType(secondaryId);
+        String valueId = secondaryIdValue(secondaryId);
+        String value = valueId.substring(2);
+        String secondaryKey = secondaryKey(typeId);
+        MapAccessor mapAccessor = db.mapAccessor();
+        ListAccessor listAccessor = mapAccessor.listAccessor(vmnId);
+        if (listAccessor == null)
+            return false;
+        VersionedMapNode versionedMapNode = (VersionedMapNode) listAccessor.get(0);
+        ListAccessor vlistAccessor = versionedMapNode.listAccessor(secondaryKey, timestamp);
+        for (Object x: vlistAccessor) {
+            if (value.equals(x))
+                return true;
+        }
+        return false;
     }
 }
