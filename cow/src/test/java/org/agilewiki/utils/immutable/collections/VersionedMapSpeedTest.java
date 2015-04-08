@@ -42,7 +42,7 @@ public class VersionedMapSpeedTest extends TestCase {
 
             long t4 = System.currentTimeMillis();
             VersionedMapNode m2 = (VersionedMapNode) registry.readId(byteBuffer).deserialize(byteBuffer);
-            String fk = (String) m2.firstKey(FactoryRegistry.MAX_TIME);
+            String fk = (String) m2.firstKey(FactoryRegistry.MAX_TIMESTAMP);
             m2 = m2.set("k0", "upd");
             ByteBuffer byteBuffer1 = ByteBuffer.allocate(m2.getDurableLength());
             m2.writeDurable(byteBuffer1);

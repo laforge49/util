@@ -2,6 +2,10 @@ package org.agilewiki.utils.ids.composites;
 
 import org.agilewiki.utils.ids.NameId;
 import org.agilewiki.utils.ids.ValueId;
+import org.agilewiki.utils.immutable.collections.ListAccessor;
+import org.agilewiki.utils.immutable.collections.VersionedMapNode;
+
+import java.util.Iterator;
 
 /**
  * An implementation of secondary ids for a Versioned Map List (VML).
@@ -38,7 +42,38 @@ public class SecondaryId {
         return SECONDARY_ID + NameId.generate(type) + ValueId.generate(value);
     }
 
-    public static Iterable<String> secondaryKeys(String id) {
-        return null;
+    /**
+     * Returns the name id of the secondary key type.
+     *
+     * @param secondaryKey    A secondary key.
+     * @return The name id.
+     */
+    public static String secondaryKeyType(String secondaryKey) {
+        if (!secondaryKey.startsWith(SECONDARY_KEY))
+            throw new IllegalArgumentException("not a secondary key: " + secondaryKey);
+        String nameId = secondaryKey.substring(2);
+        NameId.validateId(nameId);
+        return nameId;
+    }
+
+    /**
+     * Iterates over all the secondary key types for a given versioned list map.
+     *
+     * @param vmn    The versioned list map.
+     * @return An iterator of name ids.
+     */
+    public static Iterable<ListAccessor> secondaryKeyListAccessors(VersionedMapNode vmn) {
+        return secondaryKeyAccessors(vmn, vmn.getTimestamp());
+    }
+
+    /**
+     * Iterates over all the secondary key types for a given versioned list map.
+     *
+     * @param vmn          The versioned list map.
+     * @param timestamp    The time of the query.
+     * @return An iterator of name ids.
+     */
+    public static Iterable<ListAccessor> secondaryKeyListAccessors(VersionedMapNode vmn, long timestamp) {
+        return vmn.iterable(SECONDARY_KEY, timestamp);
     }
 }

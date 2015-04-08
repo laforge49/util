@@ -290,7 +290,7 @@ public interface VersionedListNode extends Releasable {
             }
 
             @Override
-            public long time() {
+            public long timestamp() {
                 return timestamp;
             }
 

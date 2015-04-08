@@ -277,8 +277,8 @@ public interface ListNode extends Releasable {
             }
 
             @Override
-            public long time() {
-                return FactoryRegistry.MAX_TIME;
+            public long timestamp() {
+                return FactoryRegistry.MAX_TIMESTAMP;
             }
 
             @Override

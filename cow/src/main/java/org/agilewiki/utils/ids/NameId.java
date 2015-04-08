@@ -31,6 +31,10 @@ public class NameId {
         }
     }
 
+    public static String name(String nameId) {
+        return nameId.substring(2);
+    }
+
     /**
      * Validate an id.
      *

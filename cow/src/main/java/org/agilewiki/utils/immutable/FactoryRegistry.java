@@ -10,7 +10,7 @@ public interface FactoryRegistry {
     /**
      * A time after all insertions and deletions.
      */
-    public final static long MAX_TIME = Long.MAX_VALUE - 1;
+    public final static long MAX_TIMESTAMP = Long.MAX_VALUE - 1;
 
     public static final char NULL_ID = 'N';
 

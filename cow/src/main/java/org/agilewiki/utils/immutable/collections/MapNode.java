@@ -361,8 +361,8 @@ public interface MapNode extends Releasable {
         return new MapAccessor() {
 
             @Override
-            public long time() {
-                return FactoryRegistry.MAX_TIME;
+            public long timestamp() {
+                return FactoryRegistry.MAX_TIMESTAMP;
             }
 
             @Override

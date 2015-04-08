@@ -22,7 +22,7 @@ public class VersionedListEmptyTest extends TestCase {
 
             ListAccessor la = registry.versionedNilList.listAccessor();
 
-            assertEquals(db.getTimestamp(), la.time());
+            assertEquals(db.getTimestamp(), la.timestamp());
 
             assertNull(la.get(-1));
             assertNull(la.get(0));

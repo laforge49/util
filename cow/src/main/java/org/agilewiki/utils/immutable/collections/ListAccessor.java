@@ -18,9 +18,9 @@ public interface ListAccessor extends Iterable {
     /**
      * Returns the time being accessed.
      *
-     * @return The time being accessed, or MAX_TIME.
+     * @return The time being accessed, or MAX_TIMESTAMP.
      */
-    long time();
+    long timestamp();
 
     /**
      * Returns the count of all the values currently in the list.
