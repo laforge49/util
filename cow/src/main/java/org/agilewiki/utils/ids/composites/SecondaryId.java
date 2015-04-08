@@ -63,7 +63,7 @@ public class SecondaryId {
      * @return An iterator of name ids.
      */
     public static Iterable<ListAccessor> secondaryKeyListAccessors(VersionedMapNode vmn) {
-        return secondaryKeyAccessors(vmn, vmn.getTimestamp());
+        return secondaryKeyListAccessors(vmn, vmn.getTimestamp());
     }
 
     /**
