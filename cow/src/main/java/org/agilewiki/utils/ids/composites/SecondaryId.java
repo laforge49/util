@@ -3,8 +3,6 @@ package org.agilewiki.utils.ids.composites;
 import org.agilewiki.utils.ids.NameId;
 import org.agilewiki.utils.ids.ValueId;
 import org.agilewiki.utils.immutable.collections.ListAccessor;
-import org.agilewiki.utils.immutable.collections.MapAccessor;
-import org.agilewiki.utils.immutable.collections.VersionedListNode;
 import org.agilewiki.utils.immutable.collections.VersionedMapNode;
 import org.agilewiki.utils.virtualcow.Db;
 
@@ -27,7 +25,7 @@ public class SecondaryId {
     /**
      * Returns a composite key for the value of a secondary id.
      *
-     * @param typeId    The type of secondary key.
+     * @param typeId The type of secondary key.
      * @return The composite key.
      */
     public static String secondaryKey(String typeId) {
@@ -38,8 +36,8 @@ public class SecondaryId {
     /**
      * Returns a composite id for a secondary identifier.
      *
-     * @param typeId     The type of secondary key.
-     * @param valueId    The value of the secondary key.
+     * @param typeId  The type of secondary key.
+     * @param valueId The value of the secondary key.
      * @return The composite id.
      */
     public static String secondaryId(String typeId, String valueId) {
@@ -61,7 +59,7 @@ public class SecondaryId {
     /**
      * Returns the name id of the secondary key type.
      *
-     * @param secondaryKey    A secondary key.
+     * @param secondaryKey A secondary key.
      * @return The name id.
      */
     public static String secondaryKeyType(String secondaryKey) {
@@ -75,7 +73,7 @@ public class SecondaryId {
     /**
      * Returns the name id of the secondary id type.
      *
-     * @param secondaryId    A secondary id.
+     * @param secondaryId A secondary id.
      * @return The name id.
      */
     public static String secondaryIdType(String secondaryId) {
@@ -92,7 +90,7 @@ public class SecondaryId {
     /**
      * Returns the value id of the secondary id type.
      *
-     * @param secondaryId    A secondary id.
+     * @param secondaryId A secondary id.
      * @return The value id.
      */
     public static String secondaryIdValue(String secondaryId) {
@@ -109,8 +107,8 @@ public class SecondaryId {
     /**
      * Iterates over all the secondary keys for a given versioned list map.
      *
-     * @param vmn          The versioned list map.
-     * @param timestamp    The time of the query.
+     * @param vmn       The versioned list map.
+     * @param timestamp The time of the query.
      * @return An iterator of list accessors.
      */
     public static Iterable<ListAccessor> secondaryKeyListAccessors(VersionedMapNode vmn, long timestamp) {
@@ -120,9 +118,9 @@ public class SecondaryId {
     /**
      * Iterates over the ids of the VMLs referenced by a secondary id.
      *
-     * @param db             The database.
-     * @param secondaryId    The secondary id.
-     * @param timestamp      The time of the query.
+     * @param db          The database.
+     * @param secondaryId The secondary id.
+     * @param timestamp   The time of the query.
      * @return The Iterable, or null.
      */
     public static Iterable<String> secondaryIdIterable(Db db, String secondaryId, long timestamp) {
@@ -149,15 +147,40 @@ public class SecondaryId {
         };
     }
 
-    public static boolean hasSecondaryId(Db db, String vmnId, String secondaryId, long timestamp) {
-        NameId.validateAnId(vmnId);
+    /**
+     * Returns true iff the vmn has the given secondary id.
+     *
+     * @param db             The database.
+     * @param vmlId          The id of the vml.
+     * @param secondaryId    The secondary id.
+     * @param timestamp      The time of the query.
+     * @return True if the secondary key is present.
+     */
+    public static boolean hasSecondaryId(Db db, String vmlId, String secondaryId, long timestamp) {
+        NameId.validateAnId(vmlId);
         ListAccessor listAccessor = db.mapAccessor().listAccessor(secondaryId);
         if (listAccessor == null)
             return false;
         VersionedMapNode versionedMapNode = (VersionedMapNode) listAccessor.get(0);
-        ListAccessor vlistAccessor = versionedMapNode.listAccessor(vmnId, timestamp);
+        ListAccessor vlistAccessor = versionedMapNode.listAccessor(vmlId, timestamp);
         if (vlistAccessor == null)
             return false;
         return !vlistAccessor.isEmpty();
+    }
+
+    /**
+     * Add a secondary key to a vml if not already present.
+     *
+     * @param db             The database.
+     * @param vmlId          The id of the vml.
+     * @param secondaryId    The secondary id.
+     */
+    public static void createSecondaryId(Db db, String vmlId, String secondaryId) {
+        if (hasSecondaryId(db, vmlId, secondaryId, db.getTimestamp()))
+            return;
+        db.set(secondaryId, vmlId, true);
+        db.add(vmlId,
+                secondaryKey(secondaryIdType(secondaryId)),
+                ValueId.value(secondaryIdValue(secondaryId)));
     }
 }

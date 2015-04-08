@@ -20,8 +20,24 @@ public class ValueId {
         return PREFIX + value;
     }
 
+    /**
+     * Validate a valueId.
+     *
+     * @param valueId    The valueId.
+     */
     public static void validateId(String valueId) {
         if (!valueId.startsWith("$v"))
             throw new IllegalArgumentException("not a valid valueId: "+valueId);
+    }
+
+    /**
+     * Returns the value of a valueId.
+     *
+     * @param valueId    The valueId.
+     * @return The value.
+     */
+    public static String value(String valueId) {
+        validateId(valueId);
+        return valueId.substring(2);
     }
 }
