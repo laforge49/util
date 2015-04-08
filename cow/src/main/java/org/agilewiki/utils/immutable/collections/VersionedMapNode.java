@@ -44,6 +44,12 @@ public interface VersionedMapNode extends Releasable {
         return this == getRegistry().versionedNilMap;
     }
 
+    /**
+     * Returns the list for the node.
+     *
+     * @param key The key for the node.
+     * @return The list, or null.
+     */
     default VersionedListNode getList(Comparable key) {
         if (isNil())
             return getRegistry().versionedNilList;

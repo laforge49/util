@@ -132,7 +132,7 @@ public class SecondaryId {
      *
      * @param db             The database.
      * @param secondaryId    The secondary id.
-     * @return The Iterable.
+     * @return The Iterable, or null.
      */
     public static Iterable<String> secondaryIdIterable(Db db, String secondaryId) {
         return secondaryIdIterable(db, secondaryId, db.getTimestamp());
@@ -144,11 +144,14 @@ public class SecondaryId {
      * @param db             The database.
      * @param secondaryId    The secondary id.
      * @param timestamp      The time of the query.
-     * @return The Iterable.
+     * @return The Iterable, or null.
      */
     public static Iterable<String> secondaryIdIterable(Db db, String secondaryId, long timestamp) {
         validateSecondaryId(secondaryId);
-        Iterator<ListAccessor> it = ((VersionedMapNode) db.mapAccessor().listAccessor(secondaryId).get(0)).mapAccessor().iterator();
+        ListAccessor listAccessor = db.mapAccessor().listAccessor(secondaryId);
+        if (listAccessor == null)
+            return null;
+        Iterator<ListAccessor> it = ((VersionedMapNode) listAccessor.get(0)).mapAccessor().iterator();
         return new Iterable<String>() {
             @Override
             public Iterator<String> iterator() {
@@ -179,6 +182,8 @@ public class SecondaryId {
             return false;
         VersionedMapNode versionedMapNode = (VersionedMapNode) listAccessor.get(0);
         ListAccessor vlistAccessor = versionedMapNode.listAccessor(secondaryKey, timestamp);
+        if (vlistAccessor == null)
+            return false;
         for (Object x: vlistAccessor) {
             if (value.equals(x))
                 return true;
