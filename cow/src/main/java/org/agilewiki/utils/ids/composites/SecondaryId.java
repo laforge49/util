@@ -158,11 +158,10 @@ public class SecondaryId {
      */
     public static boolean hasSecondaryId(Db db, String vmlId, String secondaryId, long timestamp) {
         NameId.validateAnId(vmlId);
-        ListAccessor listAccessor = db.mapAccessor().listAccessor(secondaryId);
-        if (listAccessor == null)
+        VersionedMapNode vmn = db.versionedMapNode(secondaryId);
+        if (vmn == null)
             return false;
-        VersionedMapNode versionedMapNode = (VersionedMapNode) listAccessor.get(0);
-        ListAccessor vlistAccessor = versionedMapNode.listAccessor(vmlId, timestamp);
+        ListAccessor vlistAccessor = vmn.listAccessor(vmlId, timestamp);
         if (vlistAccessor == null)
             return false;
         return !vlistAccessor.isEmpty();

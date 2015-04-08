@@ -77,6 +77,19 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         return (isPrivileged() ? dbMapNode : mapNode).mapAccessor();
     }
 
+    /**
+     * Returns a Versioned Map Node (VMM) for the given id.
+     *
+     * @param id    The id of the VMN.
+     * @return The VMN, or null.
+     */
+    public VersionedMapNode versionedMapNode(String id) {
+        ListAccessor listAccessor = mapAccessor().listAccessor(id);
+        if (listAccessor == null)
+            return null;
+        return (VersionedMapNode) listAccessor.get(0);
+    }
+
     private void updateJournal(String id) {
         create(Journal.modifiesKey(jeName, id));
         create(Journal.journalEntryKey(id, jeName));
