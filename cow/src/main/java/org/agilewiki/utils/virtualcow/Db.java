@@ -90,6 +90,13 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         return (VersionedMapNode) listAccessor.get(0);
     }
 
+    public VersionedListNode versionedListNode(String id, String key) {
+        VersionedMapNode versionedMapNode = versionedMapNode(id);
+        if (versionedMapNode == null)
+            return null;
+        return versionedMapNode.getList(key);
+    }
+
     private void updateJournal(String id) {
         create(Journal.modifiesKey(jeName, id));
         create(Journal.journalEntryKey(id, jeName));

@@ -3,6 +3,7 @@ package org.agilewiki.utils.ids.composites;
 import org.agilewiki.utils.ids.NameId;
 import org.agilewiki.utils.ids.ValueId;
 import org.agilewiki.utils.immutable.collections.ListAccessor;
+import org.agilewiki.utils.immutable.collections.VersionedListNode;
 import org.agilewiki.utils.immutable.collections.VersionedMapNode;
 import org.agilewiki.utils.virtualcow.Db;
 
@@ -158,13 +159,10 @@ public class SecondaryId {
      */
     public static boolean hasSecondaryId(Db db, String vmlId, String secondaryId, long timestamp) {
         NameId.validateAnId(vmlId);
-        VersionedMapNode vmn = db.versionedMapNode(secondaryId);
-        if (vmn == null)
+        VersionedListNode vln = db.versionedListNode(secondaryId, vmlId);
+        if (vln == null)
             return false;
-        ListAccessor vlistAccessor = vmn.listAccessor(vmlId, timestamp);
-        if (vlistAccessor == null)
-            return false;
-        return !vlistAccessor.isEmpty();
+        return !vln.isEmpty(timestamp);
     }
 
     /**
