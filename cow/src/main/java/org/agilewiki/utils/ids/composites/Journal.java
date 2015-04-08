@@ -31,7 +31,7 @@ public class Journal {
      */
     public static String modifiesKey(String timestampId, String id) {
         Timestamp.validateId(timestampId);
-        NameId.validateId(id);
+        NameId.validateAnId(id);
         return MODIFIES_ID + timestampId + id;
     }
 
@@ -44,7 +44,7 @@ public class Journal {
      */
     public static String journalEntryKey(String id, String timestampId) {
         Timestamp.validateId(timestampId);
-        NameId.validateId(id);
+        NameId.validateAnId(id);
         return JOURNAL_ID + id + timestampId;
     }
 
@@ -97,7 +97,7 @@ public class Journal {
      * @return The iterable.
      */
     public static Iterable<String> journal(Db db, String id) {
-        NameId.validateId(id);
+        NameId.validateAnId(id);
         MapAccessor ma = db.mapAccessor();
         Iterator<ListAccessor> it = ma.iterator(JOURNAL_ID + id);
         return new Iterable<String>() {

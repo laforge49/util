@@ -22,22 +22,25 @@ public class SecondaryId {
     /**
      * Returns a composite key for the value of a secondary id.
      *
-     * @param type    The type of secondary key.
+     * @param typeId    The type of secondary key.
      * @return The composite key.
      */
-    public static String secondaryKey(String type) {
-        return SECONDARY_KEY + NameId.generate(type);
+    public static String secondaryKey(String typeId) {
+        NameId.validateId(typeId);
+        return SECONDARY_KEY + typeId;
     }
 
     /**
      * Returns a composite id for a secondary identifier.
      *
-     * @param type     The type of secondary key.
-     * @param value    The value of the secondary key.
+     * @param typeId     The type of secondary key.
+     * @param valueId    The value of the secondary key.
      * @return The composite id.
      */
-    public static String secondaryId(String type, String value) {
-        return SECONDARY_ID + NameId.generate(type) + ValueId.generate(value);
+    public static String secondaryId(String typeId, String valueId) {
+        NameId.validateId(typeId);
+        ValueId.validateId(valueId);
+        return SECONDARY_ID + typeId + valueId;
     }
 
     /**
@@ -69,6 +72,23 @@ public class SecondaryId {
         String nameId = secondaryId.substring(2, i);
         NameId.validateId(nameId);
         return nameId;
+    }
+
+    /**
+     * Returns the value id of the secondary id type.
+     *
+     * @param secondaryId    A secondary id.
+     * @return The value id.
+     */
+    public static String secondaryIdValue(String secondaryId) {
+        if (!secondaryId.startsWith(SECONDARY_ID))
+            throw new IllegalArgumentException("not a secondary id: " + secondaryId);
+        int i = secondaryId.indexOf('$', 3);
+        if (i < 0)
+            throw new IllegalArgumentException("not a secondary id: " + secondaryId);
+        String valueId = secondaryId.substring(i);
+        ValueId.validateId(valueId);
+        return valueId;
     }
 
     /**

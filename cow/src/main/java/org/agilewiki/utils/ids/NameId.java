@@ -43,9 +43,20 @@ public class NameId {
      *
      * @param id    The id to be validated.
      */
-    public static void validateId(String id) {
+    public static void validateAnId(String id) {
         if (!id.startsWith("$") || id.length() < 2)
             throw new IllegalArgumentException("not a valid id: " + id);
         validate(id.substring(1));
+    }
+
+    /**
+     * Validate a name id.
+     *
+     * @param nameId    The name id to be validated.
+     */
+    public static void validateId(String nameId) {
+        if (!nameId.startsWith("$n"))
+            throw new IllegalArgumentException("not a valid name id: " + nameId);
+        validate(nameId.substring(2));
     }
 }

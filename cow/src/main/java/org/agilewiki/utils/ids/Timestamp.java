@@ -80,7 +80,7 @@ public class Timestamp {
     }
 
     public static void validateId(String timestampId) {
-        NameId.validateId(timestampId);
+        NameId.validateAnId(timestampId);
         if (!timestampId.startsWith(Timestamp.PREFIX))
             throw new IllegalArgumentException("not a timestamp id: " + timestampId);
     }

@@ -19,4 +19,9 @@ public class ValueId {
     public static String generate(String value) {
         return PREFIX + value;
     }
+
+    public static void validateId(String valueId) {
+        if (!valueId.startsWith("$v"))
+            throw new IllegalArgumentException("not a valid valueId: "+valueId);
+    }
 }
