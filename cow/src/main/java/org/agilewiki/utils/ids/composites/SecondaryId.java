@@ -55,6 +55,23 @@ public class SecondaryId {
     }
 
     /**
+     * Returns the name id of the secondary id type.
+     *
+     * @param secondaryId    A secondary id.
+     * @return The name id.
+     */
+    public static String secondaryIdType(String secondaryId) {
+        if (!secondaryId.startsWith(SECONDARY_ID))
+            throw new IllegalArgumentException("not a secondary id: " + secondaryId);
+        int i = secondaryId.indexOf('$', 3);
+        if (i < 0)
+            throw new IllegalArgumentException("not a secondary id: " + secondaryId);
+        String nameId = secondaryId.substring(2, i);
+        NameId.validateId(nameId);
+        return nameId;
+    }
+
+    /**
      * Iterates over all the secondary keys for a given versioned list map.
      *
      * @param vmn    The versioned list map.
