@@ -5,6 +5,9 @@ package org.agilewiki.utils.ids;
  * content of a ValueId.
  */
 public class ValueId {
+    /**
+     * Used to add an arbitrary string to a composite id.
+     */
     public static final String PREFIX = "$v";
 
     /**

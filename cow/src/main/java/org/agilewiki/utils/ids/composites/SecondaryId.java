@@ -5,8 +5,6 @@ import org.agilewiki.utils.ids.ValueId;
 import org.agilewiki.utils.immutable.collections.ListAccessor;
 import org.agilewiki.utils.immutable.collections.VersionedMapNode;
 
-import java.util.Iterator;
-
 /**
  * An implementation of secondary ids for a Versioned Map List (VML).
  */
@@ -57,21 +55,21 @@ public class SecondaryId {
     }
 
     /**
-     * Iterates over all the secondary key types for a given versioned list map.
+     * Iterates over all the secondary keys for a given versioned list map.
      *
      * @param vmn    The versioned list map.
-     * @return An iterator of name ids.
+     * @return An iterator of list accessors.
      */
     public static Iterable<ListAccessor> secondaryKeyListAccessors(VersionedMapNode vmn) {
         return secondaryKeyListAccessors(vmn, vmn.getTimestamp());
     }
 
     /**
-     * Iterates over all the secondary key types for a given versioned list map.
+     * Iterates over all the secondary keys for a given versioned list map.
      *
      * @param vmn          The versioned list map.
      * @param timestamp    The time of the query.
-     * @return An iterator of name ids.
+     * @return An iterator of list accessors.
      */
     public static Iterable<ListAccessor> secondaryKeyListAccessors(VersionedMapNode vmn, long timestamp) {
         return vmn.iterable(SECONDARY_KEY, timestamp);

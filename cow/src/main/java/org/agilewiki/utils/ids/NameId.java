@@ -5,7 +5,14 @@ package org.agilewiki.utils.ids;
  * This is used when an identifier is needed which is neither random nor a timestamp.
  */
 public class NameId {
+    /**
+     * Used to wrap a name into an id.
+     */
     public static final String PREFIX = "$n";
+
+    public static String name(String nameId) {
+        return nameId.substring(2);
+    }
 
     /**
      * Generate an id by prefixing a name with $n.
@@ -29,10 +36,6 @@ public class NameId {
             if (c <= '$')
                 throw new IllegalArgumentException("may not contain char <= $");
         }
-    }
-
-    public static String name(String nameId) {
-        return nameId.substring(2);
     }
 
     /**
