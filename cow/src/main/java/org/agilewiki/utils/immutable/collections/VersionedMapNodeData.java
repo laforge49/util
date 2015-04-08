@@ -295,30 +295,30 @@ public class VersionedMapNodeData implements Releasable {
      * Builds a set of all keys with non-empty lists for the given time.
      *
      * @param keys The set being built.
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      */
-    public void flatKeys(NavigableSet<Comparable> keys, long time) {
+    public void flatKeys(NavigableSet<Comparable> keys, long timestamp) {
         if (isNil())
             return;
-        leftNode.getData().flatKeys(keys, time);
-        if (!listNode.isEmpty(time))
+        leftNode.getData().flatKeys(keys, timestamp);
+        if (!listNode.isEmpty(timestamp))
             keys.add(key);
-        rightNode.getData().flatKeys(keys, time);
+        rightNode.getData().flatKeys(keys, timestamp);
     }
 
     /**
      * Builds a map of all the keys and values present at the given time.
      *
      * @param map  The map being built.
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      */
-    public void flatMap(NavigableMap<Comparable, List> map, long time) {
+    public void flatMap(NavigableMap<Comparable, List> map, long timestamp) {
         if (isNil())
             return;
-        leftNode.getData().flatMap(map, time);
-        if (!listNode.isEmpty(time))
-            map.put(key, listNode.flatList(time));
-        rightNode.getData().flatMap(map, time);
+        leftNode.getData().flatMap(map, timestamp);
+        if (!listNode.isEmpty(timestamp))
+            map.put(key, listNode.flatList(timestamp));
+        rightNode.getData().flatMap(map, timestamp);
     }
 
     /**
@@ -326,15 +326,15 @@ public class VersionedMapNodeData implements Releasable {
      * (This is a shallow copy, as the values in the lists are not copied.)
      *
      * @param n    The map being built.
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return The revised copy root.
      */
-    public VersionedMapNode copyMap(VersionedMapNode n, long time) {
+    public VersionedMapNode copyMap(VersionedMapNode n, long timestamp) {
         if (isNil())
             return n;
-        n = leftNode.getData().copyMap(n, time);
-        n = n.getData().addList(key, listNode.copyList(time));
-        return leftNode.getData().copyMap(n, time);
+        n = leftNode.getData().copyMap(n, timestamp);
+        n = n.getData().addList(key, listNode.copyList(timestamp));
+        return leftNode.getData().copyMap(n, timestamp);
     }
 
     protected VersionedMapNode addList(Comparable key, VersionedListNode listNode) {
@@ -370,14 +370,14 @@ public class VersionedMapNodeData implements Releasable {
     /**
      * Returns the count of all the keys with a non-empty list.
      *
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return The current size of the map.
      */
-    public int size(long time) {
+    public int size(long timestamp) {
         if (isNil())
             return 0;
-        int s = leftNode.size(time) + rightNode.size(time);
-        if (!listNode.isEmpty(time))
+        int s = leftNode.size(timestamp) + rightNode.size(timestamp);
+        if (!listNode.isEmpty(timestamp))
             s += 1;
         return s;
     }
@@ -385,119 +385,119 @@ public class VersionedMapNodeData implements Releasable {
     /**
      * Returns the smallest key of the non-empty lists for the given time.
      *
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return The smallest key, or null.
      */
-    public Comparable firstKey(long time) {
+    public Comparable firstKey(long timestamp) {
         if (isNil())
             return null;
-        Comparable k = leftNode.firstKey(time);
+        Comparable k = leftNode.firstKey(timestamp);
         if (k != null)
             return k;
-        if (!listNode.isEmpty(time))
+        if (!listNode.isEmpty(timestamp))
             return key;
-        return rightNode.firstKey(time);
+        return rightNode.firstKey(timestamp);
     }
 
     /**
      * Returns the largest key of the non-empty lists for the given time.
      *
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return The largest key, or null.
      */
-    public Comparable lastKey(long time) {
+    public Comparable lastKey(long timestamp) {
         if (isNil())
             return null;
-        Comparable k = rightNode.lastKey(time);
+        Comparable k = rightNode.lastKey(timestamp);
         if (k != null)
             return k;
-        if (!listNode.isEmpty(time))
+        if (!listNode.isEmpty(timestamp))
             return key;
-        return leftNode.lastKey(time);
+        return leftNode.lastKey(timestamp);
     }
 
     /**
      * Returns the next greater key.
      *
      * @param key  The given key.
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return The next greater key with content at the time of the query, or null.
      */
-    public Comparable higherKey(Comparable key, long time) {
+    public Comparable higherKey(Comparable key, long timestamp) {
         if (isNil())
             return null;
         int c = key.compareTo(this.key);
         if (c <= 0) {
-            Comparable k = leftNode.higherKey(key, time);
+            Comparable k = leftNode.higherKey(key, timestamp);
             if (k != null)
                 return k;
         }
-        if (c < 0 && !listNode.isEmpty(time))
+        if (c < 0 && !listNode.isEmpty(timestamp))
             return this.key;
-        return rightNode.higherKey(key, time);
+        return rightNode.higherKey(key, timestamp);
     }
 
     /**
      * Returns the key with content that is greater than or equal to the given key.
      *
      * @param key  The given key.
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return The key greater than or equal to the given key, or null.
      */
-    public Comparable ceilingKey(Comparable key, long time) {
+    public Comparable ceilingKey(Comparable key, long timestamp) {
         if (isNil())
             return null;
         int c = key.compareTo(this.key);
         if (c < 0) {
-            Comparable k = leftNode.ceilingKey(key, time);
+            Comparable k = leftNode.ceilingKey(key, timestamp);
             if (k != null)
                 return k;
         }
-        if (c <= 0 && !listNode.isEmpty(time))
+        if (c <= 0 && !listNode.isEmpty(timestamp))
             return this.key;
-        return rightNode.ceilingKey(key, time);
+        return rightNode.ceilingKey(key, timestamp);
     }
 
     /**
      * Returns the next smaller key.
      *
      * @param key  The given key.
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return The next smaller key with content at the time of the query, or null.
      */
-    public Comparable lowerKey(Comparable key, long time) {
+    public Comparable lowerKey(Comparable key, long timestamp) {
         if (isNil())
             return null;
         int c = key.compareTo(this.key);
         if (c >= 0) {
-            Comparable k = rightNode.lowerKey(key, time);
+            Comparable k = rightNode.lowerKey(key, timestamp);
             if (k != null)
                 return k;
         }
-        if (c > 0 && !listNode.isEmpty(time))
+        if (c > 0 && !listNode.isEmpty(timestamp))
             return this.key;
-        return leftNode.lowerKey(key, time);
+        return leftNode.lowerKey(key, timestamp);
     }
 
     /**
      * Returns the key with content that is smaller than or equal to the given key.
      *
      * @param key  The given key.
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return The key smaller than or equal to the given key, or null.
      */
-    public Comparable floorKey(Comparable key, long time) {
+    public Comparable floorKey(Comparable key, long timestamp) {
         if (isNil())
             return null;
         int c = key.compareTo(this.key);
         if (c > 0) {
-            Comparable k = rightNode.floorKey(key, time);
+            Comparable k = rightNode.floorKey(key, timestamp);
             if (k != null)
                 return k;
         }
-        if (c >= 0 && !listNode.isEmpty(time))
+        if (c >= 0 && !listNode.isEmpty(timestamp))
             return this.key;
-        return leftNode.floorKey(key, time);
+        return leftNode.floorKey(key, timestamp);
     }
 
     /**

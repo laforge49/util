@@ -37,4 +37,8 @@ public class SecondaryId {
     public static String secondaryId(String type, String value) {
         return SECONDARY_ID + NameId.generate(type) + ValueId.generate(value);
     }
+
+    public static Iterable<String> secondaryKeys(String id) {
+        return null;
+    }
 }

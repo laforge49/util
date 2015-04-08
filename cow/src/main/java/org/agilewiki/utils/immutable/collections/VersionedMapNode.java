@@ -75,11 +75,11 @@ public interface VersionedMapNode extends Releasable {
      * Returns a list accessor for the given time.
      *
      * @param key  The key for the list.
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return A list accessor for the given time.
      */
-    default ListAccessor listAccessor(Comparable key, long time) {
-        return getList(key).listAccessor(key, time);
+    default ListAccessor listAccessor(Comparable key, long timestamp) {
+        return getList(key).listAccessor(key, timestamp);
     }
 
     /**
@@ -183,34 +183,34 @@ public interface VersionedMapNode extends Releasable {
      * Copy everything in the list except what was deleted before a given time.
      * (This is a shallow copy, as the values in the list are not copied.)
      *
-     * @param time The given time.
+     * @param timestamp The given time.
      * @return A shortened copy of the list without some historical values.
      */
-    default VersionedListNode copyList(Comparable key, long time) {
-        return getList(key).copyList(time);
+    default VersionedListNode copyList(Comparable key, long timestamp) {
+        return getList(key).copyList(timestamp);
     }
 
     /**
      * Returns a set of all keys with non-empty lists for the given time.
      *
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return A set of the keys with content at the time of the query.
      */
-    default NavigableSet<Comparable> flatKeys(long time) {
+    default NavigableSet<Comparable> flatKeys(long timestamp) {
         NavigableSet keys = new TreeSet<>();
-        getData().flatKeys(keys, time);
+        getData().flatKeys(keys, timestamp);
         return keys;
     }
 
     /**
      * Returns a map of all the keys and values present at the given time.
      *
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return A map of lists.
      */
-    default NavigableMap<Comparable, List> flatMap(long time) {
+    default NavigableMap<Comparable, List> flatMap(long timestamp) {
         NavigableMap<Comparable, List> map = new TreeMap<Comparable, List>();
-        getData().flatMap(map, time);
+        getData().flatMap(map, timestamp);
         return map;
     }
 
@@ -227,11 +227,11 @@ public interface VersionedMapNode extends Releasable {
      * Copy everything except what was deleted before a given time.
      * (This is a shallow copy, as the values in the lists are not copied.)
      *
-     * @param time The given time.
+     * @param timestamp The given time.
      * @return A shortened copy of the map without some historical values.
      */
-    default VersionedMapNode copyMap(long time) {
-        return getData().copyMap(getRegistry().versionedNilMap, time);
+    default VersionedMapNode copyMap(long timestamp) {
+        return getData().copyMap(getRegistry().versionedNilMap, timestamp);
     }
 
     /**
@@ -248,115 +248,115 @@ public interface VersionedMapNode extends Releasable {
     /**
      * Returns the count of all the keys with a non-empty list.
      *
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return The current size of the map.
      */
-    default int size(long time) {
+    default int size(long timestamp) {
         if (isNil())
             return 0;
-        return getData().size(time);
+        return getData().size(timestamp);
     }
 
     /**
      * Returns the smallest key of the non-empty lists for the given time.
      *
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return The smallest key, or null.
      */
-    default Comparable firstKey(long time) {
+    default Comparable firstKey(long timestamp) {
         if (isNil())
             return null;
-        return getData().firstKey(time);
+        return getData().firstKey(timestamp);
     }
 
     /**
      * Returns the largest key of the non-empty lists for the given time.
      *
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return The largest key, or null.
      */
-    default Comparable lastKey(long time) {
+    default Comparable lastKey(long timestamp) {
         if (isNil())
             return null;
-        return getData().lastKey(time);
+        return getData().lastKey(timestamp);
     }
 
     /**
      * Returns the next greater key.
      *
      * @param key  The given key.
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return The next greater key with content at the time of the query, or null.
      */
-    default Comparable higherKey(Comparable key, long time) {
+    default Comparable higherKey(Comparable key, long timestamp) {
         if (isNil())
             return null;
-        return getData().higherKey(key, time);
+        return getData().higherKey(key, timestamp);
     }
 
     /**
      * Returns the key with content that is greater than or equal to the given key.
      *
      * @param key  The given key.
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return The key greater than or equal to the given key, or null.
      */
-    default Comparable ceilingKey(Comparable key, long time) {
+    default Comparable ceilingKey(Comparable key, long timestamp) {
         if (isNil())
             return null;
-        return getData().ceilingKey(key, time);
+        return getData().ceilingKey(key, timestamp);
     }
 
     /**
      * Returns the next smaller key.
      *
      * @param key  The given key.
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return The next smaller key with content at the time of the query, or null.
      */
-    default Comparable lowerKey(Comparable key, long time) {
+    default Comparable lowerKey(Comparable key, long timestamp) {
         if (isNil())
             return null;
-        return getData().lowerKey(key, time);
+        return getData().lowerKey(key, timestamp);
     }
 
     /**
      * Returns the key with content that is smaller than or equal to the given key.
      *
      * @param key  The given key.
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return The key smaller than or equal to the given key, or null.
      */
-    default Comparable floorKey(Comparable key, long time) {
+    default Comparable floorKey(Comparable key, long timestamp) {
         if (isNil())
             return null;
-        return getData().floorKey(key, time);
+        return getData().floorKey(key, timestamp);
     }
 
     /**
      * Returns an iterator over the non-empty list accessors.
      *
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return The iterator.
      */
-    default Iterator<ListAccessor> iterator(long time) {
+    default Iterator<ListAccessor> iterator(long timestamp) {
         return new Iterator<ListAccessor>() {
             Comparable last = null;
 
             @Override
             public boolean hasNext() {
                 if (last == null)
-                    return firstKey(time) != null;
-                return higherKey(last, time) != null;
+                    return firstKey(timestamp) != null;
+                return higherKey(last, timestamp) != null;
             }
 
             @Override
             public ListAccessor next() {
-                Comparable next = last == null ? firstKey(time) : higherKey(last, time);
+                Comparable next = last == null ? firstKey(timestamp) : higherKey(last, timestamp);
                 if (next == null)
                     throw new NoSuchElementException();
                 last = next;
-                return listAccessor(last, time);
+                return listAccessor(last, timestamp);
             }
         };
     }
@@ -366,11 +366,11 @@ public interface VersionedMapNode extends Releasable {
      * with keys whose toString start with the given prefix.
      *
      * @param prefix The qualifying prefix.
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return The iterator.
      */
-    default Iterator<ListAccessor> iterator(String prefix, long time) {
-        return iterable(prefix, time).iterator();
+    default Iterator<ListAccessor> iterator(String prefix, long timestamp) {
+        return iterable(prefix, timestamp).iterator();
     }
 
     /**
@@ -378,10 +378,10 @@ public interface VersionedMapNode extends Releasable {
      * with keys whose toString start with the given prefix.
      *
      * @param prefix The qualifying prefix.
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return The iterator.
      */
-    default Iterable<ListAccessor> iterable(String prefix, long time) {
+    default Iterable<ListAccessor> iterable(String prefix, long timestamp) {
         return new Iterable<ListAccessor>() {
             @Override
             public Iterator<ListAccessor> iterator() {
@@ -391,8 +391,8 @@ public interface VersionedMapNode extends Releasable {
                     @Override
                     public boolean hasNext() {
                         if (last == null)
-                            return ceilingKey(prefix, time) != null;
-                        Comparable hk = higherKey(last, time);
+                            return ceilingKey(prefix, timestamp) != null;
+                        Comparable hk = higherKey(last, timestamp);
                         if (hk == null)
                             return false;
                         return hk.toString().startsWith(prefix);
@@ -400,7 +400,7 @@ public interface VersionedMapNode extends Releasable {
 
                     @Override
                     public ListAccessor next() {
-                        Comparable next = last == null ? ceilingKey(prefix, time) : higherKey(last, time);
+                        Comparable next = last == null ? ceilingKey(prefix, timestamp) : higherKey(last, timestamp);
                         if (next == null || !next.toString().startsWith(prefix))
                             throw new NoSuchElementException();
                         last = next;
@@ -423,80 +423,80 @@ public interface VersionedMapNode extends Releasable {
     /**
      * Returns a map accessor for a given time.
      *
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return A map accessor for the given time.
      */
-    default MapAccessor mapAccessor(long time) {
+    default MapAccessor mapAccessor(long timestamp) {
         return new MapAccessor() {
 
             @Override
             public long time() {
-                return time;
+                return timestamp;
             }
 
             @Override
             public int size() {
-                return VersionedMapNode.this.size(time);
+                return VersionedMapNode.this.size(timestamp);
             }
 
             @Override
             public ListAccessor listAccessor(Comparable key) {
-                return VersionedMapNode.this.listAccessor(key, time);
+                return VersionedMapNode.this.listAccessor(key, timestamp);
             }
 
             @Override
             public NavigableSet<Comparable> flatKeys() {
-                return VersionedMapNode.this.flatKeys(time);
+                return VersionedMapNode.this.flatKeys(timestamp);
             }
 
             @Override
             public Comparable firstKey() {
-                return VersionedMapNode.this.firstKey(time);
+                return VersionedMapNode.this.firstKey(timestamp);
             }
 
             @Override
             public Comparable lastKey() {
-                return VersionedMapNode.this.lastKey(time);
+                return VersionedMapNode.this.lastKey(timestamp);
             }
 
             @Override
             public Comparable higherKey(Comparable key) {
-                return VersionedMapNode.this.higherKey(key, time);
+                return VersionedMapNode.this.higherKey(key, timestamp);
             }
 
             @Override
             public Comparable ceilingKey(Comparable key) {
-                return VersionedMapNode.this.ceilingKey(key, time);
+                return VersionedMapNode.this.ceilingKey(key, timestamp);
             }
 
             @Override
             public Comparable lowerKey(Comparable key) {
-                return VersionedMapNode.this.lowerKey(key, time);
+                return VersionedMapNode.this.lowerKey(key, timestamp);
             }
 
             @Override
             public Comparable floorKey(Comparable key) {
-                return VersionedMapNode.this.floorKey(key, time);
+                return VersionedMapNode.this.floorKey(key, timestamp);
             }
 
             @Override
             public Iterator<ListAccessor> iterator() {
-                return VersionedMapNode.this.iterator(time);
+                return VersionedMapNode.this.iterator(timestamp);
             }
 
             @Override
             public Iterator<ListAccessor> iterator(final String prefix) {
-                return VersionedMapNode.this.iterator(prefix, time);
+                return VersionedMapNode.this.iterator(prefix, timestamp);
             }
 
             @Override
             public Iterable<ListAccessor> iterable(final String prefix) {
-                return VersionedMapNode.this.iterable(prefix, time);
+                return VersionedMapNode.this.iterable(prefix, timestamp);
             }
 
             @Override
             public NavigableMap<Comparable, List> flatMap() {
-                return VersionedMapNode.this.flatMap(time);
+                return VersionedMapNode.this.flatMap(timestamp);
             }
         };
     }

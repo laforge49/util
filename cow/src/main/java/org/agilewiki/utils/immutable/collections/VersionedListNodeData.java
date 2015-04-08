@@ -167,24 +167,24 @@ public class VersionedListNodeData implements Releasable {
     /**
      * Returns true if the value of the node exists for the given time.
      *
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return True if the value currently exists.
      */
-    public boolean exists(long time) {
-        return time >= created && time < deleted;
+    public boolean exists(long timestamp) {
+        return timestamp >= created && timestamp < deleted;
     }
 
     /**
      * Returns the count of all the values currently in the list.
      *
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return The current size of the list.
      */
-    public int size(long time) {
+    public int size(long timestamp) {
         if (isNil())
             return 0;
-        int s = leftNode.size(time) + rightNode.size(time);
-        if (exists(time))
+        int s = leftNode.size(timestamp) + rightNode.size(timestamp);
+        if (exists(timestamp))
             s += 1;
         return s;
     }
@@ -209,11 +209,11 @@ public class VersionedListNodeData implements Releasable {
     /**
      * Returns the value if it exists.
      *
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return The value, or null.
      */
-    public Object getExistingValue(long time) {
-        return exists(time) ? value : null;
+    public Object getExistingValue(long timestamp) {
+        return exists(timestamp) ? value : null;
     }
 
     /**
@@ -221,18 +221,18 @@ public class VersionedListNodeData implements Releasable {
      * (The list is searched in order.)
      *
      * @param value The value sought.
-     * @param time  The time of the query.
+     * @param timestamp  The time of the query.
      * @return The index, or -1.
      */
-    public int getIndex(Object value, long time) {
+    public int getIndex(Object value, long timestamp) {
         if (isNil())
             return -1;
-        int ndx = leftNode.getIndex(value, time);
+        int ndx = leftNode.getIndex(value, timestamp);
         if (ndx > -1)
             return ndx;
-        if (this.value == value && exists(time))
+        if (this.value == value && exists(timestamp))
             return leftNode.totalSize();
-        ndx = rightNode.getIndex(value, time);
+        ndx = rightNode.getIndex(value, timestamp);
         if (ndx == -1)
             return -1;
         return leftNode.totalSize() + 1 + ndx;
@@ -243,18 +243,18 @@ public class VersionedListNodeData implements Releasable {
      * (The list is searched in reverse order.)
      *
      * @param value The value sought.
-     * @param time  The time of the query.
+     * @param timestamp  The time of the query.
      * @return The index, or -1.
      */
-    public int getIndexRight(Object value, long time) {
+    public int getIndexRight(Object value, long timestamp) {
         if (isNil())
             return -1;
-        int ndx = rightNode.getIndexRight(value, time);
+        int ndx = rightNode.getIndexRight(value, timestamp);
         if (ndx > -1)
             return leftNode.totalSize() + 1 + ndx;
-        if (this.value == value && exists(time))
+        if (this.value == value && exists(timestamp))
             return leftNode.totalSize();
-        ndx = leftNode.getIndexRight(value, time);
+        ndx = leftNode.getIndexRight(value, timestamp);
         if (ndx == -1)
             return -1;
         return ndx;
@@ -265,18 +265,18 @@ public class VersionedListNodeData implements Releasable {
      * (The list is searched in order.)
      *
      * @param value The value sought.
-     * @param time  The time of the query.
+     * @param timestamp  The time of the query.
      * @return The index, or -1.
      */
-    public int findIndex(Object value, long time) {
+    public int findIndex(Object value, long timestamp) {
         if (isNil())
             return -1;
-        int ndx = leftNode.findIndex(value, time);
+        int ndx = leftNode.findIndex(value, timestamp);
         if (ndx > -1)
             return ndx;
-        if (exists(time) && this.value.equals(value))
+        if (exists(timestamp) && this.value.equals(value))
             return leftNode.totalSize();
-        ndx = rightNode.findIndex(value, time);
+        ndx = rightNode.findIndex(value, timestamp);
         if (ndx == -1)
             return -1;
         return leftNode.totalSize() + 1 + ndx;
@@ -287,18 +287,18 @@ public class VersionedListNodeData implements Releasable {
      * (The list is searched in reverse order.)
      *
      * @param value The value sought.
-     * @param time  The time of the query.
+     * @param timestamp  The time of the query.
      * @return The index, or -1.
      */
-    public int findIndexRight(Object value, long time) {
+    public int findIndexRight(Object value, long timestamp) {
         if (isNil())
             return -1;
-        int ndx = rightNode.findIndexRight(value, time);
+        int ndx = rightNode.findIndexRight(value, timestamp);
         if (ndx > -1)
             return leftNode.totalSize() + 1 + ndx;
-        if (exists(time) && this.value.equals(value))
+        if (exists(timestamp) && this.value.equals(value))
             return leftNode.totalSize();
-        ndx = leftNode.findIndexRight(value, time);
+        ndx = leftNode.findIndexRight(value, timestamp);
         if (ndx == -1)
             return -1;
         return ndx;
@@ -308,23 +308,23 @@ public class VersionedListNodeData implements Releasable {
      * Returns the index of an existing value higher than the given index.
      *
      * @param ndx  A given index.
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return An index of an existing value that is higher, or -1.
      */
-    public int higherIndex(int ndx, long time) {
+    public int higherIndex(int ndx, long timestamp) {
         if (ndx >= totalSize - 1 || isNil())
             return -1; //out of range
         int leftSize = leftNode.totalSize();
         if (ndx < leftSize - 1) {
-            int h = leftNode.higherIndex(ndx, time);
+            int h = leftNode.higherIndex(ndx, timestamp);
             if (h > -1)
                 return h;
         }
         if (ndx < leftSize) {
-            if (exists(time))
+            if (exists(timestamp))
                 return leftSize;
         }
-        int h = rightNode.higherIndex(ndx - leftSize - 1, time);
+        int h = rightNode.higherIndex(ndx - leftSize - 1, timestamp);
         return h == -1 ? -1 : h + leftSize + 1;
     }
 
@@ -332,24 +332,24 @@ public class VersionedListNodeData implements Releasable {
      * Returns the index of an existing value higher than or equal to the given index.
      *
      * @param ndx  A given index.
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return An index of an existing value that is higher or equal, or -1.
      */
-    public int ceilingIndex(int ndx, long time) {
+    public int ceilingIndex(int ndx, long timestamp) {
         if (ndx >= totalSize || isNil()) {
             return -1; //out of range
         }
         int leftSize = leftNode.totalSize();
         if (ndx < leftSize) {
-            int h = leftNode.ceilingIndex(ndx, time);
+            int h = leftNode.ceilingIndex(ndx, timestamp);
             if (h > -1)
                 return h;
         }
         if (ndx <= leftSize) {
-            if (exists(time))
+            if (exists(timestamp))
                 return leftSize;
         }
-        int h = rightNode.ceilingIndex(ndx - leftSize - 1, time);
+        int h = rightNode.ceilingIndex(ndx - leftSize - 1, timestamp);
         return h <= -1 ? -1 : h + leftSize + 1;
     }
 
@@ -357,73 +357,73 @@ public class VersionedListNodeData implements Releasable {
      * Returns the index of an existing value lower than the given index.
      *
      * @param ndx  A given index.
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return An index of an existing value that is lower, or -1.
      */
-    public int lowerIndex(int ndx, long time) {
+    public int lowerIndex(int ndx, long timestamp) {
         if (ndx <= 0 || isNil())
             return -1; //out of range
         int leftSize = leftNode.totalSize();
         if (ndx > leftSize + 1) {
-            int l = rightNode.lowerIndex(ndx - leftSize - 1, time);
+            int l = rightNode.lowerIndex(ndx - leftSize - 1, timestamp);
             if (l > -1)
                 return l + leftSize + 1;
         }
         if (ndx > leftSize) {
-            if (exists(time))
+            if (exists(timestamp))
                 return leftSize;
         }
-        return leftNode.lowerIndex(ndx, time);
+        return leftNode.lowerIndex(ndx, timestamp);
     }
 
     /**
      * Returns the index of an existing value lower than or equal to the given index.
      *
      * @param ndx  A given index.
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return An index of an existing value that is lower or equal, or -1.
      */
-    public int floorIndex(int ndx, long time) {
+    public int floorIndex(int ndx, long timestamp) {
         if (ndx < 0 || isNil())
             return -1; //out of range
         int leftSize = leftNode.totalSize();
         if (ndx > leftSize) {
-            int l = rightNode.floorIndex(ndx - leftSize - 1, time);
+            int l = rightNode.floorIndex(ndx - leftSize - 1, timestamp);
             if (l > -1)
                 return l + leftSize + 1;
         }
         if (ndx >= leftSize) {
-            if (exists(time))
+            if (exists(timestamp))
                 return leftSize;
         }
-        return leftNode.floorIndex(ndx, time);
+        return leftNode.floorIndex(ndx, timestamp);
     }
 
     /**
      * Returns true if there are no values present for the given time.
      *
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return Returns true if the list is empty for the given time.
      */
-    public boolean isEmpty(long time) {
+    public boolean isEmpty(long timestamp) {
         if (isNil())
             return true;
-        return !(exists(time) && leftNode.isEmpty(time) && rightNode.isEmpty(time));
+        return !(exists(timestamp) && leftNode.isEmpty(timestamp) && rightNode.isEmpty(timestamp));
     }
 
     /**
      * Appends existing values to the list.
      *
      * @param list The list being build.
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      */
-    public void flatList(List list, long time) {
+    public void flatList(List list, long timestamp) {
         if (isNil())
             return;
-        leftNode.getData().flatList(list, time);
-        if (exists(time))
+        leftNode.getData().flatList(list, timestamp);
+        if (exists(timestamp))
             list.add(value);
-        rightNode.getData().flatList(list, time);
+        rightNode.getData().flatList(list, timestamp);
     }
 
     /**
@@ -527,16 +527,16 @@ public class VersionedListNodeData implements Releasable {
      * (This is a shallow copy, as the values in the list are not copied.)
      *
      * @param n    The new list.
-     * @param time The given time.
+     * @param timestamp The given time.
      * @return A shortened copy of the list without some historical values.
      */
-    public VersionedListNode copyList(VersionedListNode n, long time) {
+    public VersionedListNode copyList(VersionedListNode n, long timestamp) {
         if (isNil())
             return n;
-        n = leftNode.getData().copyList(n, time);
-        if (deleted >= time)
+        n = leftNode.getData().copyList(n, timestamp);
+        if (deleted >= timestamp)
             n = n.add(n.totalSize(), value, created, deleted);
-        return rightNode.getData().copyList(n, time);
+        return rightNode.getData().copyList(n, timestamp);
     }
 
     /**

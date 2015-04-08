@@ -59,27 +59,27 @@ public interface VersionedListNode extends Releasable {
     /**
      * Returns the count of all the values currently in the list.
      *
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return The current size of the list.
      */
-    default int size(long time) {
+    default int size(long timestamp) {
         if (isNil())
             return 0;
-        return getData().size(time);
+        return getData().size(timestamp);
     }
 
     /**
      * Returns a value if it is in range and the value exists for the given time.
      *
      * @param ndx  The index of the selected value.
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return A value, or null.
      */
-    default Object getExistingValue(int ndx, long time) {
+    default Object getExistingValue(int ndx, long timestamp) {
         VersionedListNode n = getData().getListNode(ndx);
         if (n == null)
             return null;
-        return n.getData().getExistingValue(time);
+        return n.getData().getExistingValue(timestamp);
     }
 
     /**
@@ -87,13 +87,13 @@ public interface VersionedListNode extends Releasable {
      * (The list is searched in order.)
      *
      * @param value The value sought.
-     * @param time  The time of the query.
+     * @param timestamp  The time of the query.
      * @return The index, or -1.
      */
-    default int getIndex(Object value, long time) {
+    default int getIndex(Object value, long timestamp) {
         if (isNil())
             return -1;
-        return getData().getIndex(value, time);
+        return getData().getIndex(value, timestamp);
     }
 
     /**
@@ -101,13 +101,13 @@ public interface VersionedListNode extends Releasable {
      * (The list is searched in reverse order.)
      *
      * @param value The value sought.
-     * @param time  The time of the query.
+     * @param timestamp  The time of the query.
      * @return The index, or -1.
      */
-    default int getIndexRight(Object value, long time) {
+    default int getIndexRight(Object value, long timestamp) {
         if (isNil())
             return -1;
-        return getData().getIndexRight(value, time);
+        return getData().getIndexRight(value, timestamp);
     }
 
     /**
@@ -115,13 +115,13 @@ public interface VersionedListNode extends Releasable {
      * (The list is searched in order.)
      *
      * @param value The value sought.
-     * @param time  The time of the query.
+     * @param timestamp  The time of the query.
      * @return The index, or -1.
      */
-    default int findIndex(Object value, long time) {
+    default int findIndex(Object value, long timestamp) {
         if (isNil())
             return -1;
-        return getData().findIndex(value, time);
+        return getData().findIndex(value, timestamp);
     }
 
     /**
@@ -129,129 +129,129 @@ public interface VersionedListNode extends Releasable {
      * (The list is searched in reverse order.)
      *
      * @param value The value sought.
-     * @param time  The time of the query.
+     * @param timestamp  The time of the query.
      * @return The index, or -1.
      */
-    default int findIndexRight(Object value, long time) {
+    default int findIndexRight(Object value, long timestamp) {
         if (isNil())
             return -1;
-        return getData().findIndexRight(value, time);
+        return getData().findIndexRight(value, timestamp);
     }
 
     /**
      * Returns the index of an existing value higher than the given index.
      *
      * @param ndx  A given index.
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return An index of an existing value that is higher, or -1.
      */
-    default int higherIndex(int ndx, long time) {
-        return getData().higherIndex(ndx, time);
+    default int higherIndex(int ndx, long timestamp) {
+        return getData().higherIndex(ndx, timestamp);
     }
 
     /**
      * Returns the index of an existing value higher than or equal to the given index.
      *
      * @param ndx  A given index.
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return An index of an existing value that is higher or equal, or -1.
      */
-    default int ceilingIndex(int ndx, long time) {
-        return getData().ceilingIndex(ndx, time);
+    default int ceilingIndex(int ndx, long timestamp) {
+        return getData().ceilingIndex(ndx, timestamp);
     }
 
     /**
      * Returns the index of the first existing value in the list.
      *
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return The index of the first existing value in the list, or -1.
      */
-    default int firstIndex(long time) {
-        return ceilingIndex(0, time);
+    default int firstIndex(long timestamp) {
+        return ceilingIndex(0, timestamp);
     }
 
     /**
      * Returns the index of an existing value lower than the given index.
      *
      * @param ndx  A given index.
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return An index of an existing value that is lower, or -1.
      */
-    default int lowerIndex(int ndx, long time) {
+    default int lowerIndex(int ndx, long timestamp) {
         if (ndx <= 0 || isNil())
             return -1; //out of range
-        return getData().lowerIndex(ndx, time);
+        return getData().lowerIndex(ndx, timestamp);
     }
 
     /**
      * Returns the index of an existing value lower than or equal to the given index.
      *
      * @param ndx  A given index.
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return An index of an existing value that is lower or equal, or -1.
      */
-    default int floorIndex(int ndx, long time) {
+    default int floorIndex(int ndx, long timestamp) {
         if (ndx < 0 || isNil())
             return -1; //out of range
-        return getData().floorIndex(ndx, time);
+        return getData().floorIndex(ndx, timestamp);
     }
 
     /**
      * Returns the index of the last existing value in the list.
      *
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return The index of the last existing value in the list, or -1.
      */
-    default int lastIndex(long time) {
-        return floorIndex(totalSize(), time);
+    default int lastIndex(long timestamp) {
+        return floorIndex(totalSize(), timestamp);
     }
 
     /**
      * Returns true if there are no values present for the given time.
      *
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return Returns true if the list is empty for the given time.
      */
-    default boolean isEmpty(long time) {
+    default boolean isEmpty(long timestamp) {
         if (isNil())
             return true;
-        return getData().isEmpty(time);
+        return getData().isEmpty(timestamp);
     }
 
     /**
      * Returns a list of all the values that are present for a given time.
      *
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return A list of all values present for the given time.
      */
-    default List flatList(long time) {
+    default List flatList(long timestamp) {
         List list = new ArrayList<>();
-        getData().flatList(list, time);
+        getData().flatList(list, timestamp);
         return list;
     }
 
     /**
      * Returns an iterator over the existing values.
      *
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return The iterator.
      */
-    default Iterator iterator(long time) {
+    default Iterator iterator(long timestamp) {
         return new Iterator() {
             int last = -1;
 
             @Override
             public boolean hasNext() {
-                return higherIndex(last, time) > -1;
+                return higherIndex(last, timestamp) > -1;
             }
 
             @Override
             public Object next() {
-                int next = higherIndex(last, time);
+                int next = higherIndex(last, timestamp);
                 if (next == -1)
                     throw new NoSuchElementException();
                 last = next;
-                return getExistingValue(last, time);
+                return getExistingValue(last, timestamp);
             }
         };
     }
@@ -279,10 +279,10 @@ public interface VersionedListNode extends Releasable {
      * Returns a list accessor for the given time.
      *
      * @param key  The key for the list.
-     * @param time The time of the query.
+     * @param timestamp The time of the query.
      * @return A list accessor for the given time.
      */
-    default ListAccessor listAccessor(Comparable key, long time) {
+    default ListAccessor listAccessor(Comparable key, long timestamp) {
         return new ListAccessor() {
             @Override
             public Comparable key() {
@@ -291,82 +291,82 @@ public interface VersionedListNode extends Releasable {
 
             @Override
             public long time() {
-                return time;
+                return timestamp;
             }
 
             @Override
             public int size() {
-                return VersionedListNode.this.size(time);
+                return VersionedListNode.this.size(timestamp);
             }
 
             @Override
             public Object get(int ndx) {
-                return VersionedListNode.this.getExistingValue(ndx, time);
+                return VersionedListNode.this.getExistingValue(ndx, timestamp);
             }
 
             @Override
             public int getIndex(Object value) {
-                return VersionedListNode.this.getIndex(value, time);
+                return VersionedListNode.this.getIndex(value, timestamp);
             }
 
             @Override
             public int getIndexRight(Object value) {
-                return VersionedListNode.this.getIndexRight(value, time);
+                return VersionedListNode.this.getIndexRight(value, timestamp);
             }
 
             @Override
             public int findIndex(Object value) {
-                return VersionedListNode.this.findIndex(value, time);
+                return VersionedListNode.this.findIndex(value, timestamp);
             }
 
             @Override
             public int findIndexRight(Object value) {
-                return VersionedListNode.this.findIndexRight(value, time);
+                return VersionedListNode.this.findIndexRight(value, timestamp);
             }
 
             @Override
             public int higherIndex(int ndx) {
-                return VersionedListNode.this.higherIndex(ndx, time);
+                return VersionedListNode.this.higherIndex(ndx, timestamp);
             }
 
             @Override
             public int ceilingIndex(int ndx) {
-                return VersionedListNode.this.ceilingIndex(ndx, time);
+                return VersionedListNode.this.ceilingIndex(ndx, timestamp);
             }
 
             @Override
             public int firstIndex() {
-                return VersionedListNode.this.firstIndex(time);
+                return VersionedListNode.this.firstIndex(timestamp);
             }
 
             @Override
             public int lowerIndex(int ndx) {
-                return VersionedListNode.this.lowerIndex(ndx, time);
+                return VersionedListNode.this.lowerIndex(ndx, timestamp);
             }
 
             @Override
             public int floorIndex(int ndx) {
-                return VersionedListNode.this.floorIndex(ndx, time);
+                return VersionedListNode.this.floorIndex(ndx, timestamp);
             }
 
             @Override
             public int lastIndex() {
-                return VersionedListNode.this.lastIndex(time);
+                return VersionedListNode.this.lastIndex(timestamp);
             }
 
             @Override
             public boolean isEmpty() {
-                return VersionedListNode.this.isEmpty(time);
+                return VersionedListNode.this.isEmpty(timestamp);
             }
 
             @Override
             public List flatList() {
-                return VersionedListNode.this.flatList(time);
+                return VersionedListNode.this.flatList(timestamp);
             }
 
             @Override
             public Iterator iterator() {
-                return VersionedListNode.this.iterator(time);
+                return VersionedListNode.this.iterator(timestamp);
             }
         };
     }
@@ -433,11 +433,11 @@ public interface VersionedListNode extends Releasable {
      * Copy everything except what was deleted before a given time.
      * (This is a shallow copy, as the values in the list are not copied.)
      *
-     * @param time The given time.
+     * @param timestamp The given time.
      * @return A shortened copy of the list without some historical values.
      */
-    default VersionedListNode copyList(long time) {
-        return getData().copyList(getRegistry().versionedNilList, time);
+    default VersionedListNode copyList(long timestamp) {
+        return getData().copyList(getRegistry().versionedNilList, timestamp);
     }
 
     /**
