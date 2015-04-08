@@ -109,33 +109,12 @@ public class SecondaryId {
     /**
      * Iterates over all the secondary keys for a given versioned list map.
      *
-     * @param vmn    The versioned list map.
-     * @return An iterator of list accessors.
-     */
-    public static Iterable<ListAccessor> secondaryKeyListAccessors(VersionedMapNode vmn) {
-        return secondaryKeyListAccessors(vmn, vmn.getTimestamp());
-    }
-
-    /**
-     * Iterates over all the secondary keys for a given versioned list map.
-     *
      * @param vmn          The versioned list map.
      * @param timestamp    The time of the query.
      * @return An iterator of list accessors.
      */
     public static Iterable<ListAccessor> secondaryKeyListAccessors(VersionedMapNode vmn, long timestamp) {
         return vmn.iterable(SECONDARY_KEY, timestamp);
-    }
-
-    /**
-     * Iterates over the ids of the VMLs referenced by a secondary id.
-     *
-     * @param db             The database.
-     * @param secondaryId    The secondary id.
-     * @return The Iterable, or null.
-     */
-    public static Iterable<String> secondaryIdIterable(Db db, String secondaryId) {
-        return secondaryIdIterable(db, secondaryId, db.getTimestamp());
     }
 
     /**
@@ -172,22 +151,13 @@ public class SecondaryId {
 
     public static boolean hasSecondaryId(Db db, String vmnId, String secondaryId, long timestamp) {
         NameId.validateAnId(vmnId);
-        String typeId = secondaryIdType(secondaryId);
-        String valueId = secondaryIdValue(secondaryId);
-        String value = valueId.substring(2);
-        String secondaryKey = secondaryKey(typeId);
-        MapAccessor mapAccessor = db.mapAccessor();
-        ListAccessor listAccessor = mapAccessor.listAccessor(vmnId);
+        ListAccessor listAccessor = db.mapAccessor().listAccessor(secondaryId);
         if (listAccessor == null)
             return false;
         VersionedMapNode versionedMapNode = (VersionedMapNode) listAccessor.get(0);
-        ListAccessor vlistAccessor = versionedMapNode.listAccessor(secondaryKey, timestamp);
+        ListAccessor vlistAccessor = versionedMapNode.listAccessor(vmnId, timestamp);
         if (vlistAccessor == null)
             return false;
-        for (Object x: vlistAccessor) {
-            if (value.equals(x))
-                return true;
-        }
-        return false;
+        return !vlistAccessor.isEmpty();
     }
 }
