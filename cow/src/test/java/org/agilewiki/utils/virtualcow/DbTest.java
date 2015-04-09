@@ -43,6 +43,8 @@ public class DbTest extends TestCase {
                 for (String id: Journal.modifies(db, timestampId)) {
                     System.out.println(id);
                 }
+
+                Display.all(db, db.getTimestamp());
             }
         } finally {
             Plant.close();
