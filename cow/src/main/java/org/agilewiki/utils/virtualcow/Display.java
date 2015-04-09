@@ -13,13 +13,13 @@ public class Display {
         MapAccessor mapAccessor = db.mapAccessor();
         for (ListAccessor la: mapAccessor) {
             VersionedMapNode vmn = (VersionedMapNode) la.get(0);
-            vmn(db, timestamp, vmn, (String) la.key());
+            vmn(db, vmn.mapAccessor(timestamp), (String) la.key());
         }
     }
 
-    public static void vmn(Db db, long timestamp, VersionedMapNode vmn, String id) {
+    public static void vmn(Db db, MapAccessor ma, String id) {
         System.out.println("\nvmn id: " + id);
-        for (ListAccessor la: vmn.mapAccessor(timestamp)) {
+        for (ListAccessor la: ma) {
             vln(db, la);
         }
     }
