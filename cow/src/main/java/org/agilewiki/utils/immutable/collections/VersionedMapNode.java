@@ -136,6 +136,22 @@ public interface VersionedMapNode extends Releasable {
     }
 
     /**
+     * Remove the first occurance of a value from a list.
+     *
+     * @param key The key of the list.
+     * @param x    The value to be removed.
+     * @return The updated root.
+     */
+    default VersionedMapNode remove(Comparable key, Object x) {
+        if (isNil())
+            return this;
+        VersionedListNode ln = getList(key);
+        if (ln == null)
+            return this;
+        return set(key, ln.remove(x));
+    }
+
+    /**
      * Empty the list by marking all the existing values as deleted.
      *
      * @param key  The key of the list.

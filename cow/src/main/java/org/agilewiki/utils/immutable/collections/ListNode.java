@@ -408,12 +408,36 @@ public interface ListNode extends Releasable {
      */
     void serialize(ByteBuffer byteBuffer);
 
+    /**
+     * Remove an item from the list.
+     *
+     * @param ndx    Position of the item.
+     * @return The updated root.
+     */
     default ListNode remove(int ndx) {
         if (isNil())
             return this;
         if (ndx < 0)
             return this;
         return getData().remove(ndx);
+    }
+
+    /**
+     * Remove the first occurance of a value from a list.
+     *
+     * @param x    The value to be removed.
+     * @return The updated root.
+     */
+    default ListNode remove(Object x) {
+        if (isNil())
+            return this;
+        int ts = totalSize();
+        for (int i = 0; i < ts; ++i) {
+            Object y = get(i);
+            if (x.equals(y))
+                return remove(i);
+        }
+        return this;
     }
 
     @Override

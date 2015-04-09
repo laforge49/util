@@ -421,6 +421,24 @@ public interface VersionedListNode extends Releasable {
     }
 
     /**
+     * Mark the first occurance of a value in a list as deleted.
+     *
+     * @param x    The value to be removed.
+     * @return The updated root.
+     */
+    default VersionedListNode remove(Object x) {
+        if (isNil())
+            return this;
+        int ts = totalSize();
+        for (int i = 0; i < ts; ++i) {
+            Object y = getExistingValue(i, getTimestamp());
+            if (y != null && x.equals(y))
+                return remove(i);
+        }
+        return this;
+    }
+
+    /**
      * Perform a complete copy.
      *
      * @return A complete, but shallow copy of the list.

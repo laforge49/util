@@ -133,6 +133,22 @@ public interface MapNode extends Releasable {
     }
 
     /**
+     * Remove the first occurance of a value from a list.
+     *
+     * @param key The key of the list.
+     * @param x    The value to be removed.
+     * @return The updated root.
+     */
+    default MapNode remove(Comparable key, Object x) {
+        if (isNil())
+            return this;
+        ListNode ln = getList(key);
+        if (ln == null)
+            return this;
+        return set(key, ln.remove(x));
+    }
+
+    /**
      * Delete the list.
      *
      * @param key The key of the list.
