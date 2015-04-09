@@ -99,7 +99,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
 
     private void updateJournal(String id) {
         create(Journal.modifiesKey(jeName, id));
-        create(Journal.journalEntryKey(id, jeName));
+        add(id, Journal.JOURNAL_ID, jeName, true);
     }
 
     /**
@@ -111,8 +111,6 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         if (!id.startsWith("$"))
             throw new IllegalArgumentException("not an id or composite id: " + id);
         ListNode listNode = dbMapNode.getList(id);
-        if (listNode != null)
-            return;
         dbMapNode = dbMapNode.set(id, dbFactoryRegistry.versionedNilMap);
     }
 
@@ -221,6 +219,9 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
      * @param value The value to be added to the list.
      */
     public void add(String id, String key, Object value) {
+        add(id, key, value, false);
+    }
+    private void add(String id, String key, Object value, boolean journal) {
         checkPrivilege();
         if (!id.startsWith("$"))
             throw new IllegalArgumentException("not an id or composite id: " + id);
@@ -230,7 +231,8 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                 (VersionedMapNode) listNode.get(0);
         versionedMapNode = versionedMapNode.add(key, value);
         dbMapNode = dbMapNode.set(id, versionedMapNode);
-        updateJournal(id);
+        if (!journal)
+            updateJournal(id);
     }
 
     /**

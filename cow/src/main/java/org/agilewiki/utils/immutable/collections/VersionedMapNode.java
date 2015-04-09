@@ -71,10 +71,13 @@ public interface VersionedMapNode extends Releasable {
      * Returns a list accessor for the latest time.
      *
      * @param key The key for the list.
-     * @return A list accessor for the latest time.
+     * @return A list accessor for the latest time, or null.
      */
     default ListAccessor listAccessor(Comparable key) {
-        return getList(key).listAccessor(key);
+        VersionedListNode vln = getList(key);
+        if (vln == null)
+            return null;
+        return vln.listAccessor(key);
     }
 
     /**
@@ -82,10 +85,13 @@ public interface VersionedMapNode extends Releasable {
      *
      * @param key  The key for the list.
      * @param timestamp The time of the query.
-     * @return A list accessor for the given time.
+     * @return A list accessor for the given time, or null.
      */
     default ListAccessor listAccessor(Comparable key, long timestamp) {
-        return getList(key).listAccessor(key, timestamp);
+        VersionedListNode vln = getList(key);
+        if (vln == null)
+            return null;
+        return vln.listAccessor(key, timestamp);
     }
 
     /**

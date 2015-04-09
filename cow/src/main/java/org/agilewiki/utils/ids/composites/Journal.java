@@ -2,8 +2,10 @@ package org.agilewiki.utils.ids.composites;
 
 import org.agilewiki.utils.ids.NameId;
 import org.agilewiki.utils.ids.Timestamp;
+import org.agilewiki.utils.ids.ValueId;
 import org.agilewiki.utils.immutable.collections.ListAccessor;
 import org.agilewiki.utils.immutable.collections.MapAccessor;
+import org.agilewiki.utils.immutable.collections.VersionedMapNode;
 import org.agilewiki.utils.virtualcow.Db;
 
 import java.util.Iterator;
@@ -18,7 +20,8 @@ public class Journal {
     public static final String MODIFIES_ID = "$A";
 
     /**
-     * Prefix to an id/timestamp composite key.
+     * The key to the list of timestamps identifying the
+     * journal entry which modified the vmn.
      */
     public static final String JOURNAL_ID = "$B";
 
@@ -31,21 +34,8 @@ public class Journal {
      */
     public static String modifiesKey(String timestampId, String id) {
         Timestamp.validateId(timestampId);
-        NameId.validateAnId(id);
+        ValueId.validateAnId(id);
         return MODIFIES_ID + timestampId + id;
-    }
-
-    /**
-     * Returns a composite id used to connect an item with the journal entries which modified it.
-     *
-     * @param timestampId    The id of the journal entry.
-     * @param id           The id of the modified versioned map list.
-     * @return A composite of 3 ids.
-     */
-    public static String journalEntryKey(String id, String timestampId) {
-        Timestamp.validateId(timestampId);
-        NameId.validateAnId(id);
-        return JOURNAL_ID + id + timestampId;
     }
 
     /**
@@ -99,7 +89,46 @@ public class Journal {
     public static Iterable<String> journal(Db db, String id) {
         NameId.validateAnId(id);
         MapAccessor ma = db.mapAccessor();
-        Iterator<ListAccessor> it = ma.iterator(JOURNAL_ID + id);
+        ListAccessor la = ma.listAccessor(id);
+        if (la == null) {
+            return new Iterable<String>() {
+                @Override
+                public Iterator<String> iterator() {
+                    return new Iterator<String>() {
+                        @Override
+                        public boolean hasNext() {
+                            return false;
+                        }
+
+                        @Override
+                        public String next() {
+                            return null;
+                        }
+                    };
+                }
+            };
+        }
+        VersionedMapNode vmn = (VersionedMapNode) la.get(0);
+        ListAccessor vla = vmn.listAccessor(JOURNAL_ID);
+        if (vla == null) {
+            return new Iterable<String>() {
+                @Override
+                public Iterator<String> iterator() {
+                    return new Iterator<String>() {
+                        @Override
+                        public boolean hasNext() {
+                            return false;
+                        }
+
+                        @Override
+                        public String next() {
+                            return null;
+                        }
+                    };
+                }
+            };
+        }
+        Iterator it = vla.iterator();
         return new Iterable<String>() {
             @Override
             public Iterator<String> iterator() {
@@ -111,7 +140,7 @@ public class Journal {
 
                     @Override
                     public String next() {
-                        return lastId((String) it.next().key());
+                        return (String) it.next();
                     }
                 };
             }

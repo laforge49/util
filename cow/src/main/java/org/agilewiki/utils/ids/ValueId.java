@@ -25,6 +25,16 @@ public class ValueId {
      *
      * @param valueId    The valueId.
      */
+    public static void validateAnId(String valueId) {
+        if (!valueId.startsWith("$"))
+            throw new IllegalArgumentException("not a valid Id: "+valueId);
+    }
+
+    /**
+     * Validate a valueId.
+     *
+     * @param valueId    The valueId.
+     */
     public static void validateId(String valueId) {
         if (!valueId.startsWith("$v"))
             throw new IllegalArgumentException("not a valid valueId: "+valueId);
