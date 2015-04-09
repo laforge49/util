@@ -180,4 +180,20 @@ public class SecondaryId {
                 secondaryKey(secondaryIdType(secondaryId)),
                 ValueId.value(secondaryIdValue(secondaryId)));
     }
+
+    /**
+     * Remove a secondary key from a vml if not already present.
+     *
+     * @param db             The database.
+     * @param vmlId          The id of the vml.
+     * @param secondaryId    The secondary id.
+     */
+    public static void removeSecondaryId(Db db, String vmlId, String secondaryId) {
+        if (!hasSecondaryId(db, vmlId, secondaryId, db.getTimestamp()))
+            return;
+        db.clearList(secondaryId, vmlId);
+        db.remove(vmlId,
+                secondaryKey(secondaryIdType(secondaryId)),
+                ValueId.value(secondaryIdValue(secondaryId)));
+    }
 }
