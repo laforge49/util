@@ -182,7 +182,7 @@ public class SecondaryId {
     }
 
     /**
-     * Remove a secondary key from a vml if not already present.
+     * Remove a secondary key from a vml if present.
      *
      * @param db             The database.
      * @param vmlId          The id of the vml.
