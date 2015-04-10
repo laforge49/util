@@ -142,10 +142,7 @@ public interface MapNode extends Releasable {
     default MapNode remove(Comparable key, Object x) {
         if (isNil())
             return this;
-        ListNode ln = getList(key);
-        if (ln == null)
-            return this;
-        return set(key, ln.remove(x));
+        return getData().remove(key, x);
     }
 
     /**

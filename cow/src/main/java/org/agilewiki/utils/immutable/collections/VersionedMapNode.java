@@ -151,10 +151,8 @@ public interface VersionedMapNode extends Releasable {
     default VersionedMapNode remove(Comparable key, Object x) {
         if (isNil())
             return this;
-        VersionedListNode ln = getList(key);
-        if (ln == null)
-            return this;
-        return set(key, ln.remove(x));
+        VersionedMapNode n = getData().remove(key, x);
+        return n;
     }
 
     /**

@@ -110,7 +110,6 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         checkPrivilege();
         if (!id.startsWith("$"))
             throw new IllegalArgumentException("not an id or composite id: " + id);
-        ListNode listNode = dbMapNode.getList(id);
         dbMapNode = dbMapNode.set(id, dbFactoryRegistry.versionedNilMap);
     }
 

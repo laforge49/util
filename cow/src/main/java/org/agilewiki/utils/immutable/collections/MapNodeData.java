@@ -313,6 +313,39 @@ public class MapNodeData implements Releasable {
     }
 
     /**
+     * Delete the first occurance of a value from the list.
+     *
+     * @param key The key of the list.
+     * @param x The value to remove.
+     * @return The revised node.
+     */
+    public MapNode remove(Comparable key, Object x) {
+        if (key == null)
+            throw new IllegalArgumentException("key may not be null");
+        if (isNil())
+            return thisNode;
+        int c = key.compareTo(this.key);
+        if (c < 0) {
+            MapNode n = leftNode.remove(key, x);
+            if (n == leftNode)
+                return thisNode;
+            return replaceLeft(n);
+        }
+        if (c > 0) {
+            MapNode n = rightNode.remove(key, x);
+            if (n == rightNode)
+                return thisNode;
+            return replaceRight(n);
+        }
+        ListNode n = listNode.remove(x);
+        if (n == listNode)
+            return thisNode;
+        if (n.isNil())
+            return remove(key);
+        return replace(n);
+    }
+
+    /**
      * Replace the list entries with a single value.
      *
      * @param key   The key of the list.

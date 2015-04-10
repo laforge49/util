@@ -225,6 +225,37 @@ public class VersionedMapNodeData implements Releasable {
     }
 
     /**
+     * Mark the first occurance of a value as deleted.
+     *
+     * @param key  The key of the list.
+     * @param x  The object to be removed.
+     * @return The revised node.
+     */
+    public VersionedMapNode remove(Comparable key, Object x) {
+        if (key == null)
+            throw new IllegalArgumentException("key may not be null");
+        if (isNil())
+            return thisNode;
+        int c = key.compareTo(this.key);
+        if (c < 0) {
+            VersionedMapNode n = leftNode.remove(key, x);
+            if (n == leftNode)
+                return thisNode;
+            return replaceLeft(n);
+        } else if (c == 0) {
+            VersionedListNode n = listNode.remove(x);
+            if (n == listNode)
+                return thisNode;
+            return replace(n);
+        } else {
+            VersionedMapNode n = rightNode.remove(key, x);
+            if (n == rightNode)
+                return thisNode;
+            return replaceRight(n);
+        }
+    }
+
+    /**
      * Empty the list by marking all the existing values as deleted.
      *
      * @param key  The key of the list.

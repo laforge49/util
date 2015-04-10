@@ -432,8 +432,10 @@ public interface VersionedListNode extends Releasable {
         int ts = totalSize();
         for (int i = 0; i < ts; ++i) {
             Object y = getExistingValue(i, getTimestamp());
-            if (y != null && x.equals(y))
-                return remove(i);
+            if (y != null && x.equals(y)) {
+                VersionedListNode ln = remove(i);
+                return ln;
+            }
         }
         return this;
     }

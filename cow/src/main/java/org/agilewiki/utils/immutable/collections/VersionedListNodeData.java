@@ -506,8 +506,10 @@ public class VersionedListNodeData implements Releasable {
         long time = thisNode.getTimestamp();
         int leftSize = leftNode.totalSize();
         if (ndx == leftSize) {
-            if (exists(time))
-                return replace(time);
+            if (exists(time)) {
+                VersionedListNode ln = replace(time);
+                return ln;
+            }
             return thisNode;
         }
         if (ndx < leftSize) {
@@ -654,5 +656,11 @@ public class VersionedListNodeData implements Releasable {
         else
             n = replaceRight((VersionedListNode) q);
         return n.resize(maxSize, maxBlockSize);
+    }
+
+    public String toString() {
+        if (isNil())
+            return "";
+        return "(" + leftNode.getData().toString() + value + "-" + level + "-" + totalSize + rightNode.getData().toString() + ")";
     }
 }

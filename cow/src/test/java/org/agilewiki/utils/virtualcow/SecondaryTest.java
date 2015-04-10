@@ -20,7 +20,6 @@ public class SecondaryTest extends TestCase {
                 db.registerTransaction("SecondaryTran", SecondaryTran.class);
                 db.open(true);
                 String timestampId = db.update("SecondaryTran").call();
-                Display.all(db, db.getTimestamp());
             }
         } finally {
             Plant.close();
