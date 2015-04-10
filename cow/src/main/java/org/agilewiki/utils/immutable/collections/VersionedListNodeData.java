@@ -553,7 +553,7 @@ public class VersionedListNodeData implements Releasable {
         VersionedListNode rn = rightNode.clearList();
         if (ln == leftNode && rn == rightNode && !exists(thisNode.getTimestamp()))
             return thisNode;
-        return replace(ln, rn);
+        return replace(thisNode.getTimestamp(), ln, rn);
     }
 
     @Override
@@ -571,17 +571,17 @@ public class VersionedListNodeData implements Releasable {
         return new VersionedListNodeImpl(thisNode.getRegistry(), level, totalSize, created, deleted, leftNode, value, rightNode);
     }
 
-    public VersionedListNode replace(int level, int totalSize) {
-        thisNode.releaseLocal();
-        return new VersionedListNodeImpl(thisNode.getRegistry(), level, totalSize, created, deleted, leftNode, value, rightNode);
-    }
-
     public VersionedListNode replace(int level, int totalSize, long created, long deleted, Object value) {
         thisNode.releaseLocal();
         return new VersionedListNodeImpl(thisNode.getRegistry(), level, totalSize, created, deleted, leftNode, value, rightNode);
     }
 
     public VersionedListNode replace(VersionedListNode leftNode, VersionedListNode rightNode) {
+        thisNode.releaseLocal();
+        return new VersionedListNodeImpl(thisNode.getRegistry(), level, totalSize, created, deleted, leftNode, value, rightNode);
+    }
+
+    public VersionedListNode replace(long deleted, VersionedListNode leftNode, VersionedListNode rightNode) {
         thisNode.releaseLocal();
         return new VersionedListNodeImpl(thisNode.getRegistry(), level, totalSize, created, deleted, leftNode, value, rightNode);
     }
