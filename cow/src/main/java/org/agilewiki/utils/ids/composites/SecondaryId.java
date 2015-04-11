@@ -7,7 +7,9 @@ import org.agilewiki.utils.immutable.collections.VersionedListNode;
 import org.agilewiki.utils.immutable.collections.VersionedMapNode;
 import org.agilewiki.utils.virtualcow.Db;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * An implementation of secondary ids for a Versioned Map List (VML).
@@ -106,25 +108,35 @@ public class SecondaryId {
     }
 
     /**
-     * Iterates over all the secondary keys for a given versioned list map.
+     * Returns a list of the secondary ids for a given versioned map node.
      *
      * @param vmn       The versioned list map.
      * @param timestamp The time of the query.
-     * @return An iterator of list accessors.
+     * @return A list of the secondary ids.
      */
-    public static Iterable<ListAccessor> secondaryKeyListAccessors(VersionedMapNode vmn, long timestamp) {
-        return vmn.iterable(SECONDARY_KEY, timestamp);
+    public static List<String> secondaryIdList(VersionedMapNode vmn, long timestamp) {
+        List<String> sids = new ArrayList<>();
+        for (ListAccessor la: vmn.iterable(SECONDARY_KEY, timestamp)) {
+            String secondaryKey = la.key().toString();
+            String secondaryType = SecondaryId.secondaryKeyType(secondaryKey);
+            for (Object o: la) {
+                String valueId = ValueId.generate(o.toString());
+                String secondaryId = SecondaryId.secondaryId(secondaryType, valueId);
+                sids.add(secondaryId);
+            }
+        }
+        return sids;
     }
 
     /**
-     * Iterates over the ids of the VMLs referenced by a secondary id.
+     * Iterates over the ids of the VMNs referenced by a secondary id.
      *
      * @param db          The database.
      * @param secondaryId The secondary id.
      * @param timestamp   The time of the query.
      * @return The Iterable, or null.
      */
-    public static Iterable<String> secondaryIdIterable(Db db, String secondaryId, long timestamp) {
+    public static Iterable<String> vlnIdIterable(Db db, String secondaryId, long timestamp) {
         validateSecondaryId(secondaryId);
         ListAccessor listAccessor = db.mapAccessor().listAccessor(secondaryId);
         if (listAccessor == null)
