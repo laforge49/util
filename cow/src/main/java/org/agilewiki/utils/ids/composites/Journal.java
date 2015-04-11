@@ -3,6 +3,7 @@ package org.agilewiki.utils.ids.composites;
 import org.agilewiki.utils.ids.NameId;
 import org.agilewiki.utils.ids.Timestamp;
 import org.agilewiki.utils.ids.ValueId;
+import org.agilewiki.utils.immutable.collections.EmptyIterable;
 import org.agilewiki.utils.immutable.collections.ListAccessor;
 import org.agilewiki.utils.immutable.collections.MapAccessor;
 import org.agilewiki.utils.immutable.collections.VersionedMapNode;
@@ -91,42 +92,12 @@ public class Journal {
         MapAccessor ma = db.mapAccessor();
         ListAccessor la = ma.listAccessor(id);
         if (la == null) {
-            return new Iterable<String>() {
-                @Override
-                public Iterator<String> iterator() {
-                    return new Iterator<String>() {
-                        @Override
-                        public boolean hasNext() {
-                            return false;
-                        }
-
-                        @Override
-                        public String next() {
-                            return null;
-                        }
-                    };
-                }
-            };
+            return new EmptyIterable<String>();
         }
         VersionedMapNode vmn = (VersionedMapNode) la.get(0);
         ListAccessor vla = vmn.listAccessor(JOURNAL_ID);
         if (vla == null) {
-            return new Iterable<String>() {
-                @Override
-                public Iterator<String> iterator() {
-                    return new Iterator<String>() {
-                        @Override
-                        public boolean hasNext() {
-                            return false;
-                        }
-
-                        @Override
-                        public String next() {
-                            return null;
-                        }
-                    };
-                }
-            };
+            return new EmptyIterable<String>();
         }
         Iterator it = vla.iterator();
         return new Iterable<String>() {
