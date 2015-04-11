@@ -416,8 +416,10 @@ public interface VersionedMapNode extends Releasable {
 
                     @Override
                     public boolean hasNext() {
-                        if (last == null)
-                            return ceilingKey(prefix, timestamp) != null;
+                        if (last == null) {
+                            Comparable ck = ceilingKey(prefix, timestamp);
+                            return ck != null && ck.toString().startsWith(prefix);
+                        }
                         Comparable hk = higherKey(last, timestamp);
                         if (hk == null)
                             return false;

@@ -344,8 +344,10 @@ public interface MapNode extends Releasable {
 
                     @Override
                     public boolean hasNext() {
-                        if (last == null)
-                            return ceilingKey(prefix) != null;
+                        if (last == null) {
+                            Comparable ck = ceilingKey(prefix);
+                            return ck != null && ck.toString().startsWith(prefix);
+                        }
                         Comparable hk = higherKey(last);
                         if (hk == null)
                             return false;
