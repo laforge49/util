@@ -33,10 +33,15 @@ public class Journal {
      * @param id           The id of the modified versioned map list.
      * @return A composite of 3 ids.
      */
-    public static String modifiesKey(String timestampId, String id) {
+    public static String modifiesId(String timestampId, String id) {
         Timestamp.validateId(timestampId);
         ValueId.validateAnId(id);
         return MODIFIES_ID + timestampId + id;
+    }
+
+    public static String journalId(String id) {
+        ValueId.validateAnId(id);
+        return JOURNAL_ID + id;
     }
 
     /**
@@ -80,38 +85,34 @@ public class Journal {
     }
 
     /**
-     * Iterates over the ids of the journal entries which modified a given
-     * Virtual Map List (VML).
+     * Iterates over the timestamps of the journal entries which modified a given
+     * Virtual Map Node (VMN).
      *
      * @param db    The database.
-     * @param id    The id of the VML.
+     * @param id    The id of the VMN.
      * @return The iterable.
      */
     public static Iterable<String> journal(Db db, String id) {
         NameId.validateAnId(id);
         MapAccessor ma = db.mapAccessor();
-        ListAccessor la = ma.listAccessor(id);
+        ListAccessor la = ma.listAccessor(journalId(id));
         if (la == null) {
             return new EmptyIterable<String>();
         }
         VersionedMapNode vmn = (VersionedMapNode) la.get(0);
-        ListAccessor vla = vmn.listAccessor(JOURNAL_ID);
-        if (vla == null) {
-            return new EmptyIterable<String>();
-        }
-        Iterator it = vla.iterator();
+        Iterator<ListAccessor> lait = vmn.iterator(db.getTimestamp());
         return new Iterable<String>() {
             @Override
             public Iterator<String> iterator() {
                 return new Iterator<String>() {
                     @Override
                     public boolean hasNext() {
-                        return it.hasNext();
+                        return lait.hasNext();
                     }
 
                     @Override
                     public String next() {
-                        return (String) it.next();
+                        return lait.next().key().toString();
                     }
                 };
             }

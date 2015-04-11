@@ -4,8 +4,8 @@ import org.agilewiki.jactor2.core.blades.IsolationBladeBase;
 import org.agilewiki.jactor2.core.messages.AsyncResponseProcessor;
 import org.agilewiki.jactor2.core.messages.impl.AsyncRequestImpl;
 import org.agilewiki.utils.BlockIOException;
-import org.agilewiki.utils.ids.Timestamp;
 import org.agilewiki.utils.dsm.DiskSpaceManager;
+import org.agilewiki.utils.ids.Timestamp;
 import org.agilewiki.utils.ids.composites.Journal;
 import org.agilewiki.utils.immutable.CascadingRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
@@ -80,7 +80,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     /**
      * Returns a Versioned Map Node (VMM) for the given id.
      *
-     * @param id    The id of the VMN.
+     * @param id The id of the VMN.
      * @return The VMN, or null.
      */
     public VersionedMapNode versionedMapNode(String id) {
@@ -98,13 +98,14 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     }
 
     private void updateJournal(String id) {
-        create(Journal.modifiesKey(jeName, id));
-        add(id, Journal.JOURNAL_ID, jeName, true);
+        create(Journal.modifiesId(jeName, id));
+        set(Journal.journalId(id), jeName, true, true);
     }
 
     /**
      * Set the list of id to versionedNilMap if the list is not present.
-     * @param id    The key for the list in dbMapNode.
+     *
+     * @param id The key for the list in dbMapNode.
      */
     public void create(String id) {
         checkPrivilege();
@@ -175,7 +176,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
      *
      * @param id  The id for the VersionedMapNode.
      * @param key The key for the VersionedListNode in the VersionedMapNode.
-     * @param x The item to be deleted.
+     * @param x   The item to be deleted.
      */
     public void remove(String id, String key, Object x) {
         checkPrivilege();
@@ -198,6 +199,10 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
      * @param value The new value.
      */
     public void set(String id, String key, Object value) {
+        set(id, key, value, false);
+    }
+
+    public void set(String id, String key, Object value, boolean journal) {
         checkPrivilege();
         if (!id.startsWith("$"))
             throw new IllegalArgumentException("not an id or composite id: " + id);
@@ -207,7 +212,8 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                 (VersionedMapNode) listNode.get(0);
         versionedMapNode = versionedMapNode.set(key, value);
         dbMapNode = dbMapNode.set(id, versionedMapNode);
-        updateJournal(id);
+        if (!journal)
+            updateJournal(id);
     }
 
     /**
