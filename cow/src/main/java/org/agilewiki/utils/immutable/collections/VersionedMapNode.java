@@ -456,7 +456,7 @@ public interface VersionedMapNode extends Releasable {
         return new MapAccessor() {
 
             @Override
-            public long timestamp() {
+            public long getTimestamp() {
                 return timestamp;
             }
 

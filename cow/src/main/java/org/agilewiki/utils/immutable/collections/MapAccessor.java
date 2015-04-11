@@ -15,7 +15,7 @@ public interface MapAccessor extends Iterable<ListAccessor> {
      *
      * @return The time being accessed, or MAX_TIMESTAMP.
      */
-    long timestamp();
+    long getTimestamp();
 
     /**
      * Returns the count of all the keys with a non-empty list.

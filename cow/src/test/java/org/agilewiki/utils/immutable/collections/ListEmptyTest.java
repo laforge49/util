@@ -22,7 +22,7 @@ public class ListEmptyTest extends TestCase {
 
             ListAccessor la = registry.nilList.listAccessor();
 
-            assertEquals(BaseRegistry.MAX_TIMESTAMP, la.timestamp());
+            assertEquals(BaseRegistry.MAX_TIMESTAMP, la.getTimestamp());
 
             assertNull(la.get(-1));
             assertNull(la.get(0));

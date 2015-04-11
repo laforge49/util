@@ -220,6 +220,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     public void add(String id, String key, Object value) {
         add(id, key, value, false);
     }
+
     private void add(String id, String key, Object value, boolean journal) {
         checkPrivilege();
         if (!id.startsWith("$"))

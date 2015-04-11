@@ -408,7 +408,7 @@ public class VersionedListNodeData implements Releasable {
     public boolean isEmpty(long timestamp) {
         if (isNil())
             return true;
-        return !(exists(timestamp) && leftNode.isEmpty(timestamp) && rightNode.isEmpty(timestamp));
+        return (!exists(timestamp) && leftNode.isEmpty(timestamp) && rightNode.isEmpty(timestamp));
     }
 
     /**

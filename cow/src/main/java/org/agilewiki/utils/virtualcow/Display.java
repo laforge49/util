@@ -13,18 +13,18 @@ public class Display {
         MapAccessor mapAccessor = db.mapAccessor();
         for (ListAccessor la: mapAccessor) {
             VersionedMapNode vmn = (VersionedMapNode) la.get(0);
-            vmn(db, vmn.mapAccessor(timestamp), (String) la.key());
+            vmn(vmn.mapAccessor(timestamp), (String) la.key());
         }
     }
 
-    public static void vmn(Db db, MapAccessor ma, String id) {
+    public static void vmn(MapAccessor ma, String id) {
         System.out.println("\nvmn id: " + id);
         for (ListAccessor la: ma) {
-            vln(db, la);
+            vln(la);
         }
     }
 
-    public static void vln(Db db, ListAccessor la) {
+    public static void vln(ListAccessor la) {
         System.out.println("    " + la.key() + " = " + la.flatList());
     }
 }

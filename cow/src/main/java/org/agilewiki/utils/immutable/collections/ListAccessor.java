@@ -20,7 +20,7 @@ public interface ListAccessor extends Iterable {
      *
      * @return The time being accessed, or MAX_TIMESTAMP.
      */
-    long timestamp();
+    long getTimestamp();
 
     /**
      * Returns the count of all the values currently in the list.

@@ -277,7 +277,7 @@ public interface ListNode extends Releasable {
             }
 
             @Override
-            public long timestamp() {
+            public long getTimestamp() {
                 return FactoryRegistry.MAX_TIMESTAMP;
             }
 
