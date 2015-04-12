@@ -5,7 +5,9 @@ import org.agilewiki.jactor2.core.messages.AsyncResponseProcessor;
 import org.agilewiki.jactor2.core.messages.impl.AsyncRequestImpl;
 import org.agilewiki.utils.BlockIOException;
 import org.agilewiki.utils.dsm.DiskSpaceManager;
+import org.agilewiki.utils.ids.NameId;
 import org.agilewiki.utils.ids.Timestamp;
+import org.agilewiki.utils.ids.ValueId;
 import org.agilewiki.utils.ids.composites.Journal;
 import org.agilewiki.utils.immutable.CascadingRegistry;
 import org.agilewiki.utils.immutable.ImmutableFactory;
@@ -18,6 +20,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.nio.file.StandardOpenOption.*;
@@ -98,8 +101,41 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     }
 
     private void updateJournal(String id) {
-        create(Journal.modifiesId(jeName, id));
+        set(Journal.modifiesId(jeName), id, true, true);
         set(Journal.journalId(id), jeName, true, true);
+    }
+
+    /**
+     * Iterates over the keys under an id.
+     *
+     * @param id    The id of a VMN.
+     * @return The key iterable.
+     */
+    public Iterable<String> keysIterable(String id) {
+        ValueId.validateAnId(id);
+        MapAccessor ma = mapAccessor();
+        ListAccessor la = ma.listAccessor(id);
+        if (la == null) {
+            return new EmptyIterable<String>();
+        }
+        VersionedMapNode vmn = (VersionedMapNode) la.get(0);
+        Iterator<ListAccessor> lait = vmn.iterator(getTimestamp());
+        return new Iterable<String>() {
+            @Override
+            public Iterator<String> iterator() {
+                return new Iterator<String>() {
+                    @Override
+                    public boolean hasNext() {
+                        return lait.hasNext();
+                    }
+
+                    @Override
+                    public String next() {
+                        return lait.next().key().toString();
+                    }
+                };
+            }
+        };
     }
 
     /**
