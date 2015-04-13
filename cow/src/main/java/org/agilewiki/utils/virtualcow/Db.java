@@ -93,6 +93,13 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         return (VersionedMapNode) listAccessor.get(0);
     }
 
+    /**
+     * Returns the versioned list node for a given id and key.
+     *
+     * @param id     The id for the versioned list node.
+     * @param key    The key for the versioned list node.
+     * @return The versioned list node, or null.
+     */
     public VersionedListNode versionedListNode(String id, String key) {
         VersionedMapNode versionedMapNode = versionedMapNode(id);
         if (versionedMapNode == null)
@@ -111,7 +118,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
      * @param id    The id of a VMN.
      * @return The key iterable.
      */
-    public Iterable<String> keysIterable(String id) {
+    public Iterable<String> keysIterable(String id, long timestamp) {
         ValueId.validateAnId(id);
         MapAccessor ma = mapAccessor();
         ListAccessor la = ma.listAccessor(id);
@@ -119,7 +126,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             return new EmptyIterable<String>();
         }
         VersionedMapNode vmn = (VersionedMapNode) la.get(0);
-        Iterator<ListAccessor> lait = vmn.iterator(getTimestamp());
+        Iterator<ListAccessor> lait = vmn.iterator(timestamp);
         return new Iterable<String>() {
             @Override
             public Iterator<String> iterator() {

@@ -56,7 +56,7 @@ public class Journal {
      * @return The iterable.
      */
     public static Iterable<String> modifies(Db db, String timestampId) {
-        return db.keysIterable(modifiesId(timestampId));
+        return db.keysIterable(modifiesId(timestampId), db.getTimestamp());
     }
 
     /**
@@ -68,6 +68,6 @@ public class Journal {
      * @return The iterable.
      */
     public static Iterable<String> journal(Db db, String id) {
-        return db.keysIterable(journalId(id));
+        return db.keysIterable(journalId(id), db.getTimestamp());
     }
 }

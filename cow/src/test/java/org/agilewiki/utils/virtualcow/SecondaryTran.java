@@ -17,24 +17,29 @@ public class SecondaryTran implements Transaction {
         Display.all(db, timestamp);
 
         System.out.println("\nSecondary ids of "+johnJonesId);
-        VersionedMapNode vmn = db.versionedMapNode(johnJonesId);
-        System.out.println("    " + SecondaryId.secondaryIdList(vmn, timestamp));
+        for (String typeId: SecondaryId.typeIdIterable(db, johnJonesId)) {
+            for (String secondaryId: SecondaryId.secondaryIdIterable(db, johnJonesId, typeId, db.getTimestamp())) {
+                System.out.println(secondaryId);
+            }
+        };
 
         System.out.println("\nVMN IDs for secondary id " + johnJonesSID);
-        for (String vmlId: SecondaryId.vlnIdIterable(db, johnJonesSID, timestamp)) {
+        for (String vmlId: SecondaryId.vmnIdIterable(db, johnJonesSID, timestamp)) {
             System.out.println("    "+vmlId);
         }
 
         SecondaryId.removeSecondaryId(db, johnJonesId, johnJonesSID);
         Display.all(db, timestamp);
 
-        System.out.println("\nSecondary ids of " + johnJonesId);
-        vmn = db.versionedMapNode(johnJonesId);
-        System.out.println("    " + SecondaryId.secondaryIdList(vmn, timestamp));
-
+        System.out.println("\nSecondary ids of "+johnJonesId);
+        for (String typeId: SecondaryId.typeIdIterable(db, johnJonesId)) {
+            for (String secondaryId: SecondaryId.secondaryIdIterable(db, johnJonesId, typeId, db.getTimestamp())) {
+                System.out.println(secondaryId);
+            }
+        };
 
         System.out.println("\nVMN IDs for secondary id " + johnJonesSID);
-        for (String vmlId: SecondaryId.vlnIdIterable(db, johnJonesSID, timestamp)) {
+        for (String vmlId: SecondaryId.vmnIdIterable(db, johnJonesSID, timestamp)) {
             System.out.println("    "+vmlId);
         }
     }

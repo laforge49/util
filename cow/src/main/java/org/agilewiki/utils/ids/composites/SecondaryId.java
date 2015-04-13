@@ -3,22 +3,20 @@ package org.agilewiki.utils.ids.composites;
 import org.agilewiki.utils.ids.NameId;
 import org.agilewiki.utils.ids.ValueId;
 import org.agilewiki.utils.immutable.collections.ListAccessor;
+import org.agilewiki.utils.immutable.collections.MapAccessor;
 import org.agilewiki.utils.immutable.collections.VersionedListNode;
-import org.agilewiki.utils.immutable.collections.VersionedMapNode;
 import org.agilewiki.utils.virtualcow.Db;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * An implementation of secondary ids for a Versioned Map List (VML).
  */
 public class SecondaryId {
     /**
-     * Used as a key prefix in a VML key to identify a key/value for a secondary id.
+     * Identifies an id as a composite for an inverted secondary id.
      */
-    public static final String SECONDARY_KEY = "$C";
+    public static final String SECONDARY_INV = "$C";
 
     /**
      * Identifies an id as a composite for a secondary id.
@@ -26,14 +24,16 @@ public class SecondaryId {
     public static final String SECONDARY_ID = "$D";
 
     /**
-     * Returns a composite key for the value of a secondary id.
+     * Returns a composite key for the inverse of a secondary id.
      *
+     * @param vmnId  The id of the VMN.
      * @param typeId The type of secondary key.
      * @return The composite key.
      */
-    public static String secondaryKey(String typeId) {
+    public static String secondaryInv(String vmnId, String typeId) {
+        NameId.validateAnId(vmnId);
         NameId.validateId(typeId);
-        return SECONDARY_KEY + typeId;
+        return SECONDARY_INV + vmnId + typeId;
     }
 
     /**
@@ -60,15 +60,18 @@ public class SecondaryId {
     }
 
     /**
-     * Returns the name id of the secondary key type.
+     * Returns the name id of the secondary inv type.
      *
-     * @param secondaryKey A secondary key.
+     * @param secondaryInv A secondary inv.
      * @return The name id.
      */
-    public static String secondaryKeyType(String secondaryKey) {
-        if (!secondaryKey.startsWith(SECONDARY_KEY))
-            throw new IllegalArgumentException("not a secondary key: " + secondaryKey);
-        String nameId = secondaryKey.substring(2);
+    public static String secondaryInvType(String secondaryInv) {
+        if (!secondaryInv.startsWith(SECONDARY_INV))
+            throw new IllegalArgumentException("not a secondary inv: " + secondaryInv);
+        int i = secondaryInv.indexOf('$', 3);
+        if (i < 0)
+            throw new IllegalArgumentException("not a secondary inv: " + secondaryInv);
+        String nameId = secondaryInv.substring(i);
         NameId.validateId(nameId);
         return nameId;
     }
@@ -108,24 +111,62 @@ public class SecondaryId {
     }
 
     /**
-     * Returns a list of the secondary ids for a given versioned map node.
+     * Iterates over the secondary types.
      *
-     * @param vmn       The versioned list map.
-     * @param timestamp The time of the query.
-     * @return A list of the secondary ids.
+     * @param db       The database.
+     * @param vmnId    The id of a VMN.
+     * @return An iterable over the types.
      */
-    public static List<String> secondaryIdList(VersionedMapNode vmn, long timestamp) {
-        List<String> sids = new ArrayList<>();
-        for (ListAccessor la: vmn.iterable(SECONDARY_KEY, timestamp)) {
-            String secondaryKey = la.key().toString();
-            String secondaryType = SecondaryId.secondaryKeyType(secondaryKey);
-            for (Object o: la) {
-                String valueId = ValueId.generate(o.toString());
-                String secondaryId = SecondaryId.secondaryId(secondaryType, valueId);
-                sids.add(secondaryId);
+    public static Iterable<String> typeIdIterable(Db db, String vmnId) {
+        MapAccessor ma = db.mapAccessor();
+        Iterator<ListAccessor> lait = ma.iterator(SECONDARY_INV+vmnId);
+        return new Iterable<String>() {
+            @Override
+            public Iterator<String> iterator() {
+                return new Iterator<String>() {
+                    @Override
+                    public boolean hasNext() {
+                        return lait.hasNext();
+                    }
+
+                    @Override
+                    public String next() {
+                        String secondaryInv = lait.next().key().toString();
+                        int i = secondaryInv.lastIndexOf("$");
+                        return secondaryInv.substring(i);
+                    }
+                };
             }
-        }
-        return sids;
+        };
+    }
+
+    /**
+     * Iterates over the secondary keys.
+     *
+     * @param db     The database.
+     * @param vmnId  The id of the VMN.
+     * @param typeId The type of secondary key.
+     * @param timestamp   The time of the query.
+     * @return The Iterable, or null.
+     */
+    public static Iterable<String> secondaryIdIterable(Db db, String vmnId, String typeId, long timestamp) {
+        Iterator<String> vit = db.keysIterable(secondaryInv(vmnId, typeId), timestamp).iterator();
+        return new Iterable<String>() {
+            @Override
+            public Iterator<String> iterator() {
+                return new Iterator<String>() {
+                    @Override
+                    public boolean hasNext() {
+                        return vit.hasNext();
+                    }
+
+                    @Override
+                    public String next() {
+                        return secondaryId(typeId, vit.next());
+                    }
+                };
+            }
+        };
     }
 
     /**
@@ -136,37 +177,17 @@ public class SecondaryId {
      * @param timestamp   The time of the query.
      * @return The Iterable, or null.
      */
-    public static Iterable<String> vlnIdIterable(Db db, String secondaryId, long timestamp) {
-        validateSecondaryId(secondaryId);
-        ListAccessor listAccessor = db.mapAccessor().listAccessor(secondaryId);
-        if (listAccessor == null)
-            return null;
-        Iterator<ListAccessor> it = ((VersionedMapNode) listAccessor.get(0)).mapAccessor().iterator();
-        return new Iterable<String>() {
-            @Override
-            public Iterator<String> iterator() {
-                return new Iterator<String>() {
-                    @Override
-                    public boolean hasNext() {
-                        return it.hasNext();
-                    }
-
-                    @Override
-                    public String next() {
-                        return (String) it.next().key();
-                    }
-                };
-            }
-        };
+    public static Iterable<String> vmnIdIterable(Db db, String secondaryId, long timestamp) {
+        return db.keysIterable(secondaryId, timestamp);
     }
 
     /**
      * Returns true iff the vmn has the given secondary id.
      *
-     * @param db             The database.
-     * @param vmlId          The id of the vml.
-     * @param secondaryId    The secondary id.
-     * @param timestamp      The time of the query.
+     * @param db          The database.
+     * @param vmlId       The id of the vml.
+     * @param secondaryId The secondary id.
+     * @param timestamp   The time of the query.
      * @return True if the secondary key is present.
      */
     public static boolean hasSecondaryId(Db db, String vmlId, String secondaryId, long timestamp) {
@@ -180,32 +201,31 @@ public class SecondaryId {
     /**
      * Add a secondary key to a vml if not already present.
      *
-     * @param db             The database.
-     * @param vmlId          The id of the vml.
-     * @param secondaryId    The secondary id.
+     * @param db          The database.
+     * @param vmlId       The id of the vml.
+     * @param secondaryId The secondary id.
      */
     public static void createSecondaryId(Db db, String vmlId, String secondaryId) {
         if (hasSecondaryId(db, vmlId, secondaryId, db.getTimestamp()))
             return;
         db.set(secondaryId, vmlId, true);
-        db.add(vmlId,
-                secondaryKey(secondaryIdType(secondaryId)),
-                ValueId.value(secondaryIdValue(secondaryId)));
+        db.set(secondaryInv(vmlId, secondaryIdType(secondaryId)),
+                secondaryIdValue(secondaryId),
+                true);
     }
 
     /**
      * Remove a secondary key from a vml if present.
      *
-     * @param db             The database.
-     * @param vmlId          The id of the vml.
-     * @param secondaryId    The secondary id.
+     * @param db          The database.
+     * @param vmlId       The id of the vml.
+     * @param secondaryId The secondary id.
      */
     public static void removeSecondaryId(Db db, String vmlId, String secondaryId) {
         if (!hasSecondaryId(db, vmlId, secondaryId, db.getTimestamp()))
             return;
         db.clearList(secondaryId, vmlId);
-        db.remove(vmlId,
-                secondaryKey(secondaryIdType(secondaryId)),
-                ValueId.value(secondaryIdValue(secondaryId)));
+        db.clearList(secondaryInv(vmlId, secondaryIdType(secondaryId)),
+                secondaryIdValue(secondaryId));
     }
 }
