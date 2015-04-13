@@ -5,7 +5,6 @@ import org.agilewiki.jactor2.core.messages.AsyncResponseProcessor;
 import org.agilewiki.jactor2.core.messages.impl.AsyncRequestImpl;
 import org.agilewiki.utils.BlockIOException;
 import org.agilewiki.utils.dsm.DiskSpaceManager;
-import org.agilewiki.utils.ids.NameId;
 import org.agilewiki.utils.ids.Timestamp;
 import org.agilewiki.utils.ids.ValueId;
 import org.agilewiki.utils.ids.composites.Journal;
@@ -29,7 +28,7 @@ import static java.nio.file.StandardOpenOption.*;
  * A database that supports multiple blocks.
  */
 public class Db extends IsolationBladeBase implements AutoCloseable {
-    public final static String transactionName = "transaction_name";
+    public final static String transactionNameId = "$ntransactionName";
 
     protected final ConcurrentHashMap<String, Class> transactionRegistry =
             new ConcurrentHashMap<>(16, 0.75f, 1);
@@ -380,7 +379,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
      * @return The request to perform the update.
      */
     public AReq<String> update(String transactionName, MapNode tMapNode) {
-        tMapNode = tMapNode.add(Db.transactionName, transactionName);
+        tMapNode = tMapNode.add(Db.transactionNameId, transactionName);
         return update(tMapNode.toByteBuffer());
     }
 
@@ -402,7 +401,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                 try {
                     ImmutableFactory f = dbFactoryRegistry.readId(tByteBuffer);
                     MapNode tMapNode = (MapNode) f.deserialize(tByteBuffer);
-                    String transactionName = (String) tMapNode.getList(Db.transactionName).get(0);
+                    String transactionName = (String) tMapNode.getList(Db.transactionNameId).get(0);
                     Class tClass = transactionRegistry.get(transactionName);
                     Transaction transaction = (Transaction) tClass.newInstance();
                     _asyncRequestImpl.setMessageTimeoutMillis(transaction.timeoutMillis());
@@ -416,7 +415,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
                         for (ListAccessor la : ma) {
                             String key = (String) la.key();
                             for (Object v : la) {
-                                je.add(key, v);
+                                je = je.add(key, v);
                             }
                         }
                         dbMapNode = dbMapNode.add(jeName, je);

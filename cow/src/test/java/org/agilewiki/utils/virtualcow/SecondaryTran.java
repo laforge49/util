@@ -19,7 +19,7 @@ public class SecondaryTran implements Transaction {
         System.out.println("\nSecondary ids of "+johnJonesId);
         for (String typeId: SecondaryId.typeIdIterable(db, johnJonesId)) {
             for (String secondaryId: SecondaryId.secondaryIdIterable(db, johnJonesId, typeId, db.getTimestamp())) {
-                System.out.println(secondaryId);
+                System.out.println("    "+secondaryId);
             }
         };
 
@@ -34,7 +34,7 @@ public class SecondaryTran implements Transaction {
         System.out.println("\nSecondary ids of "+johnJonesId);
         for (String typeId: SecondaryId.typeIdIterable(db, johnJonesId)) {
             for (String secondaryId: SecondaryId.secondaryIdIterable(db, johnJonesId, typeId, db.getTimestamp())) {
-                System.out.println(secondaryId);
+                System.out.println("    "+secondaryId);
             }
         };
 
