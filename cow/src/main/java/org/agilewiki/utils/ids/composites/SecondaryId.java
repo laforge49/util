@@ -10,7 +10,7 @@ import org.agilewiki.utils.virtualcow.Db;
 import java.util.Iterator;
 
 /**
- * An implementation of secondary ids for a Versioned Map List (VML).
+ * An implementation of secondary ids for a Versioned Map Node (VMN).
  */
 public class SecondaryId {
     /**
@@ -49,8 +49,13 @@ public class SecondaryId {
         return SECONDARY_ID + typeId + valueId;
     }
 
+    /**
+     * Validate a secondary id.
+     *
+     * @param secondaryId    The secondary id.
+     */
     public static void validateSecondaryId(String secondaryId) {
-        if (!secondaryId.startsWith(SECONDARY_ID + NameId.PREFIX))
+        if (!secondaryId.startsWith(SECONDARY_ID + "$"))
             throw new IllegalArgumentException("not a secondary id: " + secondaryId);
         int i = secondaryId.indexOf('$', 4);
         if (i < 0)
@@ -202,14 +207,14 @@ public class SecondaryId {
      * Add a secondary key to a vml if not already present.
      *
      * @param db          The database.
-     * @param vmlId       The id of the vml.
+     * @param vmnId       The id of the vmn.
      * @param secondaryId The secondary id.
      */
-    public static void createSecondaryId(Db db, String vmlId, String secondaryId) {
-        if (hasSecondaryId(db, vmlId, secondaryId, db.getTimestamp()))
+    public static void createSecondaryId(Db db, String vmnId, String secondaryId) {
+        if (hasSecondaryId(db, vmnId, secondaryId, db.getTimestamp()))
             return;
-        db.set(secondaryId, vmlId, true);
-        db.set(secondaryInv(vmlId, secondaryIdType(secondaryId)),
+        db.set(secondaryId, vmnId, true);
+        db.set(secondaryInv(vmnId, secondaryIdType(secondaryId)),
                 secondaryIdValue(secondaryId),
                 true);
     }
