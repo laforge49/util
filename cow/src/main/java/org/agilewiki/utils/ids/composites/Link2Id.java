@@ -10,14 +10,14 @@ import org.agilewiki.utils.virtualcow.Db;
 import java.util.Iterator;
 
 /**
- * An implementation of one-way link ids for a Versioned Map Node (VMN).
+ * An implementation of two-way link ids for a Versioned Map Node (VMN).
  */
-public class Link1Id {
+public class Link2Id {
 
     /**
      * Identifies an id as a composite for a link id.
      */
-    public static final String LINK1_ID = "$E";
+    public static final String LINK2_ID = "$I";
 
     /**
      * Returns a composite id for a link identifier.
@@ -26,10 +26,10 @@ public class Link1Id {
      * @param labelId The label of the link.
      * @return The composite id.
      */
-    public static String link1Id(String originId, String labelId) {
+    public static String link2Id(String originId, String labelId) {
         NameId.validateAnId(originId);
         ValueId.validateAnId(labelId);
-        return LINK1_ID + originId + labelId;
+        return LINK2_ID + originId + labelId;
     }
 
     /**
@@ -38,8 +38,8 @@ public class Link1Id {
      * @param linkId A link id.
      * @return The label id.
      */
-    public static String link1IdLabel(String linkId) {
-        if (!linkId.startsWith(LINK1_ID))
+    public static String link2IdLabel(String linkId) {
+        if (!linkId.startsWith(LINK2_ID))
             throw new IllegalArgumentException("not a link id: " + linkId);
         int i = linkId.indexOf('$', 3);
         if (i < 0)
@@ -56,9 +56,9 @@ public class Link1Id {
      * @param vmnId    The id of the origin VMN.
      * @return An iterable over the label ids of all links.
      */
-    public static Iterable<String> link1LabelIdIterable(Db db, String vmnId) {
+    public static Iterable<String> link2LabelIdIterable(Db db, String vmnId) {
         MapAccessor ma = db.mapAccessor();
-        Iterator<ListAccessor> lait = ma.iterator(LINK1_ID + vmnId);
+        Iterator<ListAccessor> lait = ma.iterator(LINK2_ID + vmnId);
         return new Iterable<String>() {
             @Override
             public Iterator<String> iterator() {
@@ -71,7 +71,7 @@ public class Link1Id {
                     @Override
                     public String next() {
                         String linkId = lait.next().key().toString();
-                        return link1IdLabel(linkId);
+                        return link2IdLabel(linkId);
                     }
                 };
             }
@@ -87,8 +87,8 @@ public class Link1Id {
      * @param timestamp   The time of the query.
      * @return The Iterable.
      */
-    public static Iterable<String> link1IdIterable(Db db, String vmnId, String labelId, long timestamp) {
-        return db.keysIterable(link1Id(vmnId, labelId), timestamp);
+    public static Iterable<String> link2IdIterable(Db db, String vmnId, String labelId, long timestamp) {
+        return db.keysIterable(link2Id(vmnId, labelId), timestamp);
     }
 
     /**
@@ -101,8 +101,8 @@ public class Link1Id {
      * @param timestamp    The time of the query.
      * @return True if the link exists.
      */
-    public static boolean hasLink1(Db db, String vmnId1, String labelId, String vmnId2, long timestamp) {
-        String linkId = link1Id(vmnId1, labelId);
+    public static boolean hasLink2(Db db, String vmnId1, String labelId, String vmnId2, long timestamp) {
+        String linkId = link2Id(vmnId1, labelId);
         VersionedListNode vln = db.versionedListNode(linkId, vmnId2);
         if (vln == null)
             return false;
@@ -117,11 +117,13 @@ public class Link1Id {
      * @param labelId      The link label.
      * @param vmnId2       The target vmn.
      */
-    public static void createLink1(Db db, String vmnId1, String labelId, String vmnId2) {
-        if (hasLink1(db, vmnId1, labelId, vmnId2, db.getTimestamp()))
+    public static void createLink2(Db db, String vmnId1, String labelId, String vmnId2) {
+        if (hasLink2(db, vmnId1, labelId, vmnId2, db.getTimestamp()))
             return;
-        String linkId = link1Id(vmnId1, labelId);
+        String linkId = link2Id(vmnId1, labelId);
         db.set(linkId, vmnId2, true);
+        linkId = link2Id(vmnId2, labelId);
+        db.set(linkId, vmnId1, true);
     }
 
     /**
@@ -132,10 +134,12 @@ public class Link1Id {
      * @param labelId      The link label.
      * @param vmnId2       The target vmn.
      */
-    public static void removeLink1(Db db, String vmnId1, String labelId, String vmnId2) {
-        if (!hasLink1(db, vmnId1, labelId, vmnId2, db.getTimestamp()))
+    public static void removeLink2(Db db, String vmnId1, String labelId, String vmnId2) {
+        if (!hasLink2(db, vmnId1, labelId, vmnId2, db.getTimestamp()))
             return;
-        String linkId = link1Id(vmnId1, labelId);
+        String linkId = link2Id(vmnId1, labelId);
         db.clearList(linkId, vmnId2);
+        linkId = link2Id(vmnId2, labelId);
+        db.clearList(linkId, vmnId1);
     }
 }

@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class Link1Test extends TestCase {
+public class Link2Test extends TestCase {
     public void test() throws Exception {
         new Plant();
         try {
@@ -17,9 +17,9 @@ public class Link1Test extends TestCase {
             int maxRootBlockSize = 1000;
             try (Db db = new Db(new BaseRegistry(), dbPath, maxRootBlockSize)) {
                 Files.deleteIfExists(dbPath);
-                db.registerTransaction("Link1Tran", Link1Tran.class);
+                db.registerTransaction("Link2Tran", Link2Tran.class);
                 db.open(true);
-                String timestampId = db.update("Link1Tran").call();
+                String timestampId = db.update("Link2Tran").call();
             }
         } finally {
             Plant.close();
