@@ -284,6 +284,18 @@ public interface VersionedMapNode extends Releasable {
     }
 
     /**
+     * Returns true if all lists are empty.
+     *
+     * @param timestamp    The time of the query.
+     * @return False if there is any content.
+     */
+    default boolean isEmpty(long timestamp) {
+        if (isNil())
+            return true;
+        return getData().isEmpty(timestamp);
+    }
+
+    /**
      * Returns the smallest key of the non-empty lists for the given time.
      *
      * @param timestamp The time of the query.

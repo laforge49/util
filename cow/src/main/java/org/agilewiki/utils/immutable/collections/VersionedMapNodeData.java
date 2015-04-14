@@ -413,6 +413,18 @@ public class VersionedMapNodeData implements Releasable {
         return s;
     }
 
+    public boolean isEmpty(long timestamp) {
+        if (isNil())
+            return true;
+        if (!listNode.isEmpty(timestamp))
+            return false;
+        if (!leftNode.isEmpty(timestamp))
+            return false;
+        if (!rightNode.isEmpty(timestamp))
+            return false;
+        return true;
+    }
+
     /**
      * Returns the smallest key of the non-empty lists for the given time.
      *
