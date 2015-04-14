@@ -4,9 +4,11 @@ import org.agilewiki.utils.ids.NameId;
 import org.agilewiki.utils.immutable.collections.ListAccessor;
 import org.agilewiki.utils.immutable.collections.MapAccessor;
 import org.agilewiki.utils.immutable.collections.VersionedListNode;
+import org.agilewiki.utils.immutable.collections.VersionedMapNode;
 import org.agilewiki.utils.virtualcow.Db;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * An implementation of two-way link ids for a Versioned Map Node (VMN).
@@ -64,6 +66,70 @@ public class Link2Id {
         String labelId = linkId.substring(i);
         NameId.validateAnId(labelId);
         return labelId;
+    }
+
+    /**
+     * Returns the vmn id which is the origin of a link with the given label.
+     *
+     * @param labelId A label id.
+     * @return The VMN id.
+     */
+    public static String label2IdLabel(String labelId) {
+        if (!labelId.startsWith(LABEL2_INDEX_ID))
+            throw new IllegalArgumentException("not a link id: " + labelId);
+        int i = labelId.indexOf('$', 3);
+        if (i < 0)
+            throw new IllegalArgumentException("not a link id: " + labelId);
+        String vmnId = labelId.substring(i);
+        NameId.validateAnId(vmnId);
+        return vmnId;
+    }
+
+    /**
+     * Iterates over the VMNs that are the orgin of a link with the given label.
+     *
+     * @param db           The database.
+     * @param labelId      The label id.
+     * @param timestamp    The time of the query.
+     * @return The iterable.
+     */
+    public static Iterable<String> label2IdIterable(Db db, String labelId, long timestamp) {
+        MapAccessor ma = db.mapAccessor();
+        Iterator<ListAccessor> lait = ma.iterator(LABEL2_INDEX_ID + labelId);
+        return new Iterable<String>() {
+            @Override
+            public Iterator<String> iterator() {
+                return new Iterator<String>() {
+                    ListAccessor next = null;
+
+                    boolean isNext() {
+                        while (next == null && lait.hasNext()) {
+                            next = lait.next();
+                            String labelIndexId = next.key().toString();
+                            VersionedMapNode vmn = (VersionedMapNode) next.get(0);
+                            if (vmn == null || vmn.isEmpty(timestamp)) {
+                                next = null;
+                            }
+                        }
+                        return next != null;
+                    }
+
+                    @Override
+                    public boolean hasNext() {
+                        return isNext();
+                    }
+
+                    @Override
+                    public String next() {
+                        if (!isNext())
+                            throw new NoSuchElementException();
+                        String n = label2IdLabel(next.key().toString());
+                        next = null;
+                        return n;
+                    }
+                };
+            }
+        };
     }
 
     /**

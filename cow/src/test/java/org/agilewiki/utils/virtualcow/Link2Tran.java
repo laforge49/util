@@ -19,6 +19,10 @@ public class Link2Tran implements Transaction {
                 System.out.println("target: "+targetId);
             }
         }
+        System.out.println("");
+        for (String vmnId: Link2Id.label2IdIterable(db, brotherId, db.getTimestamp())) {
+            System.out.println("has brother link: "+vmnId);
+        }
 
         Display.all(db, timestamp);
 
@@ -28,6 +32,10 @@ public class Link2Tran implements Transaction {
             for (String targetId: Link2Id.link2IdIterable(db, johnJonesId, labelId, timestamp)) {
                 System.out.println("target: "+targetId);
             }
+        }
+        System.out.println("");
+        for (String vmnId: Link2Id.label2IdIterable(db, brotherId, db.getTimestamp())) {
+            System.out.println("has brother link: " + vmnId);
         }
 
         Display.all(db, timestamp);
