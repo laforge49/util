@@ -1,7 +1,6 @@
 package org.agilewiki.utils.ids.composites;
 
 import org.agilewiki.utils.ids.NameId;
-import org.agilewiki.utils.ids.ValueId;
 import org.agilewiki.utils.immutable.collections.ListAccessor;
 import org.agilewiki.utils.immutable.collections.MapAccessor;
 import org.agilewiki.utils.immutable.collections.VersionedListNode;
@@ -28,7 +27,7 @@ public class Link1Id {
      */
     public static String link1Id(String originId, String labelId) {
         NameId.validateAnId(originId);
-        ValueId.validateAnId(labelId);
+        NameId.validateAnId(labelId);
         return LINK1_ID + originId + labelId;
     }
 
@@ -45,7 +44,7 @@ public class Link1Id {
         if (i < 0)
             throw new IllegalArgumentException("not a link id: " + linkId);
         String labelId = linkId.substring(i);
-        ValueId.validateAnId(labelId);
+        NameId.validateAnId(labelId);
         return labelId;
     }
 

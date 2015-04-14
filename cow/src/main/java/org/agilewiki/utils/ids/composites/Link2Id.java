@@ -1,7 +1,6 @@
 package org.agilewiki.utils.ids.composites;
 
 import org.agilewiki.utils.ids.NameId;
-import org.agilewiki.utils.ids.ValueId;
 import org.agilewiki.utils.immutable.collections.ListAccessor;
 import org.agilewiki.utils.immutable.collections.MapAccessor;
 import org.agilewiki.utils.immutable.collections.VersionedListNode;
@@ -20,6 +19,11 @@ public class Link2Id {
     public static final String LINK2_ID = "$I";
 
     /**
+     * Identifies an id as a composite for a label index id.
+     */
+    public static final String LABEL2_INDEX_ID = "$J";
+
+    /**
      * Returns a composite id for a link identifier.
      *
      * @param originId  The originating VMN Id of link.
@@ -28,8 +32,21 @@ public class Link2Id {
      */
     public static String link2Id(String originId, String labelId) {
         NameId.validateAnId(originId);
-        ValueId.validateAnId(labelId);
+        NameId.validateAnId(labelId);
         return LINK2_ID + originId + labelId;
+    }
+
+    /**
+     * Returns a composite id for a label identifier.
+     *
+     * @param originId  The originating VMN Id of link.
+     * @param labelId The label of the link.
+     * @return The composite id.
+     */
+    public static String label2IndexId(String originId, String labelId) {
+        NameId.validateAnId(originId);
+        NameId.validateAnId(labelId);
+        return LABEL2_INDEX_ID + labelId + originId;
     }
 
     /**
@@ -45,7 +62,7 @@ public class Link2Id {
         if (i < 0)
             throw new IllegalArgumentException("not a link id: " + linkId);
         String labelId = linkId.substring(i);
-        ValueId.validateAnId(labelId);
+        NameId.validateAnId(labelId);
         return labelId;
     }
 
@@ -124,6 +141,10 @@ public class Link2Id {
         db.set(linkId, vmnId2, true);
         linkId = link2Id(vmnId2, labelId);
         db.set(linkId, vmnId1, true);
+        String labelIndexId = label2IndexId(vmnId1, labelId);
+        db.set(labelIndexId, vmnId2, true);
+        labelIndexId = label2IndexId(vmnId2, labelId);
+        db.set(labelIndexId, vmnId1, true);
     }
 
     /**
@@ -141,5 +162,9 @@ public class Link2Id {
         db.clearList(linkId, vmnId2);
         linkId = link2Id(vmnId2, labelId);
         db.clearList(linkId, vmnId1);
+        String labelIndexId = label2IndexId(vmnId1, labelId);
+        db.clearList(labelIndexId, vmnId2);
+        labelIndexId = label2IndexId(vmnId2, labelId);
+        db.clearList(labelIndexId, vmnId1);
     }
 }
