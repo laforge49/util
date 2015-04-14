@@ -13,7 +13,8 @@ public class Display {
         MapAccessor mapAccessor = db.mapAccessor();
         for (ListAccessor la: mapAccessor) {
             VersionedMapNode vmn = (VersionedMapNode) la.get(0);
-            vmn(vmn.mapAccessor(timestamp), (String) la.key());
+            if (!vmn.isEmpty(timestamp))
+                vmn(vmn.mapAccessor(timestamp), (String) la.key());
         }
     }
 
