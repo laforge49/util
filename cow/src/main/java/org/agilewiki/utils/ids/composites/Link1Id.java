@@ -19,6 +19,11 @@ public class Link1Id {
     public static final String LINK1_ID = "$E";
 
     /**
+     * Identifies an id as a composite for an inverted link id.
+     */
+    public static final String LINK1_INV = "$F";
+
+    /**
      * Returns a composite id for a link identifier.
      *
      * @param originId  The originating VMN Id of link.
@@ -29,6 +34,19 @@ public class Link1Id {
         NameId.validateAnId(originId);
         NameId.validateAnId(labelId);
         return LINK1_ID + originId + labelId;
+    }
+
+    /**
+     * Returns a composite id for an inverted link identifier.
+     *
+     * @param targetId  The target VMN Id of link.
+     * @param labelId The label of the link.
+     * @return The composite id.
+     */
+    public static String link1Inv(String targetId, String labelId) {
+        NameId.validateAnId(targetId);
+        NameId.validateAnId(labelId);
+        return LINK1_INV + targetId + labelId;
     }
 
     /**
@@ -43,6 +61,23 @@ public class Link1Id {
         int i = linkId.indexOf('$', 3);
         if (i < 0)
             throw new IllegalArgumentException("not a link id: " + linkId);
+        String labelId = linkId.substring(i);
+        NameId.validateAnId(labelId);
+        return labelId;
+    }
+
+    /**
+     * Returns the label id of the inverted link id.
+     *
+     * @param linkId A link id.
+     * @return The label id.
+     */
+    public static String link1InvLabel(String linkId) {
+        if (!linkId.startsWith(LINK1_INV))
+            throw new IllegalArgumentException("not an inverted link id: " + linkId);
+        int i = linkId.indexOf('$', 3);
+        if (i < 0)
+            throw new IllegalArgumentException("not an inverted link id: " + linkId);
         String labelId = linkId.substring(i);
         NameId.validateAnId(labelId);
         return labelId;
@@ -78,6 +113,35 @@ public class Link1Id {
     }
 
     /**
+     * Iterates over the label ids of links targeting a VMN.
+     *
+     * @param db       The database.
+     * @param vmnId    The id of the target VMN.
+     * @return An iterable over the label ids of all inverted links.
+     */
+    public static Iterable<String> link1LabelInvIterable(Db db, String vmnId) {
+        MapAccessor ma = db.mapAccessor();
+        Iterator<ListAccessor> lait = ma.iterator(LINK1_INV + vmnId);
+        return new Iterable<String>() {
+            @Override
+            public Iterator<String> iterator() {
+                return new Iterator<String>() {
+                    @Override
+                    public boolean hasNext() {
+                        return lait.hasNext();
+                    }
+
+                    @Override
+                    public String next() {
+                        String linkId = lait.next().key().toString();
+                        return link1InvLabel(linkId);
+                    }
+                };
+            }
+        };
+    }
+
+    /**
      * Iterates over the target VMN ids linked to from a given VMN..
      *
      * @param db     The database.
@@ -88,6 +152,19 @@ public class Link1Id {
      */
     public static Iterable<String> link1IdIterable(Db db, String vmnId, String labelId, long timestamp) {
         return db.keysIterable(link1Id(vmnId, labelId), timestamp);
+    }
+
+    /**
+     * Iterates over the originating VMN ids targeting a given VMN..
+     *
+     * @param db     The database.
+     * @param vmnId  The id of the target VMN.
+     * @param labelId The label of the links.
+     * @param timestamp   The time of the query.
+     * @return The Iterable.
+     */
+    public static Iterable<String> link1InvIterable(Db db, String vmnId, String labelId, long timestamp) {
+        return db.keysIterable(link1Inv(vmnId, labelId), timestamp);
     }
 
     /**
@@ -121,6 +198,8 @@ public class Link1Id {
             return;
         String linkId = link1Id(vmnId1, labelId);
         db.set(linkId, vmnId2, true);
+        linkId = link1Inv(vmnId2, labelId);
+        db.set(linkId, vmnId1, true);
     }
 
     /**
@@ -136,5 +215,7 @@ public class Link1Id {
             return;
         String linkId = link1Id(vmnId1, labelId);
         db.clearList(linkId, vmnId2);
+        linkId = link1Inv(vmnId2, labelId);
+        db.clearList(linkId, vmnId1);
     }
 }

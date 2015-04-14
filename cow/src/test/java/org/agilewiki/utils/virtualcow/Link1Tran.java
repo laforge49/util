@@ -19,6 +19,12 @@ public class Link1Tran implements Transaction {
                 System.out.println("target: "+targetId);
             }
         }
+        for (String labelId: Link1Id.link1LabelInvIterable(db, jackJonesId)) {
+            System.out.println("\nlink1Inv label: "+labelId);
+            for (String targetId: Link1Id.link1InvIterable(db, jackJonesId, labelId, timestamp)) {
+                System.out.println("originating: "+targetId);
+            }
+        }
 
         Display.all(db, timestamp);
 
@@ -27,6 +33,12 @@ public class Link1Tran implements Transaction {
             System.out.println("\nlink1 label: "+labelId);
             for (String targetId: Link1Id.link1IdIterable(db, johnJonesId, labelId, timestamp)) {
                 System.out.println("target: "+targetId);
+            }
+        }
+        for (String labelId: Link1Id.link1LabelInvIterable(db, jackJonesId)) {
+            System.out.println("\nlink1Inv label: "+labelId);
+            for (String targetId: Link1Id.link1InvIterable(db, jackJonesId, labelId, timestamp)) {
+                System.out.println("originating: "+targetId);
             }
         }
 
