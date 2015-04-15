@@ -25,6 +25,14 @@ public class Link1Tran implements Transaction {
                 System.out.println("originating: "+targetId);
             }
         }
+        System.out.println("");
+        for (String vmnId: Link1Id.label1IdIterable(db, sonId, db.getTimestamp())) {
+            System.out.println("has a son link: "+vmnId);
+        }
+        System.out.println("");
+        for (String vmnId: Link1Id.label1InvIterable(db, sonId, db.getTimestamp())) {
+            System.out.println("has an inverted son link: "+vmnId);
+        }
 
         Display.all(db, timestamp);
 
@@ -40,6 +48,14 @@ public class Link1Tran implements Transaction {
             for (String targetId: Link1Id.link1InvIterable(db, jackJonesId, labelId, timestamp)) {
                 System.out.println("originating: "+targetId);
             }
+        }
+        System.out.println("");
+        for (String vmnId: Link1Id.label1IdIterable(db, sonId, db.getTimestamp())) {
+            System.out.println("has a son link: "+vmnId);
+        }
+        System.out.println("");
+        for (String vmnId: Link1Id.label1InvIterable(db, sonId, db.getTimestamp())) {
+            System.out.println("has an inverted son link: "+vmnId);
         }
 
         Display.all(db, timestamp);

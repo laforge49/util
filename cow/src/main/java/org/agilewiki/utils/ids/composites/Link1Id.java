@@ -4,9 +4,11 @@ import org.agilewiki.utils.ids.NameId;
 import org.agilewiki.utils.immutable.collections.ListAccessor;
 import org.agilewiki.utils.immutable.collections.MapAccessor;
 import org.agilewiki.utils.immutable.collections.VersionedListNode;
+import org.agilewiki.utils.immutable.collections.VersionedMapNode;
 import org.agilewiki.utils.virtualcow.Db;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * An implementation of one-way link ids for a Versioned Map Node (VMN).
@@ -22,6 +24,16 @@ public class Link1Id {
      * Identifies an id as a composite for an inverted link id.
      */
     public static final String LINK1_INV = "$F";
+
+    /**
+     * Identifies an id as a composite for a label index id.
+     */
+    public static final String LABEL1_INDEX_ID = "$G";
+
+    /**
+     * Identifies an id as a composite for an inverted label index id.
+     */
+    public static final String LABEL1_INDEX_INV = "$H";
 
     /**
      * Returns a composite id for a link identifier.
@@ -50,6 +62,32 @@ public class Link1Id {
     }
 
     /**
+     * Returns a composite id for a label identifier.
+     *
+     * @param originId  The originating VMN Id of link.
+     * @param labelId The label of the link.
+     * @return The composite id.
+     */
+    public static String label1IndexId(String originId, String labelId) {
+        NameId.validateAnId(originId);
+        NameId.validateAnId(labelId);
+        return LABEL1_INDEX_ID + labelId + originId;
+    }
+
+    /**
+     * Returns a composite id for an inverted label identifier.
+     *
+     * @param targetId  The target VMN Id of link.
+     * @param labelId The label of the link.
+     * @return The composite id.
+     */
+    public static String label1IndexInv(String targetId, String labelId) {
+        NameId.validateAnId(targetId);
+        NameId.validateAnId(labelId);
+        return LABEL1_INDEX_INV + labelId + targetId;
+    }
+
+    /**
      * Returns the label id of the link id.
      *
      * @param linkId A link id.
@@ -67,20 +105,146 @@ public class Link1Id {
     }
 
     /**
-     * Returns the label id of the inverted link id.
+     * Returns the label id of the link inv.
      *
-     * @param linkId A link id.
+     * @param linkInv A link inv.
      * @return The label id.
      */
-    public static String link1InvLabel(String linkId) {
-        if (!linkId.startsWith(LINK1_INV))
-            throw new IllegalArgumentException("not an inverted link id: " + linkId);
-        int i = linkId.indexOf('$', 3);
+    public static String link1InvLabel(String linkInv) {
+        if (!linkInv.startsWith(LINK1_INV))
+            throw new IllegalArgumentException("not an inverted link id: " + linkInv);
+        int i = linkInv.indexOf('$', 3);
         if (i < 0)
-            throw new IllegalArgumentException("not an inverted link id: " + linkId);
-        String labelId = linkId.substring(i);
+            throw new IllegalArgumentException("not an inverted link id: " + linkInv);
+        String labelId = linkInv.substring(i);
         NameId.validateAnId(labelId);
         return labelId;
+    }
+
+    /**
+     * Returns the vmn id which is the origin of a link with the given label index.
+     *
+     * @param labelIndexId A label index id.
+     * @return The VMN id.
+     */
+    public static String label1IndexIdOrigin(String labelIndexId) {
+        if (!labelIndexId.startsWith(LABEL1_INDEX_ID))
+            throw new IllegalArgumentException("not a label index id: " + labelIndexId);
+        int i = labelIndexId.indexOf('$', 3);
+        if (i < 0)
+            throw new IllegalArgumentException("not a label index id: " + labelIndexId);
+        String vmnId = labelIndexId.substring(i);
+        NameId.validateAnId(vmnId);
+        return vmnId;
+    }
+
+    /**
+     * Returns the vmn id which is the target of a link with the given inverted label index.
+     *
+     * @param labelIndexInv An inverted label index id.
+     * @return The VMN id.
+     */
+    public static String label1IndexInvTarget(String labelIndexInv) {
+        if (!labelIndexInv.startsWith(LABEL1_INDEX_INV))
+            throw new IllegalArgumentException("not an inverted label index id: " + labelIndexInv);
+        int i = labelIndexInv.indexOf('$', 3);
+        if (i < 0)
+            throw new IllegalArgumentException("not an inverted label index id: " + labelIndexInv);
+        String vmnId = labelIndexInv.substring(i);
+        NameId.validateAnId(vmnId);
+        return vmnId;
+    }
+
+    /**
+     * Iterates over the VMNs that are the origin of a link with the given label.
+     *
+     * @param db           The database.
+     * @param labelId      The label id.
+     * @param timestamp    The time of the query.
+     * @return The iterable.
+     */
+    public static Iterable<String> label1IdIterable(Db db, String labelId, long timestamp) {
+        MapAccessor ma = db.mapAccessor();
+        Iterator<ListAccessor> lait = ma.iterator(LABEL1_INDEX_ID + labelId);
+        return new Iterable<String>() {
+            @Override
+            public Iterator<String> iterator() {
+                return new Iterator<String>() {
+                    ListAccessor next = null;
+
+                    boolean isNext() {
+                        while (next == null && lait.hasNext()) {
+                            next = lait.next();
+                            VersionedMapNode vmn = (VersionedMapNode) next.get(0);
+                            if (vmn == null || vmn.isEmpty(timestamp)) {
+                                next = null;
+                            }
+                        }
+                        return next != null;
+                    }
+
+                    @Override
+                    public boolean hasNext() {
+                        return isNext();
+                    }
+
+                    @Override
+                    public String next() {
+                        if (!isNext())
+                            throw new NoSuchElementException();
+                        String n = label1IndexIdOrigin(next.key().toString());
+                        next = null;
+                        return n;
+                    }
+                };
+            }
+        };
+    }
+
+    /**
+     * Iterates over the VMNs that are the target of a link with the given label.
+     *
+     * @param db           The database.
+     * @param labelId      The label id.
+     * @param timestamp    The time of the query.
+     * @return The iterable.
+     */
+    public static Iterable<String> label1InvIterable(Db db, String labelId, long timestamp) {
+        MapAccessor ma = db.mapAccessor();
+        Iterator<ListAccessor> lait = ma.iterator(LABEL1_INDEX_INV + labelId);
+        return new Iterable<String>() {
+            @Override
+            public Iterator<String> iterator() {
+                return new Iterator<String>() {
+                    ListAccessor next = null;
+
+                    boolean isNext() {
+                        while (next == null && lait.hasNext()) {
+                            next = lait.next();
+                            VersionedMapNode vmn = (VersionedMapNode) next.get(0);
+                            if (vmn == null || vmn.isEmpty(timestamp)) {
+                                next = null;
+                            }
+                        }
+                        return next != null;
+                    }
+
+                    @Override
+                    public boolean hasNext() {
+                        return isNext();
+                    }
+
+                    @Override
+                    public String next() {
+                        if (!isNext())
+                            throw new NoSuchElementException();
+                        String n = label1IndexInvTarget(next.key().toString());
+                        next = null;
+                        return n;
+                    }
+                };
+            }
+        };
     }
 
     /**
@@ -200,6 +364,10 @@ public class Link1Id {
         db.set(linkId, vmnId2, true);
         linkId = link1Inv(vmnId2, labelId);
         db.set(linkId, vmnId1, true);
+        String labelIndexId = label1IndexId(vmnId1, labelId);
+        db.set(labelIndexId, vmnId2, true);
+        labelIndexId = label1IndexInv(vmnId2, labelId);
+        db.set(labelIndexId, vmnId1, true);
     }
 
     /**
@@ -217,5 +385,9 @@ public class Link1Id {
         db.clearList(linkId, vmnId2);
         linkId = link1Inv(vmnId2, labelId);
         db.clearList(linkId, vmnId1);
+        String labelIndexId = label1IndexId(vmnId1, labelId);
+        db.clearList(labelIndexId, vmnId2);
+        labelIndexId = label1IndexInv(vmnId2, labelId);
+        db.clearList(labelIndexId, vmnId1);
     }
 }

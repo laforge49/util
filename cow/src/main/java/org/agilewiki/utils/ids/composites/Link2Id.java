@@ -69,24 +69,24 @@ public class Link2Id {
     }
 
     /**
-     * Returns the vmn id which is the origin of a link with the given label.
+     * Returns the vmn id which is the origin of a link with the given label index.
      *
-     * @param labelId A label id.
+     * @param labelIndexId A label index id.
      * @return The VMN id.
      */
-    public static String label2IdLabel(String labelId) {
-        if (!labelId.startsWith(LABEL2_INDEX_ID))
-            throw new IllegalArgumentException("not a link id: " + labelId);
-        int i = labelId.indexOf('$', 3);
+    public static String label2IndexIdOrigin(String labelIndexId) {
+        if (!labelIndexId.startsWith(LABEL2_INDEX_ID))
+            throw new IllegalArgumentException("not a label index id: " + labelIndexId);
+        int i = labelIndexId.indexOf('$', 3);
         if (i < 0)
-            throw new IllegalArgumentException("not a link id: " + labelId);
-        String vmnId = labelId.substring(i);
+            throw new IllegalArgumentException("not a label index id: " + labelIndexId);
+        String vmnId = labelIndexId.substring(i);
         NameId.validateAnId(vmnId);
         return vmnId;
     }
 
     /**
-     * Iterates over the VMNs that are the orgin of a link with the given label.
+     * Iterates over the VMNs that are the origin of a link with the given label.
      *
      * @param db           The database.
      * @param labelId      The label id.
@@ -105,7 +105,6 @@ public class Link2Id {
                     boolean isNext() {
                         while (next == null && lait.hasNext()) {
                             next = lait.next();
-                            String labelIndexId = next.key().toString();
                             VersionedMapNode vmn = (VersionedMapNode) next.get(0);
                             if (vmn == null || vmn.isEmpty(timestamp)) {
                                 next = null;
@@ -123,7 +122,7 @@ public class Link2Id {
                     public String next() {
                         if (!isNext())
                             throw new NoSuchElementException();
-                        String n = label2IdLabel(next.key().toString());
+                        String n = label2IndexIdOrigin(next.key().toString());
                         next = null;
                         return n;
                     }
