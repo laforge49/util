@@ -691,4 +691,18 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         checkPrivilege();
         dsm.release(i);
     }
+
+    /**
+     * Get the selected vmn.
+     * @param id    The id of the selected vmn.
+     * @return The vmn, or null.
+     */
+    public VersionedMapNode get(Comparable id) {
+        ListAccessor la = mapAccessor().listAccessor(id);
+        if (la == null)
+            return null;
+        if (la.isEmpty())
+            return null;
+        return (VersionedMapNode) la.get(0);
+    }
 }
