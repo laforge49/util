@@ -45,7 +45,7 @@ public class SecondaryId {
      */
     public static String secondaryId(String typeId, String valueId) {
         NameId.validateId(typeId);
-        ValueId.validateId(valueId);
+        ValueId.validateAnId(valueId);
         return SECONDARY_ID + typeId + valueId;
     }
 
@@ -60,7 +60,7 @@ public class SecondaryId {
         int i = secondaryId.indexOf('$', 4);
         if (i < 0)
             throw new IllegalArgumentException("not a secondary id: " + secondaryId);
-        if (!secondaryId.substring(i).startsWith(ValueId.PREFIX))
+        if (!secondaryId.substring(i).startsWith("$"))
             throw new IllegalArgumentException("not a secondary id: " + secondaryId);
     }
 
@@ -111,7 +111,7 @@ public class SecondaryId {
         if (i < 0)
             throw new IllegalArgumentException("not a secondary id: " + secondaryId);
         String valueId = secondaryId.substring(i);
-        ValueId.validateId(valueId);
+        ValueId.validateAnId(valueId);
         return valueId;
     }
 
