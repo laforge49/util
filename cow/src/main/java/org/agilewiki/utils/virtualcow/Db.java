@@ -212,7 +212,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             return;
         if (!listNode.isEmpty())
             return;
-        dbMapNode.remove(id);
+        dbMapNode = dbMapNode.remove(id);
     }
 
     /**
