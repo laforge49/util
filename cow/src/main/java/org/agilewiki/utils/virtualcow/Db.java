@@ -199,6 +199,23 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     }
 
     /**
+     * Remove a list if empty.
+     *
+     * @param id    The id of the list.
+     */
+    public void removeIfEmpty(String id) {
+        checkPrivilege();
+        if (!id.startsWith("$"))
+            throw new IllegalArgumentException("not an id or composite id: " + id);
+        ListNode listNode = dbMapNode.getList(id);
+        if (listNode == null)
+            return;
+        if (!listNode.isEmpty())
+            return;
+        dbMapNode.remove(id);
+    }
+
+    /**
      * Remove an item from a versioned list.
      *
      * @param id  The id for the VersionedMapNode.
