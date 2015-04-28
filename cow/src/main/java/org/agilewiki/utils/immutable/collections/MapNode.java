@@ -63,6 +63,22 @@ public interface MapNode extends Releasable {
     }
 
     /**
+     * Returns the selected object.
+     *
+     * @param key The key of the selected object.
+     * @return The object, or null.
+     */
+    default Object get(Comparable key) {
+        ListNode ln = getList(key);
+        if (ln == null) {
+            return null;
+        }
+        if (ln.isEmpty())
+            return null;
+        return ln.get(0);
+    }
+
+    /**
      * Returns the count of all the values in the list,
      * including deleted values.
      *
@@ -378,6 +394,11 @@ public interface MapNode extends Releasable {
             @Override
             public long getTimestamp() {
                 return FactoryRegistry.MAX_TIMESTAMP;
+            }
+
+            @Override
+            public Object get(Comparable key) {
+                return MapNode.this.get(key);
             }
 
             @Override

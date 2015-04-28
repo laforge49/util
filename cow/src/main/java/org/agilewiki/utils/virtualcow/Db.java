@@ -705,4 +705,19 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             return null;
         return (VersionedMapNode) la.get(0);
     }
+
+    /**
+     * Get the selected object.
+     *
+     * @param id           The id of the selected object.
+     * @param key          The key of the selected object.
+     * @param timestamp    The time of the query.
+     * @return The selected object, or null.
+     */
+    public Object get(Comparable id, Comparable key, long timestamp) {
+        VersionedMapNode vmn = get(id);
+        if (vmn == null)
+            return null;
+        return vmn.get(key, timestamp);
+    }
 }

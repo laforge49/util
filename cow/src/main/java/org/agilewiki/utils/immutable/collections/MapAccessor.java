@@ -18,6 +18,14 @@ public interface MapAccessor extends Iterable<ListAccessor> {
     long getTimestamp();
 
     /**
+     * Returns the selected object.
+     *
+     * @param key The key of the selected object.
+     * @return The object, or null.
+     */
+    Object get(Comparable key);
+
+    /**
      * Returns the count of all the keys with a non-empty list.
      *
      * @return The current size of the map.

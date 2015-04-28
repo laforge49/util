@@ -57,6 +57,26 @@ public interface VersionedMapNode extends Releasable {
     }
 
     /**
+     * Returns the selected object.
+     *
+     * @param key       The key of the selected object.
+     * @param timestamp The time of the query.
+     * @return The object, or null.
+     */
+    default Object get(Comparable key, long timestamp) {
+        VersionedListNode ln = getList(key);
+        if (ln == null) {
+            return null;
+        }
+        if (ln.isEmpty(timestamp))
+            return null;
+        int i = ln.firstIndex(timestamp);
+        if (i == -1)
+            return null;
+        return ln.getExistingValue(i, timestamp);
+    }
+
+    /**
      * Returns the count of all the values in the list,
      * including deleted values.
      *
@@ -83,7 +103,7 @@ public interface VersionedMapNode extends Releasable {
     /**
      * Returns a list accessor for the given time.
      *
-     * @param key  The key for the list.
+     * @param key       The key for the list.
      * @param timestamp The time of the query.
      * @return A list accessor for the given time, or null.
      */
@@ -131,8 +151,8 @@ public interface VersionedMapNode extends Releasable {
     /**
      * Mark a value as deleted.
      *
-     * @param key  The key of the list.
-     * @param ndx  The index of the value.
+     * @param key The key of the list.
+     * @param ndx The index of the value.
      * @return The revised node.
      */
     default VersionedMapNode remove(Comparable key, int ndx) {
@@ -145,7 +165,7 @@ public interface VersionedMapNode extends Releasable {
      * Remove the first occurance of a value from a list.
      *
      * @param key The key of the list.
-     * @param x    The value to be removed.
+     * @param x   The value to be removed.
      * @return The updated root.
      */
     default VersionedMapNode remove(Comparable key, Object x) {
@@ -158,7 +178,7 @@ public interface VersionedMapNode extends Releasable {
     /**
      * Empty the list by marking all the existing values as deleted.
      *
-     * @param key  The key of the list.
+     * @param key The key of the list.
      * @return The revised node.
      */
     default VersionedMapNode clearList(Comparable key) {
@@ -286,7 +306,7 @@ public interface VersionedMapNode extends Releasable {
     /**
      * Returns true if all lists are empty.
      *
-     * @param timestamp    The time of the query.
+     * @param timestamp The time of the query.
      * @return False if there is any content.
      */
     default boolean isEmpty(long timestamp) {
@@ -322,7 +342,7 @@ public interface VersionedMapNode extends Releasable {
     /**
      * Returns the next greater key.
      *
-     * @param key  The given key.
+     * @param key       The given key.
      * @param timestamp The time of the query.
      * @return The next greater key with content at the time of the query, or null.
      */
@@ -335,7 +355,7 @@ public interface VersionedMapNode extends Releasable {
     /**
      * Returns the key with content that is greater than or equal to the given key.
      *
-     * @param key  The given key.
+     * @param key       The given key.
      * @param timestamp The time of the query.
      * @return The key greater than or equal to the given key, or null.
      */
@@ -348,7 +368,7 @@ public interface VersionedMapNode extends Releasable {
     /**
      * Returns the next smaller key.
      *
-     * @param key  The given key.
+     * @param key       The given key.
      * @param timestamp The time of the query.
      * @return The next smaller key with content at the time of the query, or null.
      */
@@ -361,7 +381,7 @@ public interface VersionedMapNode extends Releasable {
     /**
      * Returns the key with content that is smaller than or equal to the given key.
      *
-     * @param key  The given key.
+     * @param key       The given key.
      * @param timestamp The time of the query.
      * @return The key smaller than or equal to the given key, or null.
      */
@@ -403,7 +423,7 @@ public interface VersionedMapNode extends Releasable {
      * Returns an iterator over the list accessors
      * with keys whose toString start with the given prefix.
      *
-     * @param prefix The qualifying prefix.
+     * @param prefix    The qualifying prefix.
      * @param timestamp The time of the query.
      * @return The iterator.
      */
@@ -415,7 +435,7 @@ public interface VersionedMapNode extends Releasable {
      * Returns an iterable over the list accessors
      * with keys whose toString start with the given prefix.
      *
-     * @param prefix The qualifying prefix.
+     * @param prefix    The qualifying prefix.
      * @param timestamp The time of the query.
      * @return The iterator.
      */
@@ -472,6 +492,11 @@ public interface VersionedMapNode extends Releasable {
             @Override
             public long getTimestamp() {
                 return timestamp;
+            }
+
+            @Override
+            public Object get(Comparable key) {
+                return VersionedMapNode.this.get(key, timestamp);
             }
 
             @Override
