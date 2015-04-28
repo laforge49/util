@@ -145,15 +145,20 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     }
 
     /**
-     * Set the list of id to versionedNilMap if the list is not present.
+     * Set the list of id to nilMap if the list is not present.
      *
      * @param id The key for the list in dbMapNode.
      */
-    public void create(String id) {
+    public ListNode create(String id) {
         checkPrivilege();
         if (!id.startsWith("$"))
             throw new IllegalArgumentException("not an id or composite id: " + id);
-        dbMapNode = dbMapNode.set(id, dbFactoryRegistry.versionedNilMap);
+        ListNode listNode = dbMapNode.getList(id);
+        if (listNode == null) {
+            listNode = dbFactoryRegistry.nilList;
+            dbMapNode = dbMapNode.add(id, listNode);
+        }
+        return listNode;
     }
 
     /**
