@@ -145,7 +145,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     }
 
     /**
-     * Set the list of id to nilMap if the list is not present.
+     * Set the list of id to nilList if the list is not present.
      *
      * @param id The key for the list in dbMapNode.
      */
