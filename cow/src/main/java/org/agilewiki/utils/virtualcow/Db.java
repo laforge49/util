@@ -145,23 +145,6 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     }
 
     /**
-     * Set the list of id to nilList if the list is not present.
-     *
-     * @param id The key for the list in dbMapNode.
-     */
-    public ListNode create(String id) {
-        checkPrivilege();
-        if (!id.startsWith("$"))
-            throw new IllegalArgumentException("not an id or composite id: " + id);
-        ListNode listNode = dbMapNode.getList(id);
-        if (listNode == null) {
-            listNode = dbFactoryRegistry.nilList;
-            dbMapNode = dbMapNode.add(id, listNode);
-        }
-        return listNode;
-    }
-
-    /**
      * Clear the versioned map.
      *
      * @param id The id for the VersionedMapNode.
@@ -177,6 +160,28 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         versionedMapNode = versionedMapNode.clearMap();
         dbMapNode = dbMapNode.set(id, versionedMapNode);
         updateJournal(id);
+    }
+
+    /**
+     * Add a non-null value to the end of the list.
+     *
+     * @param id   The id of the list.
+     * @param value The value to be added.
+     */
+    public void add(String id, Object value) {
+        add(id, -1, value);
+    }
+
+    /**
+     * Add a non-null value to the list.
+     *
+     * @param id   The id of the list.
+     * @param ndx   Where to add the value.
+     * @param value The value to be added.
+     */
+    public void add(String id, int ndx, Object value) {
+        checkPrivilege();
+        dbMapNode = dbMapNode.add(id, ndx, value);
     }
 
     /**
