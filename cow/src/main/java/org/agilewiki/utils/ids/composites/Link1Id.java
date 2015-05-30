@@ -368,6 +368,10 @@ public class Link1Id {
         db.set(labelIndexId, vmnId2, true);
         labelIndexId = label1IndexInv(vmnId2, labelId);
         db.set(labelIndexId, vmnId1, true);
+        if (vmnId1 != db.getJEName())
+            db.updateJournal(vmnId1);
+        if (vmnId2 != db.getJEName())
+            db.updateJournal(vmnId2);
     }
 
     /**
@@ -389,5 +393,9 @@ public class Link1Id {
         db.clearList(labelIndexId, vmnId2);
         labelIndexId = label1IndexInv(vmnId2, labelId);
         db.clearList(labelIndexId, vmnId1);
+        if (vmnId1 != db.getJEName())
+            db.updateJournal(vmnId1);
+        if (vmnId2 != db.getJEName())
+            db.updateJournal(vmnId2);
     }
 }

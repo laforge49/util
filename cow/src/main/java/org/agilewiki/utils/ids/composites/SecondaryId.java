@@ -214,23 +214,33 @@ public class SecondaryId {
         if (hasSecondaryId(db, vmnId, secondaryId, db.getTimestamp()))
             return;
         db.set(secondaryId, vmnId, true);
+        String valueId = secondaryIdValue(secondaryId);
         db.set(secondaryInv(vmnId, secondaryIdType(secondaryId)),
-                secondaryIdValue(secondaryId),
+                valueId,
                 true);
+        if (vmnId != db.getJEName())
+            db.updateJournal(vmnId);
+        if (valueId != db.getJEName())
+            db.updateJournal(valueId);
     }
 
     /**
      * Remove a secondary key from a vml if present.
      *
      * @param db          The database.
-     * @param vmlId       The id of the vml.
+     * @param vmnId       The id of the vmn.
      * @param secondaryId The secondary id.
      */
-    public static void removeSecondaryId(Db db, String vmlId, String secondaryId) {
-        if (!hasSecondaryId(db, vmlId, secondaryId, db.getTimestamp()))
+    public static void removeSecondaryId(Db db, String vmnId, String secondaryId) {
+        if (!hasSecondaryId(db, vmnId, secondaryId, db.getTimestamp()))
             return;
-        db.clearList(secondaryId, vmlId);
-        db.clearList(secondaryInv(vmlId, secondaryIdType(secondaryId)),
-                secondaryIdValue(secondaryId));
+        db.clearList(secondaryId, vmnId);
+        String valueId = secondaryIdValue(secondaryId);
+        db.clearList(secondaryInv(vmnId, secondaryIdType(secondaryId)),
+                valueId);
+        if (vmnId != db.getJEName())
+            db.updateJournal(vmnId);
+        if (valueId != db.getJEName())
+            db.updateJournal(valueId);
     }
 }
