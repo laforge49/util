@@ -372,6 +372,7 @@ public class Link1Id {
             db.updateJournal(vmnId1);
         if (vmnId2 != db.getJEName())
             db.updateJournal(vmnId2);
+        db.updateJournal(labelId);
     }
 
     /**
@@ -397,5 +398,6 @@ public class Link1Id {
             db.updateJournal(vmnId1);
         if (vmnId2 != db.getJEName())
             db.updateJournal(vmnId2);
+        db.updateJournal(labelId);
     }
 }

@@ -215,11 +215,13 @@ public class SecondaryId {
             return;
         db.set(secondaryId, vmnId, true);
         String valueId = secondaryIdValue(secondaryId);
-        db.set(secondaryInv(vmnId, secondaryIdType(secondaryId)),
+        String typeId = secondaryIdType(secondaryId);
+        db.set(secondaryInv(vmnId, typeId),
                 valueId,
                 true);
         if (vmnId != db.getJEName())
             db.updateJournal(vmnId);
+        db.updateJournal(typeId);
     }
 
     /**
@@ -234,9 +236,11 @@ public class SecondaryId {
             return;
         db.clearList(secondaryId, vmnId);
         String valueId = secondaryIdValue(secondaryId);
-        db.clearList(secondaryInv(vmnId, secondaryIdType(secondaryId)),
+        String typeId = secondaryIdType(secondaryId);
+        db.clearList(secondaryInv(vmnId, typeId),
                 valueId);
         if (vmnId != db.getJEName())
             db.updateJournal(vmnId);
+        db.updateJournal(typeId);
     }
 }
