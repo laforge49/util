@@ -220,8 +220,6 @@ public class SecondaryId {
                 true);
         if (vmnId != db.getJEName())
             db.updateJournal(vmnId);
-        if (valueId != db.getJEName())
-            db.updateJournal(valueId);
     }
 
     /**
@@ -240,7 +238,5 @@ public class SecondaryId {
                 valueId);
         if (vmnId != db.getJEName())
             db.updateJournal(vmnId);
-        if (valueId != db.getJEName())
-            db.updateJournal(valueId);
     }
 }
