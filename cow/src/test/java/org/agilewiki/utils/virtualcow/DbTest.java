@@ -5,6 +5,7 @@ import org.agilewiki.jactor2.core.impl.Plant;
 import org.agilewiki.utils.ids.NameId;
 import org.agilewiki.utils.ids.composites.Journal;
 import org.agilewiki.utils.immutable.BaseRegistry;
+import org.agilewiki.utils.immutable.FactoryRegistry;
 import org.agilewiki.utils.immutable.collections.ListAccessor;
 import org.agilewiki.utils.immutable.collections.MapAccessor;
 
@@ -35,12 +36,12 @@ public class DbTest extends TestCase {
                 }
 
                 System.out.println("\nJournal of x:");
-                for (String tid: Journal.journal(db, NameId.generate("x"))) {
+                for (String tid: Journal.journal(db, NameId.generate("x"), FactoryRegistry.MAX_TIMESTAMP)) {
                     System.out.println(tid);
                 }
 
                 System.out.println("\nAll items modified by " + timestampId + ":");
-                for (String id: Journal.modifies(db, timestampId)) {
+                for (String id: Journal.modifies(db, timestampId, FactoryRegistry.MAX_TIMESTAMP)) {
                     System.out.println(id);
                 }
 

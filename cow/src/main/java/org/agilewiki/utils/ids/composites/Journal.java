@@ -53,10 +53,11 @@ public class Journal {
      *
      * @param db             The database.
      * @param timestampId    The timestampId of the journal entry.
+     * @param longTimestamp The time of the query.
      * @return The iterable.
      */
-    public static Iterable<String> modifies(Db db, String timestampId) {
-        return db.keysIterable(modifiesId(timestampId), db.getTimestamp());
+    public static Iterable<String> modifies(Db db, String timestampId, long longTimestamp) {
+        return db.keysIterable(modifiesId(timestampId), longTimestamp);
     }
 
     /**
@@ -65,9 +66,10 @@ public class Journal {
      *
      * @param db    The database.
      * @param id    The id of the VMN.
+     * @param longTimestamp The time of the query.
      * @return The iterable.
      */
-    public static Iterable<String> journal(Db db, String id) {
-        return db.keysIterable(journalId(id), db.getTimestamp());
+    public static Iterable<String> journal(Db db, String id, long longTimestamp) {
+        return db.keysIterable(journalId(id), longTimestamp);
     }
 }
