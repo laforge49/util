@@ -397,24 +397,38 @@ public interface VersionedMapNode extends Releasable {
      * @param timestamp The time of the query.
      * @return The iterator.
      */
-    default Iterator<ListAccessor> iterator(long timestamp) {
-        return new Iterator<ListAccessor>() {
-            Comparable last = null;
+    default PeekABoo<ListAccessor> iterator(long timestamp) {
+        return new PeekABoo<ListAccessor>() {
+
+            String next = (String) firstKey(timestamp);
+
+            @Override
+            public String getState() {
+                return next;
+            }
+
+            @Override
+            public void setState(String state) {
+                next = (String) ceilingKey(state, timestamp);
+            }
+
+            @Override
+            public ListAccessor peek() {
+                return listAccessor(next, timestamp);
+            }
 
             @Override
             public boolean hasNext() {
-                if (last == null)
-                    return firstKey(timestamp) != null;
-                return higherKey(last, timestamp) != null;
+                return next != null;
             }
 
             @Override
             public ListAccessor next() {
-                Comparable next = last == null ? firstKey(timestamp) : higherKey(last, timestamp);
                 if (next == null)
                     throw new NoSuchElementException();
-                last = next;
-                return listAccessor(last, timestamp);
+                ListAccessor la = peek();
+                next = (String) higherKey(next, timestamp);
+                return la;
             }
         };
     }
@@ -545,7 +559,7 @@ public interface VersionedMapNode extends Releasable {
             }
 
             @Override
-            public Iterator<ListAccessor> iterator() {
+            public PeekABoo<ListAccessor> iterator() {
                 return VersionedMapNode.this.iterator(timestamp);
             }
 

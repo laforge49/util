@@ -3,7 +3,7 @@ package org.agilewiki.utils.virtualcow;
 import org.agilewiki.utils.ids.NameId;
 import org.agilewiki.utils.ids.ValueId;
 import org.agilewiki.utils.ids.composites.SecondaryId;
-import org.agilewiki.utils.immutable.collections.*;
+import org.agilewiki.utils.immutable.collections.MapNode;
 
 public class SecondaryTran implements Transaction {
     @Override

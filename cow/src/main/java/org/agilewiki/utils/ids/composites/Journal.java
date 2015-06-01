@@ -1,15 +1,8 @@
 package org.agilewiki.utils.ids.composites;
 
-import org.agilewiki.utils.ids.NameId;
 import org.agilewiki.utils.ids.Timestamp;
 import org.agilewiki.utils.ids.ValueId;
-import org.agilewiki.utils.immutable.collections.EmptyIterable;
-import org.agilewiki.utils.immutable.collections.ListAccessor;
-import org.agilewiki.utils.immutable.collections.MapAccessor;
-import org.agilewiki.utils.immutable.collections.VersionedMapNode;
 import org.agilewiki.utils.virtualcow.Db;
-
-import java.util.Iterator;
 
 /**
  * Connecting journal entries to the things they update.

@@ -311,24 +311,38 @@ public interface MapNode extends Releasable {
      *
      * @return The iterator.
      */
-    default Iterator<ListAccessor> iterator() {
-        return new Iterator<ListAccessor>() {
-            Comparable last = null;
+    default PeekABoo<ListAccessor> iterator() {
+        return new PeekABoo<ListAccessor>() {
+
+            String next = (String) firstKey();
+
+            @Override
+            public String getState() {
+                return next;
+            }
+
+            @Override
+            public void setState(String state) {
+                next = (String) ceilingKey(state);
+            }
+
+            @Override
+            public ListAccessor peek() {
+                return listAccessor(next);
+            }
 
             @Override
             public boolean hasNext() {
-                if (last == null)
-                    return firstKey() != null;
-                return higherKey(last) != null;
+                return next != null;
             }
 
             @Override
             public ListAccessor next() {
-                Comparable next = last == null ? firstKey() : higherKey(last);
                 if (next == null)
                     throw new NoSuchElementException();
-                last = next;
-                return listAccessor(last);
+                ListAccessor la = peek();
+                next = (String) higherKey(next);
+                return la;
             }
         };
     }
@@ -447,7 +461,7 @@ public interface MapNode extends Releasable {
             }
 
             @Override
-            public Iterator<ListAccessor> iterator() {
+            public PeekABoo<ListAccessor> iterator() {
                 return MapNode.this.iterator();
             }
 

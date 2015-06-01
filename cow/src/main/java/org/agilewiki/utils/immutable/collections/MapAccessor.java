@@ -98,7 +98,7 @@ public interface MapAccessor extends Iterable<ListAccessor> {
      *
      * @return The iterator.
      */
-    Iterator<ListAccessor> iterator();
+    PeekABoo<ListAccessor> iterator();
 
     /**
      * Returns an iterator over the list accessors

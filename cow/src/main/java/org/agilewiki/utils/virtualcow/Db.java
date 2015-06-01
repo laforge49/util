@@ -122,7 +122,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         MapAccessor ma = mapAccessor();
         ListAccessor la = ma.listAccessor(id);
         if (la == null) {
-            return new EmptyIterable<String>();
+            return new EmptyPeekABoo();
         }
         VersionedMapNode vmn = (VersionedMapNode) la.get(0);
         Iterator<ListAccessor> lait = vmn.iterator(timestamp);
