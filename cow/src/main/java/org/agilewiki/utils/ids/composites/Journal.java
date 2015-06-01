@@ -2,6 +2,7 @@ package org.agilewiki.utils.ids.composites;
 
 import org.agilewiki.utils.ids.Timestamp;
 import org.agilewiki.utils.ids.ValueId;
+import org.agilewiki.utils.immutable.collections.PeekABoo;
 import org.agilewiki.utils.virtualcow.Db;
 
 /**
@@ -49,7 +50,7 @@ public class Journal {
      * @param longTimestamp The time of the query.
      * @return The iterable.
      */
-    public static Iterable<String> modifies(Db db, String timestampId, long longTimestamp) {
+    public static PeekABoo<String> modifies(Db db, String timestampId, long longTimestamp) {
         return db.keysIterable(modifiesId(timestampId), longTimestamp);
     }
 
@@ -62,7 +63,7 @@ public class Journal {
      * @param longTimestamp The time of the query.
      * @return The iterable.
      */
-    public static Iterable<String> journal(Db db, String id, long longTimestamp) {
+    public static PeekABoo<String> journal(Db db, String id, long longTimestamp) {
         return db.keysIterable(journalId(id), longTimestamp);
     }
 }

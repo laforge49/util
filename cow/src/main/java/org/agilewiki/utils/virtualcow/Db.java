@@ -19,7 +19,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.nio.file.StandardOpenOption.*;
@@ -95,8 +94,8 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     /**
      * Returns the versioned list node for a given id and key.
      *
-     * @param id     The id for the versioned list node.
-     * @param key    The key for the versioned list node.
+     * @param id  The id for the versioned list node.
+     * @param key The key for the versioned list node.
      * @return The versioned list node, or null.
      */
     public VersionedListNode versionedListNode(String id, String key) {
@@ -114,10 +113,10 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     /**
      * Iterates over the keys under an id.
      *
-     * @param id    The id of a VMN.
+     * @param id The id of a VMN.
      * @return The key iterable.
      */
-    public Iterable<String> keysIterable(String id, long timestamp) {
+    public PeekABoo<String> keysIterable(String id, long timestamp) {
         ValueId.validateAnId(id);
         MapAccessor ma = mapAccessor();
         ListAccessor la = ma.listAccessor(id);
@@ -125,21 +124,31 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
             return new EmptyPeekABoo();
         }
         VersionedMapNode vmn = (VersionedMapNode) la.get(0);
-        Iterator<ListAccessor> lait = vmn.iterator(timestamp);
-        return new Iterable<String>() {
+        PeekABoo<ListAccessor> lait = vmn.iterator(timestamp);
+        return new PeekABoo<String>() {
             @Override
-            public Iterator<String> iterator() {
-                return new Iterator<String>() {
-                    @Override
-                    public boolean hasNext() {
-                        return lait.hasNext();
-                    }
+            public String getState() {
+                return lait.getState();
+            }
 
-                    @Override
-                    public String next() {
-                        return lait.next().key().toString();
-                    }
-                };
+            @Override
+            public void setState(String state) {
+                lait.setState(state);
+            }
+
+            @Override
+            public String peek() {
+                return (String) lait.peek().key();
+            }
+
+            @Override
+            public boolean hasNext() {
+                return lait.hasNext();
+            }
+
+            @Override
+            public String next() {
+                return lait.next().key().toString();
             }
         };
     }
@@ -165,7 +174,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     /**
      * Add a non-null value to the end of the list.
      *
-     * @param id   The id of the list.
+     * @param id    The id of the list.
      * @param value The value to be added.
      */
     public void add(String id, Object value) {
@@ -175,7 +184,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     /**
      * Add a non-null value to the list.
      *
-     * @param id   The id of the list.
+     * @param id    The id of the list.
      * @param ndx   Where to add the value.
      * @param value The value to be added.
      */
@@ -206,7 +215,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     /**
      * Remove a list if empty.
      *
-     * @param id    The id of the list.
+     * @param id The id of the list.
      */
     public void removeIfEmpty(String id) {
         checkPrivilege();
@@ -222,8 +231,9 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
 
     /**
      * Remove an item from a list node.
-     * @param id       The id of the list node.
-     * @param value    The value to be removed.
+     *
+     * @param id    The id of the list node.
+     * @param value The value to be removed.
      */
     public void remove(String id, Object value) {
         checkPrivilege();
@@ -738,7 +748,8 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
 
     /**
      * Get the selected vmn.
-     * @param id    The id of the selected vmn.
+     *
+     * @param id The id of the selected vmn.
      * @return The vmn, or null.
      */
     public VersionedMapNode get(Comparable id) {
@@ -753,9 +764,9 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     /**
      * Get the selected object.
      *
-     * @param id           The id of the selected object.
-     * @param key          The key of the selected object.
-     * @param timestamp    The time of the query.
+     * @param id        The id of the selected object.
+     * @param key       The key of the selected object.
+     * @param timestamp The time of the query.
      * @return The selected object, or null.
      */
     public Object get(Comparable id, Comparable key, long timestamp) {
