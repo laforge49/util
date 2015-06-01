@@ -1,13 +1,9 @@
 package org.agilewiki.utils.ids.composites;
 
 import org.agilewiki.utils.ids.NameId;
-import org.agilewiki.utils.immutable.collections.ListAccessor;
-import org.agilewiki.utils.immutable.collections.MapAccessor;
-import org.agilewiki.utils.immutable.collections.VersionedListNode;
-import org.agilewiki.utils.immutable.collections.VersionedMapNode;
+import org.agilewiki.utils.immutable.collections.*;
 import org.agilewiki.utils.virtualcow.Db;
 
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
@@ -38,8 +34,8 @@ public class Link1Id {
     /**
      * Returns a composite id for a link identifier.
      *
-     * @param originId  The originating VMN Id of link.
-     * @param labelId The label of the link.
+     * @param originId The originating VMN Id of link.
+     * @param labelId  The label of the link.
      * @return The composite id.
      */
     public static String link1Id(String originId, String labelId) {
@@ -51,8 +47,8 @@ public class Link1Id {
     /**
      * Returns a composite id for an inverted link identifier.
      *
-     * @param targetId  The target VMN Id of link.
-     * @param labelId The label of the link.
+     * @param targetId The target VMN Id of link.
+     * @param labelId  The label of the link.
      * @return The composite id.
      */
     public static String link1Inv(String targetId, String labelId) {
@@ -64,8 +60,8 @@ public class Link1Id {
     /**
      * Returns a composite id for a label identifier.
      *
-     * @param originId  The originating VMN Id of link.
-     * @param labelId The label of the link.
+     * @param originId The originating VMN Id of link.
+     * @param labelId  The label of the link.
      * @return The composite id.
      */
     public static String label1IndexId(String originId, String labelId) {
@@ -77,8 +73,8 @@ public class Link1Id {
     /**
      * Returns a composite id for an inverted label identifier.
      *
-     * @param targetId  The target VMN Id of link.
-     * @param labelId The label of the link.
+     * @param targetId The target VMN Id of link.
+     * @param labelId  The label of the link.
      * @return The composite id.
      */
     public static String label1IndexInv(String targetId, String labelId) {
@@ -158,45 +154,58 @@ public class Link1Id {
     /**
      * Iterates over the VMNs that are the origin of a link with the given label.
      *
-     * @param db           The database.
-     * @param labelId      The label id.
-     * @param timestamp    The time of the query.
+     * @param db        The database.
+     * @param labelId   The label id.
+     * @param timestamp The time of the query.
      * @return The iterable.
      */
-    public static Iterable<String> label1IdIterable(Db db, String labelId, long timestamp) {
+    public static PeekABoo<String> label1IdIterable(Db db, String labelId, long timestamp) {
         MapAccessor ma = db.mapAccessor();
-        Iterator<ListAccessor> lait = ma.iterator(LABEL1_INDEX_ID + labelId);
-        return new Iterable<String>() {
+        PeekABoo<ListAccessor> lait = ma.iterator(LABEL1_INDEX_ID + labelId);
+        return new PeekABoo<String>() {
+
+            ListAccessor next = null;
+
             @Override
-            public Iterator<String> iterator() {
-                return new Iterator<String>() {
-                    ListAccessor next = null;
+            public String getState() {
+                return lait.getState();
+            }
 
-                    boolean isNext() {
-                        while (next == null && lait.hasNext()) {
-                            next = lait.next();
-                            VersionedMapNode vmn = (VersionedMapNode) next.get(0);
-                            if (vmn == null || vmn.isEmpty(timestamp)) {
-                                next = null;
-                            }
-                        }
-                        return next != null;
-                    }
+            @Override
+            public void setState(String state) {
+                lait.setState(state);
+            }
 
-                    @Override
-                    public boolean hasNext() {
-                        return isNext();
-                    }
+            @Override
+            public String peek() {
+                if (!isNext())
+                    return null;
+                return label1IndexIdOrigin(next.key().toString());
+            }
 
-                    @Override
-                    public String next() {
-                        if (!isNext())
-                            throw new NoSuchElementException();
-                        String n = label1IndexIdOrigin(next.key().toString());
+            boolean isNext() {
+                while (next == null && lait.hasNext()) {
+                    next = lait.next();
+                    VersionedMapNode vmn = (VersionedMapNode) next.get(0);
+                    if (vmn == null || vmn.isEmpty(timestamp)) {
                         next = null;
-                        return n;
                     }
-                };
+                }
+                return next != null;
+            }
+
+            @Override
+            public boolean hasNext() {
+                return isNext();
+            }
+
+            @Override
+            public String next() {
+                if (!isNext())
+                    throw new NoSuchElementException();
+                String n = label1IndexIdOrigin(next.key().toString());
+                next = null;
+                return n;
             }
         };
     }
@@ -204,45 +213,58 @@ public class Link1Id {
     /**
      * Iterates over the VMNs that are the target of a link with the given label.
      *
-     * @param db           The database.
-     * @param labelId      The label id.
-     * @param timestamp    The time of the query.
+     * @param db        The database.
+     * @param labelId   The label id.
+     * @param timestamp The time of the query.
      * @return The iterable.
      */
-    public static Iterable<String> label1InvIterable(Db db, String labelId, long timestamp) {
+    public static PeekABoo<String> label1InvIterable(Db db, String labelId, long timestamp) {
         MapAccessor ma = db.mapAccessor();
-        Iterator<ListAccessor> lait = ma.iterator(LABEL1_INDEX_INV + labelId);
-        return new Iterable<String>() {
+        PeekABoo<ListAccessor> lait = ma.iterator(LABEL1_INDEX_INV + labelId);
+        return new PeekABoo<String>() {
+
+            ListAccessor next = null;
+
             @Override
-            public Iterator<String> iterator() {
-                return new Iterator<String>() {
-                    ListAccessor next = null;
+            public String getState() {
+                return lait.getState();
+            }
 
-                    boolean isNext() {
-                        while (next == null && lait.hasNext()) {
-                            next = lait.next();
-                            VersionedMapNode vmn = (VersionedMapNode) next.get(0);
-                            if (vmn == null || vmn.isEmpty(timestamp)) {
-                                next = null;
-                            }
-                        }
-                        return next != null;
-                    }
+            @Override
+            public void setState(String state) {
+                lait.setState(state);
+            }
 
-                    @Override
-                    public boolean hasNext() {
-                        return isNext();
-                    }
+            @Override
+            public String peek() {
+                if (!isNext())
+                    return null;
+                return label1IndexInvTarget(next.key().toString());
+            }
 
-                    @Override
-                    public String next() {
-                        if (!isNext())
-                            throw new NoSuchElementException();
-                        String n = label1IndexInvTarget(next.key().toString());
+            boolean isNext() {
+                while (next == null && lait.hasNext()) {
+                    next = lait.next();
+                    VersionedMapNode vmn = (VersionedMapNode) next.get(0);
+                    if (vmn == null || vmn.isEmpty(timestamp)) {
                         next = null;
-                        return n;
                     }
-                };
+                }
+                return next != null;
+            }
+
+            @Override
+            public boolean hasNext() {
+                return isNext();
+            }
+
+            @Override
+            public String next() {
+                if (!isNext())
+                    throw new NoSuchElementException();
+                String n = label1IndexInvTarget(next.key().toString());
+                next = null;
+                return n;
             }
         };
     }
@@ -250,28 +272,42 @@ public class Link1Id {
     /**
      * Iterates over the label ids of links originating with a VMN.
      *
-     * @param db       The database.
-     * @param vmnId    The id of the origin VMN.
+     * @param db    The database.
+     * @param vmnId The id of the origin VMN.
      * @return An iterable over the label ids of all links.
      */
-    public static Iterable<String> link1LabelIdIterable(Db db, String vmnId) {
+    public static PeekABoo<String> link1LabelIdIterable(Db db, String vmnId) {
         MapAccessor ma = db.mapAccessor();
-        Iterator<ListAccessor> lait = ma.iterator(LINK1_ID + vmnId);
-        return new Iterable<String>() {
+        PeekABoo<ListAccessor> lait = ma.iterator(LINK1_ID + vmnId);
+        return new PeekABoo<String>() {
             @Override
-            public Iterator<String> iterator() {
-                return new Iterator<String>() {
-                    @Override
-                    public boolean hasNext() {
-                        return lait.hasNext();
-                    }
+            public String getState() {
+                return lait.getState();
+            }
 
-                    @Override
-                    public String next() {
-                        String linkId = lait.next().key().toString();
-                        return link1IdLabel(linkId);
-                    }
-                };
+            @Override
+            public void setState(String state) {
+                lait.setState(state);
+            }
+
+            @Override
+            public String peek() {
+                ListAccessor p = lait.peek();
+                if (p == null)
+                    return null;
+                String linkId = p.key().toString();
+                return link1IdLabel(linkId);
+            }
+
+            @Override
+            public boolean hasNext() {
+                return lait.hasNext();
+            }
+
+            @Override
+            public String next() {
+                String linkId = lait.next().key().toString();
+                return link1IdLabel(linkId);
             }
         };
     }
@@ -279,28 +315,42 @@ public class Link1Id {
     /**
      * Iterates over the label ids of links targeting a VMN.
      *
-     * @param db       The database.
-     * @param vmnId    The id of the target VMN.
+     * @param db    The database.
+     * @param vmnId The id of the target VMN.
      * @return An iterable over the label ids of all inverted links.
      */
-    public static Iterable<String> link1LabelInvIterable(Db db, String vmnId) {
+    public static PeekABoo<String> link1LabelInvIterable(Db db, String vmnId) {
         MapAccessor ma = db.mapAccessor();
-        Iterator<ListAccessor> lait = ma.iterator(LINK1_INV + vmnId);
-        return new Iterable<String>() {
+        PeekABoo<ListAccessor> lait = ma.iterator(LINK1_INV + vmnId);
+        return new PeekABoo<String>() {
             @Override
-            public Iterator<String> iterator() {
-                return new Iterator<String>() {
-                    @Override
-                    public boolean hasNext() {
-                        return lait.hasNext();
-                    }
+            public String getState() {
+                return lait.getState();
+            }
 
-                    @Override
-                    public String next() {
-                        String linkId = lait.next().key().toString();
-                        return link1InvLabel(linkId);
-                    }
-                };
+            @Override
+            public void setState(String state) {
+                setState(state);
+            }
+
+            @Override
+            public String peek() {
+                ListAccessor p = lait.peek();
+                if (p == null)
+                    return null;
+                String linkId = p.key().toString();
+                return link1InvLabel(linkId);
+            }
+
+            @Override
+            public boolean hasNext() {
+                return lait.hasNext();
+            }
+
+            @Override
+            public String next() {
+                String linkId = lait.next().key().toString();
+                return link1InvLabel(linkId);
             }
         };
     }
@@ -308,37 +358,37 @@ public class Link1Id {
     /**
      * Iterates over the target VMN ids linked to from a given VMN..
      *
-     * @param db     The database.
-     * @param vmnId  The id of the originating VMN.
-     * @param labelId The label of the links.
-     * @param timestamp   The time of the query.
+     * @param db        The database.
+     * @param vmnId     The id of the originating VMN.
+     * @param labelId   The label of the links.
+     * @param timestamp The time of the query.
      * @return The Iterable.
      */
-    public static Iterable<String> link1IdIterable(Db db, String vmnId, String labelId, long timestamp) {
+    public static PeekABoo<String> link1IdIterable(Db db, String vmnId, String labelId, long timestamp) {
         return db.keysIterable(link1Id(vmnId, labelId), timestamp);
     }
 
     /**
      * Iterates over the originating VMN ids targeting a given VMN..
      *
-     * @param db     The database.
-     * @param vmnId  The id of the target VMN.
-     * @param labelId The label of the links.
-     * @param timestamp   The time of the query.
+     * @param db        The database.
+     * @param vmnId     The id of the target VMN.
+     * @param labelId   The label of the links.
+     * @param timestamp The time of the query.
      * @return The Iterable.
      */
-    public static Iterable<String> link1InvIterable(Db db, String vmnId, String labelId, long timestamp) {
+    public static PeekABoo<String> link1InvIterable(Db db, String vmnId, String labelId, long timestamp) {
         return db.keysIterable(link1Inv(vmnId, labelId), timestamp);
     }
 
     /**
      * Returns true iff the link is present.
      *
-     * @param db           The database.
-     * @param vmnId1       The originating vmn.
-     * @param labelId      The link label.
-     * @param vmnId2       The target vmn.
-     * @param timestamp    The time of the query.
+     * @param db        The database.
+     * @param vmnId1    The originating vmn.
+     * @param labelId   The link label.
+     * @param vmnId2    The target vmn.
+     * @param timestamp The time of the query.
      * @return True if the link exists.
      */
     public static boolean hasLink1(Db db, String vmnId1, String labelId, String vmnId2, long timestamp) {
@@ -352,10 +402,10 @@ public class Link1Id {
     /**
      * Creates a link.
      *
-     * @param db           The database.
-     * @param vmnId1       The originating vmn.
-     * @param labelId      The link label.
-     * @param vmnId2       The target vmn.
+     * @param db      The database.
+     * @param vmnId1  The originating vmn.
+     * @param labelId The link label.
+     * @param vmnId2  The target vmn.
      */
     public static void createLink1(Db db, String vmnId1, String labelId, String vmnId2) {
         if (hasLink1(db, vmnId1, labelId, vmnId2, db.getTimestamp()))
@@ -378,10 +428,10 @@ public class Link1Id {
     /**
      * Deletes a link.
      *
-     * @param db           The database.
-     * @param vmnId1       The originating vmn.
-     * @param labelId      The link label.
-     * @param vmnId2       The target vmn.
+     * @param db      The database.
+     * @param vmnId1  The originating vmn.
+     * @param labelId The link label.
+     * @param vmnId2  The target vmn.
      */
     public static void removeLink1(Db db, String vmnId1, String labelId, String vmnId2) {
         if (!hasLink1(db, vmnId1, labelId, vmnId2, db.getTimestamp()))

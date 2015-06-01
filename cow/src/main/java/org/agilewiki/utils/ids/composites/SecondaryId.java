@@ -169,7 +169,7 @@ public class SecondaryId {
      * @return The Iterable, or null.
      */
     public static PeekABoo<String> secondaryIdIterable(Db db, String vmnId, String typeId, long timestamp) {
-        PeekABoo<String> vit = db.keysIterable(secondaryInv(vmnId, typeId), timestamp).iterator();
+        PeekABoo<String> vit = db.keysIterable(secondaryInv(vmnId, typeId), timestamp);
         return new PeekABoo<String>() {
             @Override
             public String getState() {
