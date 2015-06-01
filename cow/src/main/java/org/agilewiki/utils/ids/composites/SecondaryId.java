@@ -4,10 +4,9 @@ import org.agilewiki.utils.ids.NameId;
 import org.agilewiki.utils.ids.ValueId;
 import org.agilewiki.utils.immutable.collections.ListAccessor;
 import org.agilewiki.utils.immutable.collections.MapAccessor;
+import org.agilewiki.utils.immutable.collections.PeekABoo;
 import org.agilewiki.utils.immutable.collections.VersionedListNode;
 import org.agilewiki.utils.virtualcow.Db;
-
-import java.util.Iterator;
 
 /**
  * An implementation of secondary ids for a Versioned Map Node (VMN).
@@ -52,7 +51,7 @@ public class SecondaryId {
     /**
      * Validate a secondary id.
      *
-     * @param secondaryId    The secondary id.
+     * @param secondaryId The secondary id.
      */
     public static void validateSecondaryId(String secondaryId) {
         if (!secondaryId.startsWith(SECONDARY_ID + "$"))
@@ -118,29 +117,44 @@ public class SecondaryId {
     /**
      * Iterates over the secondary types.
      *
-     * @param db       The database.
-     * @param vmnId    The id of a VMN.
+     * @param db    The database.
+     * @param vmnId The id of a VMN.
      * @return An iterable over the types.
      */
-    public static Iterable<String> typeIdIterable(Db db, String vmnId) {
+    public static PeekABoo<String> typeIdIterable(Db db, String vmnId) {
         MapAccessor ma = db.mapAccessor();
-        Iterator<ListAccessor> lait = ma.iterator(SECONDARY_INV+vmnId);
-        return new Iterable<String>() {
+        PeekABoo<ListAccessor> lait = ma.iterator(SECONDARY_INV + vmnId);
+        return new PeekABoo<String>() {
             @Override
-            public Iterator<String> iterator() {
-                return new Iterator<String>() {
-                    @Override
-                    public boolean hasNext() {
-                        return lait.hasNext();
-                    }
+            public String getState() {
+                return lait.getState();
+            }
 
-                    @Override
-                    public String next() {
-                        String secondaryInv = lait.next().key().toString();
-                        int i = secondaryInv.lastIndexOf("$");
-                        return secondaryInv.substring(i);
-                    }
-                };
+            @Override
+            public void setState(String state) {
+                lait.setState(state);
+            }
+
+            @Override
+            public String peek() {
+                ListAccessor p = lait.peek();
+                if (p == null)
+                    return null;
+                String secondaryInv = p.key().toString();
+                int i = secondaryInv.lastIndexOf("$");
+                return secondaryInv.substring(i);
+            }
+
+            @Override
+            public boolean hasNext() {
+                return lait.hasNext();
+            }
+
+            @Override
+            public String next() {
+                String secondaryInv = lait.next().key().toString();
+                int i = secondaryInv.lastIndexOf("$");
+                return secondaryInv.substring(i);
             }
         };
     }
@@ -148,28 +162,41 @@ public class SecondaryId {
     /**
      * Iterates over the secondary keys.
      *
-     * @param db     The database.
-     * @param vmnId  The id of the VMN.
-     * @param typeId The type of secondary key.
-     * @param timestamp   The time of the query.
+     * @param db        The database.
+     * @param vmnId     The id of the VMN.
+     * @param typeId    The type of secondary key.
+     * @param timestamp The time of the query.
      * @return The Iterable, or null.
      */
-    public static Iterable<String> secondaryIdIterable(Db db, String vmnId, String typeId, long timestamp) {
-        Iterator<String> vit = db.keysIterable(secondaryInv(vmnId, typeId), timestamp).iterator();
-        return new Iterable<String>() {
+    public static PeekABoo<String> secondaryIdIterable(Db db, String vmnId, String typeId, long timestamp) {
+        PeekABoo<String> vit = db.keysIterable(secondaryInv(vmnId, typeId), timestamp).iterator();
+        return new PeekABoo<String>() {
             @Override
-            public Iterator<String> iterator() {
-                return new Iterator<String>() {
-                    @Override
-                    public boolean hasNext() {
-                        return vit.hasNext();
-                    }
+            public String getState() {
+                return vit.getState();
+            }
 
-                    @Override
-                    public String next() {
-                        return secondaryId(typeId, vit.next());
-                    }
-                };
+            @Override
+            public void setState(String state) {
+                vit.setState(state);
+            }
+
+            @Override
+            public String peek() {
+                String p = vit.peek();
+                if (p == null)
+                    return null;
+                return secondaryId(typeId, p);
+            }
+
+            @Override
+            public boolean hasNext() {
+                return vit.hasNext();
+            }
+
+            @Override
+            public String next() {
+                return secondaryId(typeId, vit.next());
             }
         };
     }
@@ -182,7 +209,7 @@ public class SecondaryId {
      * @param timestamp   The time of the query.
      * @return The Iterable, or null.
      */
-    public static Iterable<String> vmnIdIterable(Db db, String secondaryId, long timestamp) {
+    public static PeekABoo<String> vmnIdIterable(Db db, String secondaryId, long timestamp) {
         return db.keysIterable(secondaryId, timestamp);
     }
 
