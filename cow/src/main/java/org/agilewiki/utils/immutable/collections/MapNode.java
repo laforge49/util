@@ -152,7 +152,7 @@ public interface MapNode extends Releasable {
      * Remove the first occurance of a value from a list.
      *
      * @param key The key of the list.
-     * @param x    The value to be removed.
+     * @param x   The value to be removed.
      * @return The updated root.
      */
     default MapNode remove(Comparable key, Object x) {
@@ -354,8 +354,8 @@ public interface MapNode extends Releasable {
      * @param prefix The qualifying prefix.
      * @return The iterator.
      */
-    default Iterator<ListAccessor> iterator(String prefix) {
-        return iterable(prefix).iterator();
+    default PeekABoo<ListAccessor> iterator(String prefix) {
+        return iterable(prefix);
     }
 
     /**
@@ -365,34 +365,47 @@ public interface MapNode extends Releasable {
      * @param prefix The qualifying prefix.
      * @return The iterator.
      */
-    default Iterable<ListAccessor> iterable(String prefix) {
-        return new Iterable<ListAccessor>() {
+    default PeekABoo<ListAccessor> iterable(String prefix) {
+        return new PeekABoo<ListAccessor>() {
+
+            String next = ceiling(prefix);
+
+            private String ceiling(String state) {
+                String k = (String) ceilingKey(state);
+                if (k != null && k.startsWith(prefix))
+                    return k;
+                return null;
+            }
+
             @Override
-            public Iterator<ListAccessor> iterator() {
-                return new Iterator<ListAccessor>() {
-                    Comparable last = null;
+            public String getState() {
+                return next;
+            }
 
-                    @Override
-                    public boolean hasNext() {
-                        if (last == null) {
-                            Comparable ck = ceilingKey(prefix);
-                            return ck != null && ck.toString().startsWith(prefix);
-                        }
-                        Comparable hk = higherKey(last);
-                        if (hk == null)
-                            return false;
-                        return hk.toString().startsWith(prefix);
-                    }
+            @Override
+            public void setState(String state) {
+                next = ceiling(state);
+            }
 
-                    @Override
-                    public ListAccessor next() {
-                        Comparable next = last == null ? ceilingKey(prefix) : higherKey(last);
-                        if (next == null || !next.toString().startsWith(prefix))
-                            throw new NoSuchElementException();
-                        last = next;
-                        return listAccessor(last);
-                    }
-                };
+            @Override
+            public ListAccessor peek() {
+                return listAccessor(next);
+            }
+
+            @Override
+            public boolean hasNext() {
+                return next != null;
+            }
+
+            @Override
+            public ListAccessor next() {
+                if (next == null)
+                    throw new NoSuchElementException();
+                ListAccessor la = peek();
+                next = (String) higherKey(next);
+                if (next != null && !next.startsWith(prefix))
+                    next = null;
+                return la;
             }
         };
     }
@@ -466,12 +479,12 @@ public interface MapNode extends Releasable {
             }
 
             @Override
-            public Iterator<ListAccessor> iterator(final String prefix) {
+            public PeekABoo<ListAccessor> iterator(final String prefix) {
                 return MapNode.this.iterator(prefix);
             }
 
             @Override
-            public Iterable<ListAccessor> iterable(final String prefix) {
+            public PeekABoo<ListAccessor> iterable(final String prefix) {
                 return MapNode.this.iterable(prefix);
             }
 

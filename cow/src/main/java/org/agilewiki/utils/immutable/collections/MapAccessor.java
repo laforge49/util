@@ -107,7 +107,7 @@ public interface MapAccessor extends Iterable<ListAccessor> {
      * @param prefix    The qualifying prefix.
      * @return The iterator.
      */
-    Iterator<ListAccessor> iterator(final String prefix);
+    PeekABoo<ListAccessor> iterator(final String prefix);
 
     /**
      * Returns an iterable over the list accessors
@@ -116,7 +116,7 @@ public interface MapAccessor extends Iterable<ListAccessor> {
      * @param prefix    The qualifying prefix.
      * @return The iterator.
      */
-    Iterable<ListAccessor> iterable(final String prefix);
+    PeekABoo<ListAccessor> iterable(final String prefix);
 
     /**
      * Returns a map of all the keys and values present at the given time.

@@ -18,7 +18,7 @@ public interface PeekABoo<T1> extends Iterator<T1>, Iterable<T1> {
     T1 peek();
 
     @Override
-    default Iterator<T1> iterator() {
+    default PeekABoo<T1> iterator() {
         return this;
     }
 }
