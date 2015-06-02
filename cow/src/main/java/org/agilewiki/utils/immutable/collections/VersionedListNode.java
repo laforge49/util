@@ -236,22 +236,37 @@ public interface VersionedListNode extends Releasable {
      * @param timestamp The time of the query.
      * @return The iterator.
      */
-    default Iterator iterator(long timestamp) {
-        return new Iterator() {
-            int last = -1;
+    default PeekABoo iterator(long timestamp) {
+        return new PeekABoo() {
+            int next = ceilingIndex(0, timestamp);
+
+            @Override
+            public String getState() {
+                return "" + next;
+            }
+
+            @Override
+            public void setState(String state) {
+                next = ceilingIndex(Integer.parseInt(state), timestamp);
+            }
+
+            @Override
+            public Object peek() {
+                return getExistingValue(next, timestamp);
+            }
 
             @Override
             public boolean hasNext() {
-                return higherIndex(last, timestamp) > -1;
+                return next > -1;
             }
 
             @Override
             public Object next() {
-                int next = higherIndex(last, timestamp);
                 if (next == -1)
                     throw new NoSuchElementException();
-                last = next;
-                return getExistingValue(last, timestamp);
+                int rv = next;
+                next = higherIndex(next, timestamp);
+                return getExistingValue(rv, timestamp);
             }
         };
     }
