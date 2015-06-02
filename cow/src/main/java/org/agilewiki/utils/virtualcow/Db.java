@@ -127,13 +127,13 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         PeekABoo<ListAccessor> lait = vmn.iterator(timestamp);
         return new PeekABoo<String>() {
             @Override
-            public String getState() {
-                return lait.getState();
+            public String getPostion() {
+                return lait.getPostion();
             }
 
             @Override
-            public void setState(String state) {
-                lait.setState(state);
+            public void setPosition(String state) {
+                lait.setPosition(state);
             }
 
             @Override

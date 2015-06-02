@@ -241,12 +241,12 @@ public interface VersionedListNode extends Releasable {
             int next = ceilingIndex(0, timestamp);
 
             @Override
-            public String getState() {
+            public String getPostion() {
                 return "" + next;
             }
 
             @Override
-            public void setState(String state) {
+            public void setPosition(String state) {
                 next = ceilingIndex(Integer.parseInt(state), timestamp);
             }
 

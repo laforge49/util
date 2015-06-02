@@ -94,13 +94,13 @@ public class Link2Id {
         PeekABoo<ListAccessor> lait = ma.iterator(LABEL2_INDEX_ID + labelId);
         return new PeekABoo<String>() {
             @Override
-            public String getState() {
-                return lait.getState();
+            public String getPostion() {
+                return lait.getPostion();
             }
 
             @Override
-            public void setState(String state) {
-                lait.setState(state);
+            public void setPosition(String state) {
+                lait.setPosition(state);
             }
 
             @Override
@@ -151,13 +151,13 @@ public class Link2Id {
         PeekABoo<ListAccessor> lait = ma.iterator(LINK2_ID + vmnId);
         return new PeekABoo<String>() {
             @Override
-            public String getState() {
-                return lait.getState();
+            public String getPostion() {
+                return lait.getPostion();
             }
 
             @Override
-            public void setState(String state) {
-                lait.setState(state);
+            public void setPosition(String state) {
+                lait.setPosition(state);
             }
 
             @Override

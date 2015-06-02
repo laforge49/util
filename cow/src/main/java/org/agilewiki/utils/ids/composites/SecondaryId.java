@@ -126,13 +126,13 @@ public class SecondaryId {
         PeekABoo<ListAccessor> lait = ma.iterator(SECONDARY_INV + vmnId);
         return new PeekABoo<String>() {
             @Override
-            public String getState() {
-                return lait.getState();
+            public String getPostion() {
+                return lait.getPostion();
             }
 
             @Override
-            public void setState(String state) {
-                lait.setState(state);
+            public void setPosition(String state) {
+                lait.setPosition(state);
             }
 
             @Override
@@ -172,13 +172,13 @@ public class SecondaryId {
         PeekABoo<String> vit = db.keysIterable(secondaryInv(vmnId, typeId), timestamp);
         return new PeekABoo<String>() {
             @Override
-            public String getState() {
-                return vit.getState();
+            public String getPostion() {
+                return vit.getPostion();
             }
 
             @Override
-            public void setState(String state) {
-                vit.setState(state);
+            public void setPosition(String state) {
+                vit.setPosition(state);
             }
 
             @Override

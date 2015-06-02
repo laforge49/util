@@ -5,12 +5,12 @@ package org.agilewiki.utils.immutable.collections;
  */
 public class EmptyPeekABoo implements PeekABoo {
     @Override
-    public String getState() {
+    public String getPostion() {
         return null;
     }
 
     @Override
-    public void setState(String state) {
+    public void setPosition(String state) {
     }
 
     @Override

@@ -403,12 +403,12 @@ public interface VersionedMapNode extends Releasable {
             String next = (String) firstKey(timestamp);
 
             @Override
-            public String getState() {
+            public String getPostion() {
                 return next;
             }
 
             @Override
-            public void setState(String state) {
+            public void setPosition(String state) {
                 next = (String) ceilingKey(state, timestamp);
             }
 
@@ -466,12 +466,12 @@ public interface VersionedMapNode extends Releasable {
             }
 
             @Override
-            public String getState() {
+            public String getPostion() {
                 return next;
             }
 
             @Override
-            public void setState(String state) {
+            public void setPosition(String state) {
                 next = ceiling(state);
             }
 

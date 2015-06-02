@@ -317,12 +317,12 @@ public interface MapNode extends Releasable {
             String next = (String) firstKey();
 
             @Override
-            public String getState() {
+            public String getPostion() {
                 return next;
             }
 
             @Override
-            public void setState(String state) {
+            public void setPosition(String state) {
                 next = (String) ceilingKey(state);
             }
 
@@ -378,12 +378,12 @@ public interface MapNode extends Releasable {
             }
 
             @Override
-            public String getState() {
+            public String getPostion() {
                 return next;
             }
 
             @Override
-            public void setState(String state) {
+            public void setPosition(String state) {
                 next = ceiling(state);
             }
 

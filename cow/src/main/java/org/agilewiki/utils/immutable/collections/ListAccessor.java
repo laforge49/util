@@ -138,5 +138,5 @@ public interface ListAccessor extends Iterable {
      *
      * @return The iterator.
      */
-    Iterator iterator();
+    PeekABoo iterator();
 }

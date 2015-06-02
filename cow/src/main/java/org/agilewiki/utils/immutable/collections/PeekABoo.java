@@ -6,14 +6,14 @@ import java.util.Iterator;
  * An iterator that can be positioned.
  */
 public interface PeekABoo<T1> extends Iterator<T1>, Iterable<T1> {
-    String getState();
+    String getPostion();
 
-    void setState(String state);
+    void setPosition(String position);
 
     /**
-     * Except for composites, peek often returns the state--which is
-     * a lookahead to the next value.
-     * @return
+     * Returns the next value that will be returned.
+     *
+     * @return The next value to be returned, or null.
      */
     T1 peek();
 
