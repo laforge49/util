@@ -234,22 +234,37 @@ public interface ListNode extends Releasable {
      *
      * @return The iterator.
      */
-    default Iterator iterator() {
-        return new Iterator() {
-            int last = -1;
+    default PeekABoo iterator() {
+        return new PeekABoo() {
+            int next = ceilingIndex(0);
+
+            @Override
+            public String getState() {
+                return "" + next;
+            }
+
+            @Override
+            public void setState(String state) {
+                next = ceilingIndex(Integer.parseInt(state));
+            }
+
+            @Override
+            public Object peek() {
+                return get(next);
+            }
 
             @Override
             public boolean hasNext() {
-                return higherIndex(last) > -1;
+                return next > -1;
             }
 
             @Override
             public Object next() {
-                int next = higherIndex(last);
                 if (next == -1)
                     throw new NoSuchElementException();
-                last = next;
-                return get(last);
+                int rv = next;
+                next = higherIndex(next);
+                return get(rv);
             }
         };
     }
