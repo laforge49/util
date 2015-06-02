@@ -380,7 +380,7 @@ public interface VersionedListNode extends Releasable {
             }
 
             @Override
-            public Iterator iterator() {
+            public PeekABoo iterator() {
                 return VersionedListNode.this.iterator(timestamp);
             }
         };

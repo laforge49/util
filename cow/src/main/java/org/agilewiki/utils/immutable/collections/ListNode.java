@@ -367,7 +367,7 @@ public interface ListNode extends Releasable {
             }
 
             @Override
-            public Iterator iterator() {
+            public PeekABoo iterator() {
                 return ListNode.this.iterator();
             }
         };

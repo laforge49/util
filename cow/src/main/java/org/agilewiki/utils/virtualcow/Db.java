@@ -125,32 +125,7 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
         }
         VersionedMapNode vmn = (VersionedMapNode) la.get(0);
         PeekABoo<ListAccessor> lait = vmn.iterator(timestamp);
-        return new PeekABoo<String>() {
-            @Override
-            public String getPostion() {
-                return lait.getPostion();
-            }
-
-            @Override
-            public void setPosition(String state) {
-                lait.setPosition(state);
-            }
-
-            @Override
-            public String peek() {
-                return (String) lait.peek().key();
-            }
-
-            @Override
-            public boolean hasNext() {
-                return lait.hasNext();
-            }
-
-            @Override
-            public String next() {
-                return lait.next().key().toString();
-            }
-        };
+        return new ListAccessorKeysMap(lait);
     }
 
     /**
