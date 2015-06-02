@@ -162,50 +162,10 @@ public class Link1Id {
     public static PeekABoo<String> label1IdIterable(Db db, String labelId, long timestamp) {
         MapAccessor ma = db.mapAccessor();
         PeekABoo<ListAccessor> lait = ma.iterator(LABEL1_INDEX_ID + labelId);
-        return new PeekABoo<String>() {
-
-            ListAccessor next = null;
-
+        return new PeekABooMap<ListAccessor, String>(lait) {
             @Override
-            public String getPostion() {
-                return lait.getPostion();
-            }
-
-            @Override
-            public void setPosition(String state) {
-                lait.setPosition(state);
-            }
-
-            @Override
-            public String peek() {
-                if (!isNext())
-                    return null;
-                return label1IndexIdOrigin(next.key().toString());
-            }
-
-            boolean isNext() {
-                while (next == null && lait.hasNext()) {
-                    next = lait.next();
-                    VersionedMapNode vmn = (VersionedMapNode) next.get(0);
-                    if (vmn == null || vmn.isEmpty(timestamp)) {
-                        next = null;
-                    }
-                }
-                return next != null;
-            }
-
-            @Override
-            public boolean hasNext() {
-                return isNext();
-            }
-
-            @Override
-            public String next() {
-                if (!isNext())
-                    throw new NoSuchElementException();
-                String n = label1IndexIdOrigin(next.key().toString());
-                next = null;
-                return n;
+            protected String transform(ListAccessor value) {
+                return label1IndexIdOrigin((String) value.key());
             }
         };
     }
@@ -221,50 +181,10 @@ public class Link1Id {
     public static PeekABoo<String> label1InvIterable(Db db, String labelId, long timestamp) {
         MapAccessor ma = db.mapAccessor();
         PeekABoo<ListAccessor> lait = ma.iterator(LABEL1_INDEX_INV + labelId);
-        return new PeekABoo<String>() {
-
-            ListAccessor next = null;
-
+        return new PeekABooMap<ListAccessor, String>(lait) {
             @Override
-            public String getPostion() {
-                return lait.getPostion();
-            }
-
-            @Override
-            public void setPosition(String state) {
-                lait.setPosition(state);
-            }
-
-            @Override
-            public String peek() {
-                if (!isNext())
-                    return null;
-                return label1IndexInvTarget(next.key().toString());
-            }
-
-            boolean isNext() {
-                while (next == null && lait.hasNext()) {
-                    next = lait.next();
-                    VersionedMapNode vmn = (VersionedMapNode) next.get(0);
-                    if (vmn == null || vmn.isEmpty(timestamp)) {
-                        next = null;
-                    }
-                }
-                return next != null;
-            }
-
-            @Override
-            public boolean hasNext() {
-                return isNext();
-            }
-
-            @Override
-            public String next() {
-                if (!isNext())
-                    throw new NoSuchElementException();
-                String n = label1IndexInvTarget(next.key().toString());
-                next = null;
-                return n;
+            protected String transform(ListAccessor value) {
+                return label1IndexInvTarget((String) value.key());
             }
         };
     }
@@ -279,35 +199,10 @@ public class Link1Id {
     public static PeekABoo<String> link1LabelIdIterable(Db db, String vmnId) {
         MapAccessor ma = db.mapAccessor();
         PeekABoo<ListAccessor> lait = ma.iterator(LINK1_ID + vmnId);
-        return new PeekABoo<String>() {
+        return new PeekABooMap<ListAccessor, String>(lait) {
             @Override
-            public String getPostion() {
-                return lait.getPostion();
-            }
-
-            @Override
-            public void setPosition(String state) {
-                lait.setPosition(state);
-            }
-
-            @Override
-            public String peek() {
-                ListAccessor p = lait.peek();
-                if (p == null)
-                    return null;
-                String linkId = p.key().toString();
-                return link1IdLabel(linkId);
-            }
-
-            @Override
-            public boolean hasNext() {
-                return lait.hasNext();
-            }
-
-            @Override
-            public String next() {
-                String linkId = lait.next().key().toString();
-                return link1IdLabel(linkId);
+            protected String transform(ListAccessor value) {
+                return link1IdLabel((String) value.key());
             }
         };
     }
@@ -322,35 +217,10 @@ public class Link1Id {
     public static PeekABoo<String> link1LabelInvIterable(Db db, String vmnId) {
         MapAccessor ma = db.mapAccessor();
         PeekABoo<ListAccessor> lait = ma.iterator(LINK1_INV + vmnId);
-        return new PeekABoo<String>() {
+        return new PeekABooMap<ListAccessor, String>(lait) {
             @Override
-            public String getPostion() {
-                return lait.getPostion();
-            }
-
-            @Override
-            public void setPosition(String state) {
-                setPosition(state);
-            }
-
-            @Override
-            public String peek() {
-                ListAccessor p = lait.peek();
-                if (p == null)
-                    return null;
-                String linkId = p.key().toString();
-                return link1InvLabel(linkId);
-            }
-
-            @Override
-            public boolean hasNext() {
-                return lait.hasNext();
-            }
-
-            @Override
-            public String next() {
-                String linkId = lait.next().key().toString();
-                return link1InvLabel(linkId);
+            protected String transform(ListAccessor value) {
+                return link1InvLabel((String) value.key());
             }
         };
     }
