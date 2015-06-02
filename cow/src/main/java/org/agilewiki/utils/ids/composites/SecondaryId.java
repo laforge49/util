@@ -2,10 +2,7 @@ package org.agilewiki.utils.ids.composites;
 
 import org.agilewiki.utils.ids.NameId;
 import org.agilewiki.utils.ids.ValueId;
-import org.agilewiki.utils.immutable.collections.ListAccessor;
-import org.agilewiki.utils.immutable.collections.MapAccessor;
-import org.agilewiki.utils.immutable.collections.PeekABoo;
-import org.agilewiki.utils.immutable.collections.VersionedListNode;
+import org.agilewiki.utils.immutable.collections.*;
 import org.agilewiki.utils.virtualcow.Db;
 
 /**
@@ -124,35 +121,10 @@ public class SecondaryId {
     public static PeekABoo<String> typeIdIterable(Db db, String vmnId) {
         MapAccessor ma = db.mapAccessor();
         PeekABoo<ListAccessor> lait = ma.iterator(SECONDARY_INV + vmnId);
-        return new PeekABoo<String>() {
+        return new PeekABooMap<ListAccessor, String>(lait) {
             @Override
-            public String getPostion() {
-                return lait.getPostion();
-            }
-
-            @Override
-            public void setPosition(String state) {
-                lait.setPosition(state);
-            }
-
-            @Override
-            public String peek() {
-                ListAccessor p = lait.peek();
-                if (p == null)
-                    return null;
-                String secondaryInv = p.key().toString();
-                int i = secondaryInv.lastIndexOf("$");
-                return secondaryInv.substring(i);
-            }
-
-            @Override
-            public boolean hasNext() {
-                return lait.hasNext();
-            }
-
-            @Override
-            public String next() {
-                String secondaryInv = lait.next().key().toString();
+            protected String transform(ListAccessor value) {
+                String secondaryInv = value.key().toString();
                 int i = secondaryInv.lastIndexOf("$");
                 return secondaryInv.substring(i);
             }
@@ -170,33 +142,10 @@ public class SecondaryId {
      */
     public static PeekABoo<String> secondaryIdIterable(Db db, String vmnId, String typeId, long timestamp) {
         PeekABoo<String> vit = db.keysIterable(secondaryInv(vmnId, typeId), timestamp);
-        return new PeekABoo<String>() {
+        return new PeekABooMap<String, String>(vit) {
             @Override
-            public String getPostion() {
-                return vit.getPostion();
-            }
-
-            @Override
-            public void setPosition(String state) {
-                vit.setPosition(state);
-            }
-
-            @Override
-            public String peek() {
-                String p = vit.peek();
-                if (p == null)
-                    return null;
-                return secondaryId(typeId, p);
-            }
-
-            @Override
-            public boolean hasNext() {
-                return vit.hasNext();
-            }
-
-            @Override
-            public String next() {
-                return secondaryId(typeId, vit.next());
+            protected String transform(String value) {
+                return secondaryId(typeId, value);
             }
         };
     }
