@@ -14,7 +14,9 @@ abstract public class PeekABooFilter<T1> implements PeekABoo<T1> {
     abstract protected boolean select(T1 value);
 
     private void position() {
-        while (!select(peekABoo.peek()) && peekABoo.hasNext()) {
+        while (peekABoo.hasNext() &&
+                !select(peekABoo.peek()) &&
+                peekABoo.hasNext()) {
             peekABoo.next();
         }
     }
