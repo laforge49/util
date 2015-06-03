@@ -92,49 +92,10 @@ public class Link2Id {
     public static Iterable<String> label2IdIterable(Db db, String labelId, long timestamp) {
         MapAccessor ma = db.mapAccessor();
         PeekABoo<ListAccessor> lait = ma.iterator(LABEL2_INDEX_ID + labelId);
-        return new PeekABoo<String>() {
+        return new PeekABooMap<ListAccessor, String>(lait) {
             @Override
-            public String getPostion() {
-                return lait.getPostion();
-            }
-
-            @Override
-            public void setPosition(String state) {
-                lait.setPosition(state);
-            }
-
-            @Override
-            public String peek() {
-                if (!isNext())
-                    return null;
-                return label2IndexIdOrigin(next.key().toString());
-            }
-
-            ListAccessor next = null;
-
-            boolean isNext() {
-                while (next == null && lait.hasNext()) {
-                    next = lait.next();
-                    VersionedMapNode vmn = (VersionedMapNode) next.get(0);
-                    if (vmn == null || vmn.isEmpty(timestamp)) {
-                        next = null;
-                    }
-                }
-                return next != null;
-            }
-
-            @Override
-            public boolean hasNext() {
-                return isNext();
-            }
-
-            @Override
-            public String next() {
-                if (!isNext())
-                    throw new NoSuchElementException();
-                String n = label2IndexIdOrigin(next.key().toString());
-                next = null;
-                return n;
+            protected String transform(ListAccessor value) {
+                return label2IndexIdOrigin((String) value.key());
             }
         };
     }
@@ -149,35 +110,10 @@ public class Link2Id {
     public static PeekABoo<String> link2LabelIdIterable(Db db, String vmnId) {
         MapAccessor ma = db.mapAccessor();
         PeekABoo<ListAccessor> lait = ma.iterator(LINK2_ID + vmnId);
-        return new PeekABoo<String>() {
+        return new PeekABooMap<ListAccessor, String >(lait) {
             @Override
-            public String getPostion() {
-                return lait.getPostion();
-            }
-
-            @Override
-            public void setPosition(String state) {
-                lait.setPosition(state);
-            }
-
-            @Override
-            public String peek() {
-                ListAccessor p = lait.peek();
-                if (p == null)
-                    return null;
-                String linkId = p.key().toString();
-                return link2IdLabel(linkId);
-            }
-
-            @Override
-            public boolean hasNext() {
-                return lait.hasNext();
-            }
-
-            @Override
-            public String next() {
-                String linkId = lait.next().key().toString();
-                return link2IdLabel(linkId);
+            protected String transform(ListAccessor value) {
+                return link2IdLabel((String) value.key());
             }
         };
     }
