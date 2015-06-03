@@ -12,14 +12,22 @@ abstract public class PeekABooMap<T1, T2> implements PeekABoo<T2> {
 
     abstract protected T2 transform(T1 value);
 
+    protected String transformString(String value) {
+        return value;
+    }
+
+    protected String reverseTransformString(String value) {
+        return value;
+    }
+
     @Override
     public String getPosition() {
-        return peekABoo.getPosition();
+        return transformString(peekABoo.getPosition());
     }
 
     @Override
     public void setPosition(String position) {
-        peekABoo.setPosition(position);
+        peekABoo.setPosition(reverseTransformString(position));
     }
 
     @Override
