@@ -22,8 +22,8 @@ abstract public class PeekABooFilter<T1> implements PeekABoo<T1> {
     }
 
     @Override
-    public String getPostion() {
-        return peekABoo.getPostion();
+    public String getPosition() {
+        return peekABoo.getPosition();
     }
 
     @Override

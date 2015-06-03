@@ -13,8 +13,8 @@ abstract public class PeekABooMap<T1, T2> implements PeekABoo<T2> {
     abstract protected T2 transform(T1 value);
 
     @Override
-    public String getPostion() {
-        return peekABoo.getPostion();
+    public String getPosition() {
+        return peekABoo.getPosition();
     }
 
     @Override

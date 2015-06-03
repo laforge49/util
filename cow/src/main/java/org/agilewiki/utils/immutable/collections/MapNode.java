@@ -317,7 +317,7 @@ public interface MapNode extends Releasable {
             String next = (String) firstKey();
 
             @Override
-            public String getPostion() {
+            public String getPosition() {
                 return next;
             }
 
@@ -378,7 +378,7 @@ public interface MapNode extends Releasable {
             }
 
             @Override
-            public String getPostion() {
+            public String getPosition() {
                 return next;
             }
 

@@ -239,7 +239,7 @@ public interface ListNode extends Releasable {
             int next = ceilingIndex(0);
 
             @Override
-            public String getPostion() {
+            public String getPosition() {
                 return "" + next;
             }
 

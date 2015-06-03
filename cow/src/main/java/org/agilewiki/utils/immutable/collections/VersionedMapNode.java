@@ -403,7 +403,7 @@ public interface VersionedMapNode extends Releasable {
             String next = (String) firstKey(timestamp);
 
             @Override
-            public String getPostion() {
+            public String getPosition() {
                 return next;
             }
 
@@ -466,7 +466,7 @@ public interface VersionedMapNode extends Releasable {
             }
 
             @Override
-            public String getPostion() {
+            public String getPosition() {
                 return next;
             }
 

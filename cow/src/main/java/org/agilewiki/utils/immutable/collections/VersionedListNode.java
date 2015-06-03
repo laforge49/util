@@ -241,7 +241,7 @@ public interface VersionedListNode extends Releasable {
             int next = ceilingIndex(0, timestamp);
 
             @Override
-            public String getPostion() {
+            public String getPosition() {
                 return "" + next;
             }
 

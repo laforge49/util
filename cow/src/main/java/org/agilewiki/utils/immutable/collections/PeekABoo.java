@@ -6,7 +6,7 @@ import java.util.Iterator;
  * An iterator that can be positioned.
  */
 public interface PeekABoo<T1> extends Iterator<T1>, PeekABooable<T1> {
-    String getPostion();
+    String getPosition();
 
     void setPosition(String position);
 
