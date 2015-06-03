@@ -5,7 +5,7 @@ import java.util.Iterator;
 /**
  * An iterator that can be positioned.
  */
-public interface PeekABoo<T1> extends Iterator<T1>, Iterable<T1> {
+public interface PeekABoo<T1> extends Iterator<T1>, PeekABooable<T1> {
     String getPostion();
 
     void setPosition(String position);

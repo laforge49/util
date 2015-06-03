@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Accesses a list.
  */
-public interface ListAccessor extends Iterable {
+public interface ListAccessor extends PeekABooable {
 
     /**
      * The key for the list.

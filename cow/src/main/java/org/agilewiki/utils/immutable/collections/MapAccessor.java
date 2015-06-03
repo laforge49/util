@@ -8,7 +8,7 @@ import java.util.NavigableSet;
 /**
  * Accesses a map list.
  */
-public interface MapAccessor extends Iterable<ListAccessor> {
+public interface MapAccessor extends PeekABooable<ListAccessor> {
 
     /**
      * Returns the time being accessed.
