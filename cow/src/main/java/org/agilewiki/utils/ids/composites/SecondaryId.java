@@ -128,6 +128,17 @@ public class SecondaryId {
                 int i = secondaryInv.lastIndexOf("$");
                 return secondaryInv.substring(i);
             }
+
+            @Override
+            protected String transformString(String secondaryInv) {
+                int i = secondaryInv.lastIndexOf("$");
+                return secondaryInv.substring(i);
+            }
+
+            @Override
+            protected String reverseTransformString(String typeId) {
+                return secondaryInv(vmnId, typeId);
+            }
         };
     }
 
@@ -146,6 +157,16 @@ public class SecondaryId {
             @Override
             protected String transform(String value) {
                 return secondaryId(typeId, value);
+            }
+
+            @Override
+            protected String transformString(String value) {
+                return secondaryId(typeId, value);
+            }
+
+            @Override
+            protected String reverseTransformString(String secondaryId) {
+                return secondaryIdValue(secondaryId);
             }
         };
     }

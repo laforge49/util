@@ -97,6 +97,16 @@ public class Link2Id {
             protected String transform(ListAccessor value) {
                 return label2IndexIdOrigin((String) value.key());
             }
+
+            @Override
+            protected String transformString(String labelIndexId) {
+                return label2IndexIdOrigin(labelIndexId);
+            }
+
+            @Override
+            protected String reverseTransformString(String originId) {
+                return label2IndexId(originId, labelId);
+            }
         };
     }
 
@@ -114,6 +124,16 @@ public class Link2Id {
             @Override
             protected String transform(ListAccessor value) {
                 return link2IdLabel((String) value.key());
+            }
+
+            @Override
+            protected String transformString(String linkId) {
+                return link2IdLabel(linkId);
+            }
+
+            @Override
+            protected String reverseTransformString(String labelId) {
+                return link2Id(vmnId, labelId);
             }
         };
     }

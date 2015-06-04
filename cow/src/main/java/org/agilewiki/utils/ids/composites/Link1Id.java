@@ -167,6 +167,16 @@ public class Link1Id {
             protected String transform(ListAccessor value) {
                 return label1IndexIdOrigin((String) value.key());
             }
+
+            @Override
+            protected String transformString(String key) {
+                return label1IndexIdOrigin(key);
+            }
+
+            @Override
+            protected String reverseTransformString(String origin) {
+                return label1IndexId(origin, labelId);
+            }
         };
     }
 
@@ -186,6 +196,16 @@ public class Link1Id {
             protected String transform(ListAccessor value) {
                 return label1IndexInvTarget((String) value.key());
             }
+
+            @Override
+            protected String transformString(String key) {
+                return label1IndexInvTarget(key);
+            }
+
+            @Override
+            protected String reverseTransformString(String target) {
+                return label1IndexInv(target, labelId);
+            }
         };
     }
 
@@ -204,6 +224,16 @@ public class Link1Id {
             protected String transform(ListAccessor value) {
                 return link1IdLabel((String) value.key());
             }
+
+            @Override
+            protected String transformString(String linkId) {
+                return link1IdLabel(linkId);
+            }
+
+            @Override
+            protected String reverseTransformString(String label) {
+                return link1Id(vmnId, label);
+            }
         };
     }
 
@@ -221,6 +251,16 @@ public class Link1Id {
             @Override
             protected String transform(ListAccessor value) {
                 return link1InvLabel((String) value.key());
+            }
+
+            @Override
+            protected String transformString(String linkInv) {
+                return link1InvLabel(linkInv);
+            }
+
+            @Override
+            protected String reverseTransformString(String label) {
+                return link1Inv(vmnId, label);
             }
         };
     }
