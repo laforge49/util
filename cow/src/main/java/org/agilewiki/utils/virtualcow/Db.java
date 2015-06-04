@@ -129,6 +129,17 @@ public class Db extends IsolationBladeBase implements AutoCloseable {
     }
 
     /**
+     * Iterates over the non-empty Ids.
+     *
+     * @param prefix       The prefix of the ids.
+     * @param timestamp    The time of the query.
+     * @return The key iterable.
+     */
+    public PeekABoo<String> idsIterable(String prefix, long timestamp) {
+        return new IdPeekABooable(this, prefix, timestamp).iterator();
+    }
+
+    /**
      * Clear the versioned map.
      *
      * @param id The id for the VersionedMapNode.
