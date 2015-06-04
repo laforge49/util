@@ -14,6 +14,11 @@ public class EmptyPeekABoo implements PeekABoo {
     }
 
     @Override
+    public boolean positionPrior() {
+        return false;
+    }
+
+    @Override
     public String peek() {
         return null;
     }

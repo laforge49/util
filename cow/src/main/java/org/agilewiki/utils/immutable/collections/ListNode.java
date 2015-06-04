@@ -7,7 +7,6 @@ import org.agilewiki.utils.virtualcow.DbFactoryRegistry;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -249,6 +248,19 @@ public interface ListNode extends Releasable {
             }
 
             @Override
+            public boolean positionPrior() {
+                int n;
+                if (next == -1)
+                    n = lastIndex();
+                else
+                    n = lowerIndex(next);
+                if (n == -1)
+                    return false;
+                next = n;
+                return true;
+            }
+
+            @Override
             public Object peek() {
                 return get(next);
             }
@@ -426,7 +438,7 @@ public interface ListNode extends Releasable {
     /**
      * Remove an item from the list.
      *
-     * @param ndx    Position of the item.
+     * @param ndx Position of the item.
      * @return The updated root.
      */
     default ListNode remove(int ndx) {
@@ -440,7 +452,7 @@ public interface ListNode extends Releasable {
     /**
      * Remove the first occurance of a value from a list.
      *
-     * @param x    The value to be removed.
+     * @param x The value to be removed.
      * @return The updated root.
      */
     default ListNode remove(Object x) {

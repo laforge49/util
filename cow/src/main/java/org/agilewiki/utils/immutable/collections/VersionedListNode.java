@@ -251,6 +251,19 @@ public interface VersionedListNode extends Releasable {
             }
 
             @Override
+            public boolean positionPrior() {
+                int n;
+                if (next == -1)
+                    n = lastIndex(timestamp);
+                else
+                    n = lowerIndex(next, timestamp);
+                if (n == -1)
+                    return false;
+                next = n;
+                return true;
+            }
+
+            @Override
             public Object peek() {
                 return getExistingValue(next, timestamp);
             }

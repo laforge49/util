@@ -10,6 +10,15 @@ public interface PeekABoo<T1> extends Iterator<T1>, PeekABooable<T1> {
 
     void setPosition(String position);
 
+    default boolean positionNext() {
+        if (!hasNext())
+            return false;
+        next();
+        return true;
+    }
+
+    boolean positionPrior();
+
     /**
      * Returns the next value that will be returned.
      *

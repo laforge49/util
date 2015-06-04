@@ -327,6 +327,19 @@ public interface MapNode extends Releasable {
             }
 
             @Override
+            public boolean positionPrior() {
+                if (next == null) {
+                    next = (String) lastKey();
+                    return next != null;
+                }
+                String n = (String) lowerKey(next);
+                if (n == null)
+                    return false;
+                next = n;
+                return true;
+            }
+
+            @Override
             public ListAccessor peek() {
                 return listAccessor(next);
             }
@@ -385,6 +398,22 @@ public interface MapNode extends Releasable {
             @Override
             public void setPosition(String state) {
                 next = ceiling(state);
+            }
+
+            @Override
+            public boolean positionPrior() {
+                if (next == null) {
+                    String n = (String) lowerKey(prefix + Character.MAX_VALUE);
+                    if (n == null || !n.startsWith(prefix))
+                        return false;
+                    next = n;
+                    return true;
+                }
+                String n = (String) lowerKey(next);
+                if (n == null || !n.startsWith(prefix))
+                    return false;
+                next = n;
+                return true;
             }
 
             @Override

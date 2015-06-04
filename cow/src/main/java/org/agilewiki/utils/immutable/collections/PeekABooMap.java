@@ -27,6 +27,11 @@ abstract public class PeekABooMap<T1, T2> implements PeekABoo<T2> {
     }
 
     @Override
+    public boolean positionPrior() {
+        return peekABoo.positionPrior();
+    }
+
+    @Override
     public T2 peek() {
         return transform(peekABoo.peek());
     }

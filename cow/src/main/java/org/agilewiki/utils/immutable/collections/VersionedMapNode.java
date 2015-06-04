@@ -413,6 +413,19 @@ public interface VersionedMapNode extends Releasable {
             }
 
             @Override
+            public boolean positionPrior() {
+                if (next == null) {
+                    next = (String) lastKey(timestamp);
+                    return next != null;
+                }
+                String n = (String) lowerKey(next, timestamp);
+                if (n == null)
+                    return false;
+                next = n;
+                return true;
+            }
+
+            @Override
             public ListAccessor peek() {
                 return listAccessor(next, timestamp);
             }
@@ -473,6 +486,22 @@ public interface VersionedMapNode extends Releasable {
             @Override
             public void setPosition(String state) {
                 next = ceiling(state);
+            }
+
+            @Override
+            public boolean positionPrior() {
+                if (next == null) {
+                    String n = (String) lowerKey(prefix + Character.MAX_VALUE, timestamp);
+                    if (n == null || !n.startsWith(prefix))
+                        return false;
+                    next = n;
+                    return true;
+                }
+                String n = (String) lowerKey(next, timestamp);
+                if (n == null || !n.startsWith(prefix))
+                    return false;
+                next = n;
+                return true;
             }
 
             @Override
