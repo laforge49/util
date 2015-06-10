@@ -29,7 +29,7 @@ import static java.nio.file.StandardOpenOption.*;
 public class Db extends IsolationBladeBase implements AutoCloseable {
     public final static String transactionNameId = "$ntransactionName";
 
-    protected final ConcurrentHashMap<String, Class> transactionRegistry =
+    public final ConcurrentHashMap<String, Class> transactionRegistry =
             new ConcurrentHashMap<>(16, 0.75f, 1);
     public final DbFactoryRegistry dbFactoryRegistry;
     public final Path dbPath;
