@@ -77,6 +77,17 @@ public class SecondaryId {
         return nameId;
     }
 
+    public static String secondaryInvVmn(String secondaryInv) {
+        if (!secondaryInv.startsWith(SECONDARY_INV))
+            throw new IllegalArgumentException("not a secondary inv: " + secondaryInv);
+        int i = secondaryInv.indexOf('$', 3);
+        if (i < 0)
+            throw new IllegalArgumentException("not a secondary inv: " + secondaryInv);
+        String nameId = secondaryInv.substring(2, i);
+        NameId.validateAnId(nameId);
+        return nameId;
+    }
+
     /**
      * Returns the name id of the secondary id type.
      *
