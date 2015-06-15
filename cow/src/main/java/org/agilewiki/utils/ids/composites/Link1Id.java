@@ -83,6 +83,17 @@ public class Link1Id {
         return LABEL1_INDEX_INV + labelId + targetId;
     }
 
+    public static String link1IdOrigin(String linkId) {
+        if (!linkId.startsWith(LINK1_ID))
+            throw new IllegalArgumentException("not a link id: " + linkId);
+        int i = linkId.indexOf('$', 3);
+        if (i < 0)
+            throw new IllegalArgumentException("not a link id: " + linkId);
+        String originId = linkId.substring(2, i);
+        NameId.validateAnId(originId);
+        return originId;
+    }
+
     /**
      * Returns the label id of the link id.
      *
