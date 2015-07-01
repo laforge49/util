@@ -1,9 +1,9 @@
 package org.agilewiki.awdb;
 
-import org.agilewiki.utils.ids.composites.Link1Id;
-import org.agilewiki.utils.ids.composites.SecondaryId;
-import org.agilewiki.utils.immutable.collections.VersionedMapNode;
-import org.agilewiki.utils.virtualcow.Db;
+import org.agilewiki.awdb.db.ids.composites.Link1Id;
+import org.agilewiki.awdb.db.ids.composites.SecondaryId;
+import org.agilewiki.awdb.db.immutable.collections.VersionedMapNode;
+import org.agilewiki.awdb.db.virtualcow.Db;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;

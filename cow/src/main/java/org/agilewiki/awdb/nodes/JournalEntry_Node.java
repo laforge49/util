@@ -1,11 +1,11 @@
 package org.agilewiki.awdb.nodes;
 
 import org.agilewiki.awdb.NodeBase;
-import org.agilewiki.utils.ids.NameId;
-import org.agilewiki.utils.immutable.FactoryRegistry;
-import org.agilewiki.utils.immutable.collections.MapNode;
-import org.agilewiki.utils.virtualcow.Db;
-import org.agilewiki.utils.virtualcow.Transaction;
+import org.agilewiki.awdb.db.ids.NameId;
+import org.agilewiki.awdb.db.immutable.FactoryRegistry;
+import org.agilewiki.awdb.db.immutable.collections.MapNode;
+import org.agilewiki.awdb.db.virtualcow.Db;
+import org.agilewiki.awdb.db.virtualcow.Transaction;
 
 public class JournalEntry_Node extends NodeBase implements Transaction {
 

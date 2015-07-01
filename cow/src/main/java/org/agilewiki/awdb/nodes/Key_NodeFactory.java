@@ -2,7 +2,7 @@ package org.agilewiki.awdb.nodes;
 
 import org.agilewiki.awdb.AwDb;
 import org.agilewiki.awdb.Node;
-import org.agilewiki.utils.immutable.FactoryRegistry;
+import org.agilewiki.awdb.db.immutable.FactoryRegistry;
 
 public class Key_NodeFactory extends Metadata_NodeFactory {
     public final static String ID = "$nkey.node";

@@ -1,6 +1,6 @@
 package org.agilewiki.awdb;
 
-import org.agilewiki.utils.immutable.FactoryRegistry;
+import org.agilewiki.awdb.db.immutable.FactoryRegistry;
 
 import java.util.List;
 import java.util.NavigableMap;
